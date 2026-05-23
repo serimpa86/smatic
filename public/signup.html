@@ -3,28 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro | Smatic</title>
+  <title data-i18n="page_title_signup">Registro | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
   <div class="gateway-container" role="main">
     <form id="form_signup" onsubmit="return false;">
-      <h1>Crear Cuenta</h1>
+      <h1 data-i18n="signup_title">Crear Cuenta</h1>
       <div style="margin-bottom:.5em">
-        <label for="signup_name">Nombre / Empresa:</label>
-        <input id="signup_name" class="input--large" style="width:100%" placeholder="Tu nombre o empresa">
+        <label for="signup_name" data-i18n="lbl_name_company">Nombre / Empresa:</label>
+        <input id="signup_name" class="input--large" style="width:100%" data-i18n-placeholder="placeholder_name_company" placeholder="Tu nombre o empresa">
       </div>
       <div style="margin-bottom:.5em">
-        <label for="signup_email">Correo electrónico:</label>
-        <input id="signup_email" class="input--large" style="width:100%" type="email" placeholder="Correo electrónico" autocomplete="username">
+        <label for="signup_email" data-i18n="lbl_email">Correo electrónico:</label>
+        <input id="signup_email" class="input--large" style="width:100%" type="email" data-i18n-placeholder="placeholder_email" placeholder="Correo electrónico" autocomplete="username">
       </div>
       <div style="margin-bottom:.5em">
-        <label for="signup_password">Contraseña:</label>
-        <input id="signup_password" class="input--large" style="width:100%" type="password" placeholder="Contraseña (mín. 6 caracteres)" autocomplete="new-password">
+        <label for="signup_password" data-i18n="lbl_password">Contraseña:</label>
+        <input id="signup_password" class="input--large" style="width:100%" type="password" data-i18n-placeholder="placeholder_password_signup" placeholder="Contraseña (mín. 6 caracteres)" autocomplete="new-password">
       </div>
-      <button id="btn_signup" class="btn--large btn--stack" style="float:right" onclick="signupSubmit()">Crear Cuenta</button>
-      <div class="link-bottom_container" style="clear:both;padding-top:1em">
-        ¿Ya tienes cuenta? <a href="login.html">Inicia Sesión</a>
+      <button id="btn_signup" class="btn--large btn--stack" style="float:right" onclick="signupSubmit()" data-i18n="btn_create_account">Crear Cuenta</button>
+      <div class="link-bottom_container" style="clear:both;padding-top:1em" data-i18n="signup_have_account">
+        ¿Ya tienes cuenta? <a href="login.html" data-i18n="btn_login">Inicia Sesión</a>
       </div>
     </form>
   </div>

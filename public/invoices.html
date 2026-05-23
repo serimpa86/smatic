@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Facturas | Smatic</title>
+  <title data-i18n="page_title_invoices">Facturas | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -14,20 +14,20 @@
         <span>Smatic</span>
       </div>
       <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
-        <li class="active"><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
-        <li><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+        <li class="active"><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+        <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
       </ul>
       <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
       </div>
     </nav>
   </div>
@@ -36,33 +36,33 @@
     <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-      Smatic - Facturas
+      <span data-i18n="breadcrumb_invoices">Smatic - Facturas</span>
     </div>
   </div>
 
   <div class="container" id="main-content">
     <div class="page-header">
-      <h1>Facturas</h1>
+      <h1 data-i18n="page_title_invoices">Facturas</h1>
       <div class="actions">
-        <button onclick="window.location.href='new-invoice.html'">+ Nueva Factura</button>
+        <button onclick="window.location.href='new-invoice.html'">+ <span data-i18n="btn_new_invoice">Nueva Factura</span></button>
       </div>
     </div>
 
     <div class="filters">
       <select id="filter-status">
-        <option value="">Todos los estados</option>
-        <option value="draft">Borrador</option>
-        <option value="sent">Enviada</option>
-        <option value="paid">Pagada</option>
-        <option value="partial">Parcial</option>
-        <option value="overdue">Vencida</option>
-        <option value="cancelled">Cancelada</option>
+        <option value="" data-i18n="filter_all_statuses">Todos los estados</option>
+        <option value="draft" data-i18n="status_draft">Borrador</option>
+        <option value="sent" data-i18n="status_sent">Enviada</option>
+        <option value="paid" data-i18n="status_paid">Pagada</option>
+        <option value="partial" data-i18n="status_partial">Parcial</option>
+        <option value="overdue" data-i18n="status_overdue">Vencida</option>
+        <option value="cancelled" data-i18n="status_cancelled">Cancelada</option>
       </select>
-      <input type="date" id="filter-date-from" placeholder="Desde">
-      <input type="date" id="filter-date-to" placeholder="Hasta">
+      <input type="date" id="filter-date-from" data-i18n-placeholder="placeholder_date_from" placeholder="Desde">
+      <input type="date" id="filter-date-to" data-i18n-placeholder="placeholder_date_to" placeholder="Hasta">
       <div class="search-box">
-        <input type="text" id="filter-search" placeholder="Buscar factura o cliente...">
-        <button onclick="applyFilters()">Buscar</button>
+        <input type="text" id="filter-search" data-i18n-placeholder="placeholder_search_invoices" placeholder="Buscar factura o cliente...">
+        <button onclick="applyFilters()" data-i18n="btn_search">Buscar</button>
       </div>
     </div>
 
@@ -71,17 +71,17 @@
         <table class="record-list" id="invoices-table">
           <thead>
             <tr>
-              <th>N° Factura</th>
-              <th>Cliente</th>
-              <th>Fecha</th>
-              <th>Vencimiento</th>
-              <th>Total</th>
-              <th>Estado</th>
-              <th>Acciones</th>
+              <th data-i18n="th_invoice_number">N° Factura</th>
+              <th data-i18n="th_customer">Cliente</th>
+              <th data-i18n="th_date">Fecha</th>
+              <th data-i18n="th_due_date">Vencimiento</th>
+              <th data-i18n="th_total">Total</th>
+              <th data-i18n="th_status">Estado</th>
+              <th data-i18n="th_actions">Acciones</th>
             </tr>
           </thead>
           <tbody id="invoices-body">
-            <tr><td colspan="7" class="text-center" style="color:#999">Cargando...</td></tr>
+            <tr><td colspan="7" class="text-center" style="color:#999" data-i18n="loading">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -173,9 +173,9 @@
           '<td>' + total + '</td>' +
           '<td><span class="status ' + statusClass + '">' + statusLabel + '</span></td>' +
           '<td>' +
-            '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="showInvoiceDetail(\'' + invId + '\')">Ver</button> ' +
-            '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="downloadPdf(\'' + invId + '\')">PDF</button> ' +
-            '<button class="btn-secondary" style="min-width:auto;font-size:.85em;color:#dc3545" onclick="deleteInvoice(\'' + invId + '\')">Eliminar</button>' +
+            '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="showInvoiceDetail(\'' + invId + '\')" data-i18n="btn_view">Ver</button> ' +
+            '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="downloadPdf(\'' + invId + '\')" data-i18n="btn_download_pdf">PDF</button> ' +
+            '<button class="btn-secondary" style="min-width:auto;font-size:.85em;color:#dc3545" onclick="deleteInvoice(\'' + invId + '\')" data-i18n="btn_delete">Eliminar</button>' +
           '</td>' +
         '</tr>';
       }).join('');
@@ -222,7 +222,7 @@
 
         let itemsHtml = '';
         if (items.length > 0) {
-          itemsHtml = '<table class="items-table" style="margin:.5em 0"><thead><tr><th>Descripción</th><th>Cant</th><th>Precio</th><th>Total</th></tr></thead><tbody>' +
+          itemsHtml = '<table class="items-table" style="margin:.5em 0"><thead><tr><th data-i18n="th_description">Descripción</th><th data-i18n="th_qty">Cant</th><th data-i18n="th_price">Precio</th><th data-i18n="th_total">Total</th></tr></thead><tbody>' +
             items.map(item => '<tr><td>' + APP.esc(item.description || item.name || '') + '</td><td>' + APP.esc(item.quantity || 1) + '</td><td>' + APP.formatMoney(item.price || 0) + '</td><td>' + APP.formatMoney((item.price || 0) * (item.quantity || 1)) + '</td></tr>').join('') +
           '</tbody></table>';
         }
@@ -230,25 +230,25 @@
         const html =
           '<div class="modal-content">' +
             '<button class="modal-close" onclick="this.closest(\'div[style]\').remove()">&times;</button>' +
-            '<h2>Factura ' + APP.esc(data.invoice_number || data.number || id) + '</h2>' +
+            '<h2>' + APP.t('lbl_invoice') + ' ' + APP.esc(data.invoice_number || data.number || id) + '</h2>' +
             '<div style="margin-bottom:1em">' +
-              '<p><strong>Cliente:</strong> ' + APP.esc(data.customer_name || data.customer || '-') + '</p>' +
-              '<p><strong>Fecha:</strong> ' + (data.date || data.issue_date || '-') + '</p>' +
-              '<p><strong>Vencimiento:</strong> ' + (data.due_date || '-') + '</p>' +
-              '<p><strong>Estado:</strong> <span class="status ' + statusClass + '">' + statusLabel + '</span></p>' +
+              '<p><strong data-i18n="th_customer">Cliente:</strong> ' + APP.esc(data.customer_name || data.customer || '-') + '</p>' +
+              '<p><strong data-i18n="th_date">Fecha:</strong> ' + (data.date || data.issue_date || '-') + '</p>' +
+              '<p><strong data-i18n="th_due_date">Vencimiento:</strong> ' + (data.due_date || '-') + '</p>' +
+              '<p><strong data-i18n="th_status">Estado:</strong> <span class="status ' + statusClass + '">' + statusLabel + '</span></p>' +
             '</div>' +
             itemsHtml +
             '<div class="totals">' +
-              '<div class="total-row">Subtotal: ' + subtotal + '</div>' +
-              (data.discount ? '<div class="total-row">Descuento: ' + discount + '</div>' : '') +
-              (data.tax ? '<div class="total-row">Impuesto: ' + tax + '</div>' : '') +
-              '<div class="total-row grand">Total: ' + total + '</div>' +
-              (data.paid ? '<div class="total-row">Pagado: ' + paid + '</div>' : '') +
-              (data.due ? '<div class="total-row" style="color:#dc3545">Pendiente: ' + due + '</div>' : '') +
+              '<div class="total-row"><span data-i18n="lbl_subtotal">Subtotal:</span> ' + subtotal + '</div>' +
+              (data.discount ? '<div class="total-row"><span data-i18n="lbl_discount">Descuento:</span> ' + discount + '</div>' : '') +
+              (data.tax ? '<div class="total-row"><span data-i18n="lbl_tax">Impuesto:</span> ' + tax + '</div>' : '') +
+              '<div class="total-row grand"><span data-i18n="lbl_total">Total:</span> ' + total + '</div>' +
+              (data.paid ? '<div class="total-row"><span data-i18n="lbl_paid">Pagado:</span> ' + paid + '</div>' : '') +
+              (data.due ? '<div class="total-row" style="color:#dc3545"><span data-i18n="lbl_due">Pendiente:</span> ' + due + '</div>' : '') +
             '</div>' +
             '<div class="modal-footer">' +
-              '<button onclick="window.location.href=\'new-invoice.html?id=' + APP.esc(id) + '\'">Editar</button> ' +
-              '<button onclick="downloadPdf(\'' + APP.esc(id) + '\')" class="btn-secondary">Descargar PDF</button>' +
+              '<button onclick="window.location.href=\'new-invoice.html?id=' + APP.esc(id) + '\'" data-i18n="btn_edit">Editar</button> ' +
+              '<button onclick="downloadPdf(\'' + APP.esc(id) + '\')" class="btn-secondary" data-i18n="btn_download_pdf">Descargar PDF</button>' +
             '</div>' +
           '</div>';
 

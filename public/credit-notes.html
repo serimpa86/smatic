@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notas de Crédito | Smatic</title>
+  <title data-i18n="page_title_credit_notes">Notas de Crédito | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 60; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2em 0; }
@@ -39,19 +39,19 @@
         <span>Smatic</span>
       </div>
       <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
-        <li class="active"><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+        <li class="active"><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
       </ul>
       <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
       </div>
     </nav>
   </div>
@@ -60,28 +60,28 @@
     <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-      Smatic - Notas de Crédito
+      <span data-i18n="breadcrumb_credit_notes">Smatic - Notas de Crédito</span>
     </div>
   </div>
 
   <div class="container" id="main-content">
     <div class="page-header">
-      <h1>Notas de Crédito</h1>
+      <h1 data-i18n="page_title_credit_notes">Notas de Crédito</h1>
       <div class="actions">
-        <button onclick="showCreateModal()">+ Nueva Nota</button>
+        <button onclick="showCreateModal()">+ <span data-i18n="btn_new_credit_note">Nueva Nota</span></button>
       </div>
     </div>
 
     <div class="filters">
       <select id="filter-status">
-        <option value="">Todos los estados</option>
-        <option value="open">Abierta</option>
-        <option value="partial">Parcial</option>
-        <option value="closed">Cerrada</option>
+        <option value="" data-i18n="filter_all_statuses">Todos los estados</option>
+        <option value="open" data-i18n="status_open">Abierta</option>
+        <option value="partial" data-i18n="status_partial">Parcial</option>
+        <option value="closed" data-i18n="status_closed">Cerrada</option>
       </select>
       <div class="search-box">
-        <input type="text" id="filter-search" placeholder="Buscar por número o cliente...">
-        <button onclick="applyFilters()">Buscar</button>
+        <input type="text" id="filter-search" data-i18n-placeholder="placeholder_search_credit_notes" placeholder="Buscar por número o cliente...">
+        <button onclick="applyFilters()" data-i18n="btn_search">Buscar</button>
       </div>
     </div>
 
@@ -90,19 +90,19 @@
         <table class="record-list" id="notes-table">
           <thead>
             <tr>
-              <th>N° Nota</th>
-              <th>Cliente</th>
-              <th>Factura</th>
-              <th>Fecha</th>
-              <th>Total</th>
-              <th>Aplicado</th>
-              <th>Estado</th>
-              <th>Razón</th>
-              <th>Acciones</th>
+              <th data-i18n="th_credit_note_number">N° Nota</th>
+              <th data-i18n="th_customer">Cliente</th>
+              <th data-i18n="th_invoice">Factura</th>
+              <th data-i18n="th_date">Fecha</th>
+              <th data-i18n="th_total">Total</th>
+              <th data-i18n="th_applied">Aplicado</th>
+              <th data-i18n="th_status">Estado</th>
+              <th data-i18n="th_reason">Razón</th>
+              <th data-i18n="th_actions">Acciones</th>
             </tr>
           </thead>
           <tbody id="notes-body">
-            <tr><td colspan="9" class="text-center" style="color:#999">Cargando...</td></tr>
+            <tr><td colspan="9" class="text-center" style="color:#999" data-i18n="loading">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -186,9 +186,9 @@
           <td><span class="badge ${badgeClass(n.status)}">${statusText(n.status)}</span></td>
           <td>${APP.esc((n.reason || '').substring(0, 40))}</td>
           <td>
-            <button class="btn-sm btn-outline" onclick="viewNote('${n.id}')">Ver</button>
-            ${n.status === 'open' ? '<button class="btn-sm btn-outline" onclick="showApplyModal(\'' + n.id + '\')">Aplicar</button>' : ''}
-            <button class="btn-sm btn-outline" onclick="deleteNote('${n.id}')" style="color:#dc3545;border-color:#dc3545">Eliminar</button>
+            <button class="btn-sm btn-outline" onclick="viewNote('${n.id}')" data-i18n="btn_view">Ver</button>
+            ${n.status === 'open' ? '<button class="btn-sm btn-outline" onclick="showApplyModal(\'' + n.id + '\')" data-i18n="btn_apply">Aplicar</button>' : ''}
+            <button class="btn-sm btn-outline" onclick="deleteNote('${n.id}')" style="color:#dc3545;border-color:#dc3545" data-i18n="btn_delete">Eliminar</button>
           </td>
         </tr>
       `).join('');
@@ -208,26 +208,26 @@
       const html = `
         <div class="invoice-form">
           <div class="form-row">
-            <div><label>Factura Relacionada</label><select id="cn-invoice" onchange="cnInvoiceChange()"><option value="">— Sin factura —</option>${invOpts}</select></div>
-            <div><label>Cliente</label><select id="cn-customer"><option value="">Seleccionar...</option>${customers.map(c => '<option value="' + c.id + '">' + APP.esc(c.name) + '</option>').join('')}</select></div>
+            <div><label data-i18n="lbl_related_invoice">Factura Relacionada</label><select id="cn-invoice" onchange="cnInvoiceChange()"><option value="">— <span data-i18n="option_without_invoice">Sin factura</span> —</option>${invOpts}</select></div>
+            <div><label data-i18n="lbl_customer">Cliente</label><select id="cn-customer"><option value="" data-i18n="option_select">Seleccionar...</option>${customers.map(c => '<option value="' + c.id + '">' + APP.esc(c.name) + '</option>').join('')}</select></div>
           </div>
           <div class="form-row">
-            <div><label>Fecha</label><input type="date" id="cn-date" value="${new Date().toISOString().split('T')[0]}"></div>
-            <div><label>Razón</label><input id="cn-reason" placeholder="Motivo de la nota de crédito"></div>
+            <div><label data-i18n="lbl_date">Fecha</label><input type="date" id="cn-date" value="${new Date().toISOString().split('T')[0]}"></div>
+            <div><label data-i18n="lbl_reason">Razón</label><input id="cn-reason" data-i18n-placeholder="placeholder_credit_note_reason" placeholder="Motivo de la nota de crédito"></div>
           </div>
-          <div class="form-section-title" style="margin-top:1em">Artículos</div>
+          <div class="form-section-title" data-i18n="section_items" style="margin-top:1em">Artículos</div>
           <div class="scroll-table">
             <table class="items-table">
-              <thead><tr><th>Cant</th><th>Descripción</th><th>Precio</th><th>Total</th></tr></thead>
-              <tbody id="cn-items-body"><tr><td colspan="4" class="text-center" style="color:#999">Seleccione una factura para cargar artículos</td></tr></tbody>
+              <thead><tr><th data-i18n="th_qty">Cant</th><th data-i18n="th_description">Descripción</th><th data-i18n="th_price">Precio</th><th data-i18n="th_total">Total</th></tr></thead>
+              <tbody id="cn-items-body"><tr><td colspan="4" class="text-center" style="color:#999" data-i18n="msg_select_invoice_for_items">Seleccione una factura para cargar artículos</td></tr></tbody>
             </table>
           </div>
           <div class="modal-footer" style="margin-top:1em">
-            <button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()">Cancelar</button>
-            <button class="btn" onclick="saveCreditNote()">Guardar Nota</button>
+            <button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()" data-i18n="btn_cancel">Cancelar</button>
+            <button class="btn" onclick="saveCreditNote()" data-i18n="btn_save_note">Guardar Nota</button>
           </div>
         </div>`;
-      APP.modal(html, 'Nueva Nota de Crédito');
+      APP.modal(html, APP.t('modal_title_new_credit_note', 'Nueva Nota de Crédito'));
       document.getElementById('cn-date').value = new Date().toISOString().split('T')[0];
     }
 
@@ -235,7 +235,7 @@
       const invId = document.getElementById('cn-invoice').value;
       const tbody = document.getElementById('cn-items-body');
       if (!invId) {
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="color:#999">Seleccione una factura para cargar artículos</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="color:#999" data-i18n="msg_select_invoice_for_items">Seleccione una factura para cargar artículos</td></tr>';
         document.getElementById('cn-customer').value = '';
         return;
       }
@@ -247,7 +247,7 @@
       API.get('/api/invoices/' + invId).then(invDetail => {
         const items = invDetail.items || [];
         if (!items.length) {
-          tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="color:#999">Sin artículos en esta factura</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="color:#999" data-i18n="msg_no_items_in_invoice">Sin artículos en esta factura</td></tr>';
           return;
         }
         tbody.innerHTML = items.map(it => `
@@ -260,7 +260,7 @@
         `).join('');
         cnCalcTotal();
       }).catch(e => {
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="color:#999">Error al cargar artículos</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="color:#999" data-i18n="error_loading_items">Error al cargar artículos</td></tr>';
       });
     };
 
@@ -319,18 +319,18 @@
         const items = note.items || [];
         const itemsHtml = items.length ? items.map(it => `
           <tr><td>${it.quantity}</td><td>${APP.esc(it.description)}</td><td class="text-right">${APP.formatMoney(it.unit_price)}</td><td class="text-right">${APP.formatMoney(it.total)}</td></tr>
-        `).join('') : '<tr><td colspan="4" class="text-center">Sin artículos</td></tr>';
+        `).join('') : '<tr><td colspan="4" class="text-center" data-i18n="msg_no_items">Sin artículos</td></tr>';
         const html = `
           <div style="min-width:400px">
-            <p><strong>Nota:</strong> ${APP.esc(note.credit_note_number)}</p>
-            <p><strong>Cliente:</strong> ${APP.esc(note.customer_name)}</p>
-            <p><strong>Fecha:</strong> ${note.date}</p>
-            <p><strong>Estado:</strong> ${statusText(note.status)}</p>
-            ${note.reason ? '<p><strong>Razón:</strong> ' + APP.esc(note.reason) + '</p>' : ''}
-            <table class="items-table"><thead><tr><th>Cant</th><th>Descripción</th><th class="text-right">Precio</th><th class="text-right">Total</th></tr></thead><tbody>${itemsHtml}</tbody></table>
-            <div style="text-align:right;margin-top:.5em"><strong>Total: ${APP.formatMoney(note.total)}</strong></div>
-            <div style="text-align:right"><strong>Aplicado: ${APP.formatMoney(note.amount_applied || 0)}</strong></div>
-            <div class="modal-footer"><button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()">Cerrar</button></div>
+            <p><strong data-i18n="th_credit_note_number">Nota:</strong> ${APP.esc(note.credit_note_number)}</p>
+            <p><strong data-i18n="th_customer">Cliente:</strong> ${APP.esc(note.customer_name)}</p>
+            <p><strong data-i18n="lbl_date">Fecha:</strong> ${note.date}</p>
+            <p><strong data-i18n="th_status">Estado:</strong> ${statusText(note.status)}</p>
+            ${note.reason ? '<p><strong data-i18n="th_reason">Razón:</strong> ' + APP.esc(note.reason) + '</p>' : ''}
+            <table class="items-table"><thead><tr><th data-i18n="th_qty">Cant</th><th data-i18n="th_description">Descripción</th><th class="text-right" data-i18n="th_price">Precio</th><th class="text-right" data-i18n="th_total">Total</th></tr></thead><tbody>${itemsHtml}</tbody></table>
+            <div style="text-align:right;margin-top:.5em"><strong data-i18n="lbl_total">Total: ${APP.formatMoney(note.total)}</strong></div>
+            <div style="text-align:right"><strong data-i18n="lbl_applied">Aplicado: ${APP.formatMoney(note.amount_applied || 0)}</strong></div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()" data-i18n="btn_close">Cerrar</button></div>
           </div>`;
         APP.modal(html, 'Nota de Crédito #' + note.credit_note_number);
       } catch (e) { APP.showMessage('Error al cargar nota', 'error'); }
@@ -345,15 +345,15 @@
       ).join('');
       const html = `
         <div>
-          <p>Nota: <strong>${APP.esc(note.credit_note_number)}</strong> — Disponible: ${APP.formatMoney(available)}</p>
-          <div class="form-row"><div><label>Factura</label><select id="apply-invoice">${invOpts}</select></div></div>
-          <div class="form-row"><div><label>Monto a Aplicar</label><input type="number" id="apply-amount" value="${available}" step="0.01" min="0" max="${available}"></div></div>
+          <p><span data-i18n="lbl_credit_note">Nota:</span> <strong>${APP.esc(note.credit_note_number)}</strong> — <span data-i18n="lbl_available">Disponible:</span> ${APP.formatMoney(available)}</p>
+          <div class="form-row"><div><label data-i18n="lbl_invoice">Factura</label><select id="apply-invoice">${invOpts}</select></div></div>
+          <div class="form-row"><div><label data-i18n="lbl_amount_to_apply">Monto a Aplicar</label><input type="number" id="apply-amount" value="${available}" step="0.01" min="0" max="${available}"></div></div>
           <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()">Cancelar</button>
-            <button class="btn" onclick="applyCreditNote('${id}')">Aplicar</button>
+            <button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()" data-i18n="btn_cancel">Cancelar</button>
+            <button class="btn" onclick="applyCreditNote('${id}')" data-i18n="btn_apply">Aplicar</button>
           </div>
         </div>`;
-      APP.modal(html, 'Aplicar Nota de Crédito');
+      APP.modal(html, APP.t('modal_title_apply_credit_note', 'Aplicar Nota de Crédito'));
     };
 
     window.applyCreditNote = async function(id) {

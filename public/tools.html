@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Herramientas | Smatic</title>
+  <title data-i18n="page_title_tools">Herramientas | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
     .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5em; margin-bottom: 2em; }
@@ -31,21 +31,21 @@
         <span>Smatic</span>
       </div>
       <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
-        <li><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
-        <li class="active"><a href="tools.html"><span class="nav-icon">🔧</span> Herramientas</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+        <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+        <li class="active"><a href="tools.html"><span class="nav-icon">🔧</span> <span data-i18n="nav_tools">Herramientas</span></a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
       </ul>
       <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
       </div>
     </nav>
   </div>
@@ -54,71 +54,71 @@
     <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-      Smatic - Herramientas
+      <span data-i18n="breadcrumb_tools">Smatic - Herramientas</span>
     </div>
   </div>
 
   <div class="container" id="main-content">
     <div class="page-header">
-      <h1>Herramientas</h1>
+      <h1 data-i18n="page_title_tools">Herramientas</h1>
     </div>
 
-    <h2 style="color:#555;font-size:1.2em;margin-bottom:.5em">Importar Datos</h2>
+    <h2 style="color:#555;font-size:1.2em;margin-bottom:.5em" data-i18n="section_import_data">Importar Datos</h2>
     <div class="tools-grid">
       <div class="tool-card">
-        <h3>Importar Clientes</h3>
-        <p>Sube un archivo CSV o pega JSON con los datos de clientes.</p>
+        <h3 data-i18n="card_import_customers">Importar Clientes</h3>
+        <p data-i18n="desc_import_customers">Sube un archivo CSV o pega JSON con los datos de clientes.</p>
         <div class="file-upload">
           <input type="file" id="import-customers-file" accept=".csv,.txt">
-          <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-customers-file').click()">Seleccionar CSV</button>
+          <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-customers-file').click()" data-i18n="btn_select_csv">Seleccionar CSV</button>
         </div>
-        <div class="or-divider">— o pega JSON —</div>
-        <textarea id="import-customers-json" placeholder='[{"name":"Cliente Ejemplo","email":"cliente@ejemplo.com","phone":"123456789"}]'></textarea>
+        <div class="or-divider" data-i18n="or_paste_json">— o pega JSON —</div>
+        <textarea id="import-customers-json" data-i18n-placeholder="placeholder_json_customers" placeholder='[{"name":"Cliente Ejemplo","email":"cliente@ejemplo.com","phone":"123456789"}]'></textarea>
         <div class="import-actions">
-          <button onclick="importFromFile('customers')">Importar CSV</button>
-          <button class="btn-secondary" onclick="importFromJson('customers')">Importar JSON</button>
+          <button onclick="importFromFile('customers')" data-i18n="btn_import_csv">Importar CSV</button>
+          <button class="btn-secondary" onclick="importFromJson('customers')" data-i18n="btn_import_json">Importar JSON</button>
         </div>
         <div id="import-customers-result" class="import-result"></div>
       </div>
 
       <div class="tool-card">
-        <h3>Importar Productos</h3>
-        <p>Sube un archivo CSV o pega JSON con los datos de productos/servicios.</p>
+        <h3 data-i18n="card_import_items">Importar Productos</h3>
+        <p data-i18n="desc_import_items">Sube un archivo CSV o pega JSON con los datos de productos/servicios.</p>
         <div class="file-upload">
           <input type="file" id="import-items-file" accept=".csv,.txt">
-          <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-items-file').click()">Seleccionar CSV</button>
+          <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-items-file').click()" data-i18n="btn_select_csv">Seleccionar CSV</button>
         </div>
-        <div class="or-divider">— o pega JSON —</div>
-        <textarea id="import-items-json" placeholder='[{"name":"Producto Ej.","price":100,"description":"Descripción"}]'></textarea>
+        <div class="or-divider" data-i18n="or_paste_json">— o pega JSON —</div>
+        <textarea id="import-items-json" data-i18n-placeholder="placeholder_json_items" placeholder='[{"name":"Producto Ej.","price":100,"description":"Descripción"}]'></textarea>
         <div class="import-actions">
-          <button onclick="importFromFile('items')">Importar CSV</button>
-          <button class="btn-secondary" onclick="importFromJson('items')">Importar JSON</button>
+          <button onclick="importFromFile('items')" data-i18n="btn_import_csv">Importar CSV</button>
+          <button class="btn-secondary" onclick="importFromJson('items')" data-i18n="btn_import_json">Importar JSON</button>
         </div>
         <div id="import-items-result" class="import-result"></div>
       </div>
 
       <div class="tool-card">
-        <h3>Importar Facturas</h3>
-        <p>Sube un archivo CSV o pega JSON con los datos de facturas.</p>
+        <h3 data-i18n="card_import_invoices">Importar Facturas</h3>
+        <p data-i18n="desc_import_invoices">Sube un archivo CSV o pega JSON con los datos de facturas.</p>
         <div class="file-upload">
           <input type="file" id="import-invoices-file" accept=".csv,.txt">
-          <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-invoices-file').click()">Seleccionar CSV</button>
+          <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-invoices-file').click()" data-i18n="btn_select_csv">Seleccionar CSV</button>
         </div>
-        <div class="or-divider">— o pega JSON —</div>
-        <textarea id="import-invoices-json" placeholder='[{"customer_name":"Cliente","total":150,"status":"sent","date":"2026-01-15"}]'></textarea>
+        <div class="or-divider" data-i18n="or_paste_json">— o pega JSON —</div>
+        <textarea id="import-invoices-json" data-i18n-placeholder="placeholder_json_invoices" placeholder='[{"customer_name":"Cliente","total":150,"status":"sent","date":"2026-01-15"}]'></textarea>
         <div class="import-actions">
-          <button onclick="importFromFile('invoices')">Importar CSV</button>
-          <button class="btn-secondary" onclick="importFromJson('invoices')">Importar JSON</button>
+          <button onclick="importFromFile('invoices')" data-i18n="btn_import_csv">Importar CSV</button>
+          <button class="btn-secondary" onclick="importFromJson('invoices')" data-i18n="btn_import_json">Importar JSON</button>
         </div>
         <div id="import-invoices-result" class="import-result"></div>
       </div>
     </div>
 
-    <h2 style="color:#555;font-size:1.2em;margin-bottom:.5em">Exportar Datos</h2>
+    <h2 style="color:#555;font-size:1.2em;margin-bottom:.5em" data-i18n="section_export_data">Exportar Datos</h2>
     <div class="card">
       <div class="export-buttons">
-        <button onclick="exportCSV('customers')">📥 Exportar Clientes CSV</button>
-        <button onclick="exportCSV('invoices')">📥 Exportar Facturas CSV</button>
+        <button onclick="exportCSV('customers')" data-i18n="btn_export_customers_csv">📥 Exportar Clientes CSV</button>
+        <button onclick="exportCSV('invoices')" data-i18n="btn_export_invoices_csv">📥 Exportar Facturas CSV</button>
       </div>
     </div>
   </div>

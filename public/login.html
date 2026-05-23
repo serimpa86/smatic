@@ -3,29 +3,29 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Iniciar Sesión | Smatic</title>
+  <title data-i18n="page_title_login">Iniciar Sesión | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
   <div class="gateway-container" role="main">
     <form id="form_login" onsubmit="return false;">
-      <h1 id="login-title">Iniciar Sesión</h1>
+      <h1 id="login-title" data-i18n="login_title">Iniciar Sesión</h1>
       <div id="email_container">
-        <label for="login_email">Correo electrónico:</label>
-        <input id="login_email" class="input--large" name="email" style="width:100%" type="email" placeholder="Correo electrónico" autofocus autocomplete="username">
+        <label for="login_email" data-i18n="lbl_email">Correo electrónico:</label>
+        <input id="login_email" class="input--large" name="email" style="width:100%" type="email" data-i18n-placeholder="placeholder_email" placeholder="Correo electrónico" autofocus autocomplete="username">
       </div>
       <div id="login_password-container" style="display:none">
-        <label for="login_password">Contraseña:</label>
-        <input id="login_password" class="input--large" name="password" style="width:100%" type="password" placeholder="Contraseña" autocomplete="current-password">
+        <label for="login_password" data-i18n="lbl_password">Contraseña:</label>
+        <input id="login_password" class="input--large" name="password" style="width:100%" type="password" data-i18n-placeholder="placeholder_password" placeholder="Contraseña" autocomplete="current-password">
       </div>
       <div id="login_btn-container">
-        <button style="float:right" id="btn_next" class="btn--large btn--stack" onclick="loginNext()">Siguiente</button>
-        <button style="display:none" id="btn_back" class="btn--large btn--stack btn-secondary" onclick="loginBack()">← Atrás</button>
-        <button style="float:right;display:none" id="btn_login" class="btn--large btn--stack" onclick="loginSubmit()">Iniciar Sesión</button>
+        <button style="float:right" id="btn_next" class="btn--large btn--stack" onclick="loginNext()" data-i18n="btn_next">Siguiente</button>
+        <button style="display:none" id="btn_back" class="btn--large btn--stack btn-secondary" onclick="loginBack()" data-i18n="btn_back">← Atrás</button>
+        <button style="float:right;display:none" id="btn_login" class="btn--large btn--stack" onclick="loginSubmit()" data-i18n="btn_login">Iniciar Sesión</button>
       </div>
       <div class="link-bottom_container">
-        <span id="login_newaccount">¿No tienes cuenta? <a href="signup.html">Regístrate</a></span>
-        <a id="login_forgotpassword" style="display:none" href="#">¿Olvidaste tu contraseña?</a>
+        <span id="login_newaccount" data-i18n="login_new_account">¿No tienes cuenta? <a href="signup.html" data-i18n="btn_signup_link">Regístrate</a></span>
+        <a id="login_forgotpassword" style="display:none" href="#" data-i18n="forgot_password">¿Olvidaste tu contraseña?</a>
       </div>
     </form>
   </div>

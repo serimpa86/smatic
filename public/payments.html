@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pagos | Smatic</title>
+  <title data-i18n="page_title_payments">Pagos | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 60; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2em 0; }
@@ -28,20 +28,20 @@
         <span>Smatic</span>
       </div>
       <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
-        <li class="active"><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
-        <li><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+        <li class="active"><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+        <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
       </ul>
       <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
       </div>
     </nav>
   </div>
@@ -50,31 +50,31 @@
     <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-      Smatic - Pagos
+      <span data-i18n="breadcrumb_payments">Smatic - Pagos</span>
     </div>
   </div>
 
   <div class="container" id="main-content">
     <div class="page-header">
-      <h1>Pagos</h1>
+      <h1 data-i18n="page_title_payments">Pagos</h1>
       <div class="actions">
-        <button onclick="openCreateModal()">+ Nuevo Pago</button>
+        <button onclick="openCreateModal()">+ <span data-i18n="btn_new_payment">Nuevo Pago</span></button>
       </div>
     </div>
 
     <div class="filters">
       <select id="filter-method">
-        <option value="">Todos los métodos</option>
-        <option value="cash">Efectivo</option>
-        <option value="check">Cheque</option>
-        <option value="credit_card">Tarjeta de Crédito</option>
-        <option value="debit_card">Tarjeta de Débito</option>
-        <option value="bank_transfer">Transferencia Bancaria</option>
-        <option value="online">Pago en Línea</option>
+        <option value="" data-i18n="filter_all_methods">Todos los métodos</option>
+        <option value="cash" data-i18n="payment_method_cash">Efectivo</option>
+        <option value="check" data-i18n="payment_method_check">Cheque</option>
+        <option value="credit_card" data-i18n="payment_method_credit_card">Tarjeta de Crédito</option>
+        <option value="debit_card" data-i18n="payment_method_debit_card">Tarjeta de Débito</option>
+        <option value="bank_transfer" data-i18n="payment_method_bank_transfer">Transferencia Bancaria</option>
+        <option value="online" data-i18n="payment_method_online">Pago en Línea</option>
       </select>
       <div class="search-box">
-        <input type="text" id="filter-search" placeholder="Buscar pago, cliente o factura...">
-        <button onclick="applyFilters()">Buscar</button>
+        <input type="text" id="filter-search" data-i18n-placeholder="placeholder_search_payments" placeholder="Buscar pago, cliente o factura...">
+        <button onclick="applyFilters()" data-i18n="btn_search">Buscar</button>
       </div>
     </div>
 
@@ -83,18 +83,18 @@
         <table class="record-list" id="payments-table">
           <thead>
             <tr>
-              <th>N° Pago</th>
-              <th>Cliente</th>
-              <th>Factura</th>
-              <th>Fecha</th>
-              <th>Método</th>
-              <th>Referencia</th>
-              <th>Monto</th>
-              <th>Acciones</th>
+              <th data-i18n="th_payment_number">N° Pago</th>
+              <th data-i18n="th_customer">Cliente</th>
+              <th data-i18n="th_invoice">Factura</th>
+              <th data-i18n="th_date">Fecha</th>
+              <th data-i18n="th_method">Método</th>
+              <th data-i18n="th_reference">Referencia</th>
+              <th data-i18n="th_amount">Monto</th>
+              <th data-i18n="th_actions">Acciones</th>
             </tr>
           </thead>
           <tbody id="payments-body">
-            <tr><td colspan="8" class="text-center" style="color:#999">Cargando...</td></tr>
+            <tr><td colspan="8" class="text-center" style="color:#999" data-i18n="loading">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -198,8 +198,8 @@
           '<td>' + ref + '</td>' +
           '<td>' + amount + '</td>' +
           '<td>' +
-            '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="openEditModal(\'' + pId + '\')">Editar</button> ' +
-            '<button class="btn-secondary" style="min-width:auto;font-size:.85em;color:#dc3545" onclick="deletePayment(\'' + pId + '\')">Eliminar</button>' +
+            '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="openEditModal(\'' + pId + '\')" data-i18n="btn_edit">Editar</button> ' +
+            '<button class="btn-secondary" style="min-width:auto;font-size:.85em;color:#dc3545" onclick="deletePayment(\'' + pId + '\')" data-i18n="btn_delete">Eliminar</button>' +
           '</td>' +
         '</tr>';
       }).join('');
@@ -243,31 +243,31 @@
         '<h2 style="margin:0 0 1em;color:#555">' + title + '</h2>' +
         '<form class="invoice-form" id="payment-form" onsubmit="savePayment(event)" autocomplete="off">' +
           '<div class="form-row">' +
-            '<div><label for="payment-customer">Cliente *</label><select id="payment-customer" required onchange="onPaymentCustomerChange()"><option value="">Seleccionar Cliente...</option></select></div>' +
-            '<div><label for="payment-invoice">Factura *</label><select id="payment-invoice" required><option value="">Seleccionar Factura...</option></select></div>' +
+            '<div><label for="payment-customer" data-i18n="lbl_customer">Cliente *</label><select id="payment-customer" required onchange="onPaymentCustomerChange()"><option value="" data-i18n="option_select_customer">Seleccionar Cliente...</option></select></div>' +
+            '<div><label for="payment-invoice" data-i18n="lbl_invoice">Factura *</label><select id="payment-invoice" required><option value="" data-i18n="option_select_invoice">Seleccionar Factura...</option></select></div>' +
           '</div>' +
           '<div class="form-row">' +
-            '<div><label for="payment-date">Fecha</label><input type="date" id="payment-date" value="' + (data.date || '') + '"></div>' +
-            '<div><label for="payment-method">Método de Pago *</label><select id="payment-method" required>' +
-              '<option value="">Seleccionar...</option>' +
-              '<option value="cash" ' + (data.method === 'cash' ? 'selected' : '') + '>Efectivo</option>' +
-              '<option value="check" ' + (data.method === 'check' ? 'selected' : '') + '>Cheque</option>' +
-              '<option value="credit_card" ' + (data.method === 'credit_card' ? 'selected' : '') + '>Tarjeta de Crédito</option>' +
-              '<option value="debit_card" ' + (data.method === 'debit_card' ? 'selected' : '') + '>Tarjeta de Débito</option>' +
-              '<option value="bank_transfer" ' + (data.method === 'bank_transfer' ? 'selected' : '') + '>Transferencia Bancaria</option>' +
-              '<option value="online" ' + (data.method === 'online' ? 'selected' : '') + '>Pago en Línea</option>' +
+            '<div><label for="payment-date" data-i18n="lbl_date">Fecha</label><input type="date" id="payment-date" value="' + (data.date || '') + '"></div>' +
+            '<div><label for="payment-method" data-i18n="lbl_payment_method">Método de Pago *</label><select id="payment-method" required>' +
+              '<option value="" data-i18n="option_select">Seleccionar...</option>' +
+              '<option value="cash" ' + (data.method === 'cash' ? 'selected' : '') + ' data-i18n="payment_method_cash">Efectivo</option>' +
+              '<option value="check" ' + (data.method === 'check' ? 'selected' : '') + ' data-i18n="payment_method_check">Cheque</option>' +
+              '<option value="credit_card" ' + (data.method === 'credit_card' ? 'selected' : '') + ' data-i18n="payment_method_credit_card">Tarjeta de Crédito</option>' +
+              '<option value="debit_card" ' + (data.method === 'debit_card' ? 'selected' : '') + ' data-i18n="payment_method_debit_card">Tarjeta de Débito</option>' +
+              '<option value="bank_transfer" ' + (data.method === 'bank_transfer' ? 'selected' : '') + ' data-i18n="payment_method_bank_transfer">Transferencia Bancaria</option>' +
+              '<option value="online" ' + (data.method === 'online' ? 'selected' : '') + ' data-i18n="payment_method_online">Pago en Línea</option>' +
             '</select></div>' +
           '</div>' +
           '<div class="form-row">' +
-            '<div><label for="payment-reference">Referencia</label><input type="text" id="payment-reference" value="' + APP.esc(data.reference || '') + '" placeholder="N° de cheque, transacción, etc."></div>' +
-            '<div><label for="payment-amount">Monto *</label><input type="number" id="payment-amount" step="0.01" min="0.01" required value="' + (data.amount || '') + '"></div>' +
+            '<div><label for="payment-reference" data-i18n="lbl_reference">Referencia</label><input type="text" id="payment-reference" value="' + APP.esc(data.reference || '') + '" data-i18n-placeholder="placeholder_payment_reference" placeholder="N° de cheque, transacción, etc."></div>' +
+            '<div><label for="payment-amount" data-i18n="lbl_amount_required">Monto *</label><input type="number" id="payment-amount" step="0.01" min="0.01" required value="' + (data.amount || '') + '"></div>' +
           '</div>' +
           '<div class="form-row">' +
-            '<div><label for="payment-notes">Notas</label><textarea id="payment-notes" rows="3" placeholder="Notas del pago">' + APP.esc(data.notes || '') + '</textarea></div>' +
+            '<div><label for="payment-notes" data-i18n="lbl_notes">Notas</label><textarea id="payment-notes" rows="3" data-i18n-placeholder="placeholder_payment_notes" placeholder="Notas del pago">' + APP.esc(data.notes || '') + '</textarea></div>' +
           '</div>' +
           '<div class="modal-footer">' +
-            '<button type="button" class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>' +
-            '<button type="submit" class="btn">' + (editingPaymentId ? 'Guardar Cambios' : 'Registrar Pago') + '</button>' +
+            '<button type="button" class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" data-i18n="btn_cancel">Cancelar</button>' +
+            '<button type="submit" class="btn">' + (editingPaymentId ? APP.t('btn_save_changes', 'Guardar Cambios') : APP.t('btn_register_payment', 'Registrar Pago')) + '</button>' +
           '</div>' +
         '</form>' +
       '</div>';
@@ -275,7 +275,7 @@
 
     function populatePaymentCustomerDropdown(selectedId) {
       const sel = document.getElementById('payment-customer');
-      sel.innerHTML = '<option value="">Seleccionar Cliente...</option>';
+      sel.innerHTML = '<option value="" data-i18n="option_select_customer">Seleccionar Cliente...</option>';
       customers.forEach(c => {
         sel.innerHTML += '<option value="' + APP.esc(c.id) + '" ' + (c.id === selectedId ? 'selected' : '') + '>' + APP.esc(c.name) + (c.email ? ' (' + APP.esc(c.email) + ')' : '') + '</option>';
       });
@@ -284,10 +284,10 @@
     async function onPaymentCustomerChange() {
       const customerId = document.getElementById('payment-customer').value;
       const invoiceSel = document.getElementById('payment-invoice');
-      invoiceSel.innerHTML = '<option value="">Cargando facturas...</option>';
+      invoiceSel.innerHTML = '<option value="" data-i18n="loading">Cargando facturas...</option>';
       invoiceSel.disabled = true;
       if (!customerId) {
-        invoiceSel.innerHTML = '<option value="">Seleccionar Factura...</option>';
+        invoiceSel.innerHTML = '<option value="" data-i18n="option_select_invoice">Seleccionar Factura...</option>';
         invoiceSel.disabled = false;
         return;
       }
@@ -295,20 +295,20 @@
         const resp = await API.get('/api/payments/unpaid/' + customerId);
         unpaidInvoices = resp.invoices || resp.data || resp;
         if (!Array.isArray(unpaidInvoices)) unpaidInvoices = [];
-        invoiceSel.innerHTML = '<option value="">Seleccionar Factura...</option>';
+        invoiceSel.innerHTML = '<option value="" data-i18n="option_select_invoice">Seleccionar Factura...</option>';
         if (unpaidInvoices.length === 0) {
-          invoiceSel.innerHTML += '<option value="" disabled>No hay facturas pendientes</option>';
+          invoiceSel.innerHTML += '<option value="" disabled data-i18n="msg_no_unpaid_invoices">No hay facturas pendientes</option>';
         } else {
           unpaidInvoices.forEach(inv => {
             const invId = inv.id || inv.invoice_id;
             const invNum = inv.invoice_number || inv.number || invId;
             const due = APP.formatMoney(inv.due || inv.balance || inv.total);
-            invoiceSel.innerHTML += '<option value="' + APP.esc(invId) + '">' + APP.esc(invNum) + ' - Saldo: ' + due + '</option>';
+            invoiceSel.innerHTML += '<option value="' + APP.esc(invId) + '">' + APP.esc(invNum) + ' - ' + APP.t('lbl_balance', 'Saldo') + ': ' + due + '</option>';
           });
         }
       } catch (e) {
         console.error('Error loading unpaid invoices', e);
-        invoiceSel.innerHTML = '<option value="">Error al cargar facturas</option>';
+        invoiceSel.innerHTML = '<option value="" data-i18n="error_loading_invoices">Error al cargar facturas</option>';
       }
       invoiceSel.disabled = false;
     }
@@ -330,12 +330,12 @@
           const resp = await API.get('/api/payments/unpaid/' + p.customer_id);
           unpaidInvoices = resp.invoices || resp.data || resp;
           if (!Array.isArray(unpaidInvoices)) unpaidInvoices = [];
-          invoiceSel.innerHTML = '<option value="">Seleccionar Factura...</option>';
+          invoiceSel.innerHTML = '<option value="" data-i18n="option_select_invoice">Seleccionar Factura...</option>';
           unpaidInvoices.forEach(inv => {
             const invId = inv.id || inv.invoice_id;
             const invNum = inv.invoice_number || inv.number || invId;
             const due = APP.formatMoney(inv.due || inv.balance || inv.total);
-            invoiceSel.innerHTML += '<option value="' + APP.esc(invId) + '" ' + (invId === p.invoice_id ? 'selected' : '') + '>' + APP.esc(invNum) + ' - Saldo: ' + due + '</option>';
+            invoiceSel.innerHTML += '<option value="' + APP.esc(invId) + '" ' + (invId === p.invoice_id ? 'selected' : '') + '>' + APP.esc(invNum) + ' - ' + APP.t('lbl_balance', 'Saldo') + ': ' + due + '</option>';
           });
         } catch (e) {
           console.error('Error loading unpaid invoices', e);

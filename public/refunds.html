@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reembolsos | Smatic</title>
+  <title data-i18n="page_title_refunds">Reembolsos | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 60; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2em 0; }
@@ -27,20 +27,20 @@
         <span>Smatic</span>
       </div>
       <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
-        <li class="active"><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+        <li class="active"><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
       </ul>
       <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
       </div>
     </nav>
   </div>
@@ -49,22 +49,22 @@
     <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-      Smatic - Reembolsos
+      <span data-i18n="breadcrumb_refunds">Smatic - Reembolsos</span>
     </div>
   </div>
 
   <div class="container" id="main-content">
     <div class="page-header">
-      <h1>Reembolsos</h1>
+      <h1 data-i18n="page_title_refunds">Reembolsos</h1>
       <div class="actions">
-        <button onclick="showCreateModal()">+ Nuevo Reembolso</button>
+        <button onclick="showCreateModal()">+ <span data-i18n="btn_new_refund">Nuevo Reembolso</span></button>
       </div>
     </div>
 
     <div class="filters">
       <div class="search-box">
-        <input type="text" id="filter-search" placeholder="Buscar por número o cliente...">
-        <button onclick="applyFilters()">Buscar</button>
+        <input type="text" id="filter-search" data-i18n-placeholder="placeholder_search_refunds" placeholder="Buscar por número o cliente...">
+        <button onclick="applyFilters()" data-i18n="btn_search">Buscar</button>
       </div>
     </div>
 
@@ -73,17 +73,17 @@
         <table class="record-list" id="refunds-table">
           <thead>
             <tr>
-              <th>N° Reembolso</th>
-              <th>Cliente</th>
-              <th>Pago Relacionado</th>
-              <th>Fecha</th>
-              <th>Monto</th>
-              <th>Razón</th>
-              <th>Acciones</th>
+              <th data-i18n="th_refund_number">N° Reembolso</th>
+              <th data-i18n="th_customer">Cliente</th>
+              <th data-i18n="th_related_payment">Pago Relacionado</th>
+              <th data-i18n="th_date">Fecha</th>
+              <th data-i18n="th_amount">Monto</th>
+              <th data-i18n="th_reason">Razón</th>
+              <th data-i18n="th_actions">Acciones</th>
             </tr>
           </thead>
           <tbody id="refunds-body">
-            <tr><td colspan="7" class="text-center" style="color:#999">Cargando...</td></tr>
+            <tr><td colspan="7" class="text-center" style="color:#999" data-i18n="loading">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -147,8 +147,8 @@
           <td>${APP.formatMoney(r.amount || 0)}</td>
           <td>${APP.esc((r.reason || '').substring(0, 40))}</td>
           <td>
-            <button class="btn-sm btn-outline" onclick="viewRefund('${r.id}')">Ver</button>
-            <button class="btn-sm btn-outline" onclick="deleteRefund('${r.id}')" style="color:#dc3545;border-color:#dc3545">Eliminar</button>
+            <button class="btn-sm btn-outline" onclick="viewRefund('${r.id}')" data-i18n="btn_view">Ver</button>
+            <button class="btn-sm btn-outline" onclick="deleteRefund('${r.id}')" style="color:#dc3545;border-color:#dc3545" data-i18n="btn_delete">Eliminar</button>
           </td>
         </tr>
       `).join('');
@@ -168,22 +168,22 @@
       const html = `
         <div class="invoice-form">
           <div class="form-row">
-            <div><label>Pago Relacionado</label><select id="ref-payment" onchange="refPaymentChange()"><option value="">— Sin pago —</option>${payOpts}</select></div>
-            <div><label>Cliente</label><select id="ref-customer"><option value="">Seleccionar...</option>${customers.map(c => '<option value="' + c.id + '">' + APP.esc(c.name) + '</option>').join('')}</select></div>
+            <div><label data-i18n="lbl_related_payment">Pago Relacionado</label><select id="ref-payment" onchange="refPaymentChange()"><option value="" data-i18n="option_without_payment">— Sin pago —</option>${payOpts}</select></div>
+            <div><label data-i18n="lbl_customer">Cliente</label><select id="ref-customer"><option value="" data-i18n="option_select">Seleccionar...</option>${customers.map(c => '<option value="' + c.id + '">' + APP.esc(c.name) + '</option>').join('')}</select></div>
           </div>
           <div class="form-row">
-            <div><label>Fecha</label><input type="date" id="ref-date" value="${new Date().toISOString().split('T')[0]}"></div>
-            <div><label>Monto</label><input type="number" id="ref-amount" step="0.01" min="0"></div>
+            <div><label data-i18n="lbl_date">Fecha</label><input type="date" id="ref-date" value="${new Date().toISOString().split('T')[0]}"></div>
+            <div><label data-i18n="lbl_amount">Monto</label><input type="number" id="ref-amount" step="0.01" min="0"></div>
           </div>
           <div class="form-row">
-            <div><label>Razón</label><textarea id="ref-reason" placeholder="Motivo del reembolso"></textarea></div>
+            <div><label data-i18n="lbl_reason">Razón</label><textarea id="ref-reason" data-i18n-placeholder="placeholder_refund_reason" placeholder="Motivo del reembolso"></textarea></div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()">Cancelar</button>
-            <button class="btn" onclick="saveRefund()">Guardar Reembolso</button>
+            <button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()" data-i18n="btn_cancel">Cancelar</button>
+            <button class="btn" onclick="saveRefund()" data-i18n="btn_save_refund">Guardar Reembolso</button>
           </div>
         </div>`;
-      APP.modal(html, 'Nuevo Reembolso');
+      APP.modal(html, APP.t('modal_title_new_refund', 'Nuevo Reembolso'));
     }
 
     window.refPaymentChange = function() {
@@ -227,12 +227,12 @@
         const r = await API.get('/api/refunds/' + id);
         const html = `
           <div style="min-width:350px">
-            <p><strong>N° Reembolso:</strong> ${APP.esc(r.refund_number)}</p>
-            <p><strong>Cliente:</strong> ${APP.esc(r.customer_name || '—')}</p>
-            <p><strong>Fecha:</strong> ${r.date || '—'}</p>
-            <p><strong>Monto:</strong> ${APP.formatMoney(r.amount)}</p>
-            ${r.reason ? '<p><strong>Razón:</strong> ' + APP.esc(r.reason) + '</p>' : ''}
-            <div class="modal-footer"><button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()">Cerrar</button></div>
+            <p><strong data-i18n="th_refund_number">N° Reembolso:</strong> ${APP.esc(r.refund_number)}</p>
+            <p><strong data-i18n="th_customer">Cliente:</strong> ${APP.esc(r.customer_name || '—')}</p>
+            <p><strong data-i18n="th_date">Fecha:</strong> ${r.date || '—'}</p>
+            <p><strong data-i18n="th_amount">Monto:</strong> ${APP.formatMoney(r.amount)}</p>
+            ${r.reason ? '<p><strong data-i18n="th_reason">Razón:</strong> ' + APP.esc(r.reason) + '</p>' : ''}
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()" data-i18n="btn_close">Cerrar</button></div>
           </div>`;
         APP.modal(html, 'Reembolso #' + r.refund_number);
       } catch (e) { APP.showMessage('Error al cargar reembolso', 'error'); }

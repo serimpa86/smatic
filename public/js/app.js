@@ -28,6 +28,32 @@ const APP = {
     } catch (e) {
       this.lang = {};
     }
+    this.applyLanguage();
+  },
+
+  applyLanguage() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const translation = this.t(key, el.innerText);
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.setAttribute('placeholder', translation);
+      } else if (el.tagName === 'IMG') {
+        el.setAttribute('alt', translation);
+      } else {
+        el.childNodes.forEach(node => {
+          if (node.nodeType === 3) {
+            node.textContent = translation;
+          }
+        });
+      }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      el.placeholder = this.t(el.getAttribute('data-i18n-placeholder'), el.placeholder);
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      el.title = this.t(el.getAttribute('data-i18n-title'), el.title);
+    });
+    document.title = this.t('page_title_' + document.title.toLowerCase().replace(/[^a-z0-9]/g, '_'), document.title);
   },
 
   t(key, def) {
@@ -85,17 +111,7 @@ const APP = {
   },
 
   getStatusLabel(status) {
-    const map = {
-      'draft': 'Borrador',
-      'sent': 'Enviada',
-      'paid': 'Pagada',
-      'partial': 'Parcial',
-      'overdue': 'Vencida',
-      'cancelled': 'Cancelada',
-      'open': 'Abierta',
-      'converted': 'Convertida'
-    };
-    return map[status] || status;
+    return this.t('status_' + status, status);
   },
 
   async confirm(title, text, cbYes) {
@@ -105,8 +121,8 @@ const APP = {
       <h3 style="margin:0 0 .5em">${this.esc(title)}</h3>
       <p>${this.esc(text)}</p>
       <div style="text-align:right;margin-top:1em">
-        <button class="btn btn-secondary" onclick="this.closest('div[style]').remove()">Cancelar</button>
-        <button class="btn" onclick="this.closest('div[style]').remove();(${cbYes.toString()})()">Aceptar</button>
+        <button class="btn btn-secondary" onclick="this.closest('div[style]').remove()">${this.t('btn_cancel', 'Cancelar')}</button>
+        <button class="btn" onclick="this.closest('div[style]').remove();(${cbYes.toString()})()">${this.t('btn_confirm', 'Aceptar')}</button>
       </div>
     </div>`;
     document.body.appendChild(div);

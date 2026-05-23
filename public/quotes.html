@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cotizaciones | Smatic</title>
+  <title data-i18n="page_title_quotes">Cotizaciones | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
     .invoice-form { background: #fff; padding: 1.5em; border: 1px solid #e0e0e0; }
@@ -43,20 +43,20 @@
         <span>Smatic</span>
       </div>
       <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
-        <li class="active"><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
-        <li><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+        <li class="active"><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+        <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
       </ul>
       <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
       </div>
     </nav>
   </div>
@@ -65,30 +65,30 @@
     <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-      Smatic - Cotizaciones
+      <span data-i18n="breadcrumb_quotes">Smatic - Cotizaciones</span>
     </div>
   </div>
 
   <div class="container" id="main-content">
     <div class="page-header">
-      <h1>Cotizaciones</h1>
+      <h1 data-i18n="page_title_quotes">Cotizaciones</h1>
       <div class="actions">
-        <button onclick="openCreateModal()">+ Nueva Cotización</button>
+        <button onclick="openCreateModal()">+ <span data-i18n="btn_new_quote">Nueva Cotización</span></button>
       </div>
     </div>
 
     <div class="filters">
       <select id="filter-status">
-        <option value="">Todos los estados</option>
-        <option value="draft">Borrador</option>
-        <option value="sent">Enviada</option>
-        <option value="accepted">Aceptada</option>
-        <option value="rejected">Rechazada</option>
-        <option value="converted">Convertida</option>
+        <option value="" data-i18n="filter_all_statuses">Todos los estados</option>
+        <option value="draft" data-i18n="status_draft">Borrador</option>
+        <option value="sent" data-i18n="status_sent">Enviada</option>
+        <option value="accepted" data-i18n="status_accepted">Aceptada</option>
+        <option value="rejected" data-i18n="status_rejected">Rechazada</option>
+        <option value="converted" data-i18n="status_converted">Convertida</option>
       </select>
       <div class="search-box">
-        <input type="text" id="filter-search" placeholder="Buscar cotización o cliente...">
-        <button onclick="applyFilters()">Buscar</button>
+        <input type="text" id="filter-search" data-i18n-placeholder="placeholder_search_quotes" placeholder="Buscar cotización o cliente...">
+        <button onclick="applyFilters()" data-i18n="btn_search">Buscar</button>
       </div>
     </div>
 
@@ -97,17 +97,17 @@
         <table class="record-list" id="quotes-table">
           <thead>
             <tr>
-              <th>N° Cotización</th>
-              <th>Cliente</th>
-              <th>Fecha</th>
-              <th>Vencimiento</th>
-              <th>Total</th>
-              <th>Estado</th>
-              <th>Acciones</th>
+              <th data-i18n="th_quote_number">N° Cotización</th>
+              <th data-i18n="th_customer">Cliente</th>
+              <th data-i18n="th_date">Fecha</th>
+              <th data-i18n="th_due_date">Vencimiento</th>
+              <th data-i18n="th_total">Total</th>
+              <th data-i18n="th_status">Estado</th>
+              <th data-i18n="th_actions">Acciones</th>
             </tr>
           </thead>
           <tbody id="quotes-body">
-            <tr><td colspan="7" class="text-center" style="color:#999">Cargando...</td></tr>
+            <tr><td colspan="7" class="text-center" style="color:#999" data-i18n="loading">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -226,9 +226,9 @@
           '<td>' + total + '</td>' +
           '<td><span class="status ' + statusClass + '">' + statusLabel + '</span></td>' +
           '<td>' +
-            '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="viewQuote(\'' + qId + '\')">Ver</button> ' +
-            (canConvert ? '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="convertToInvoice(\'' + qId + '\')">Convertir a Factura</button> ' : '') +
-            '<button class="btn-secondary" style="min-width:auto;font-size:.85em;color:#dc3545" onclick="deleteQuote(\'' + qId + '\')">Eliminar</button>' +
+            '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="viewQuote(\'' + qId + '\')" data-i18n="btn_view">Ver</button> ' +
+            (canConvert ? '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="convertToInvoice(\'' + qId + '\')" data-i18n="btn_convert_to_invoice">Convertir a Factura</button> ' : '') +
+            '<button class="btn-secondary" style="min-width:auto;font-size:.85em;color:#dc3545" onclick="deleteQuote(\'' + qId + '\')" data-i18n="btn_delete">Eliminar</button>' +
           '</td>' +
         '</tr>';
       }).join('');
@@ -270,35 +270,35 @@
     function getQuoteFormHtml() {
       return '<div class="modal-content">' +
         '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>' +
-        '<h2 style="margin:0 0 1em;color:#555">' + (editingQuoteId ? 'Editar Cotización' : 'Nueva Cotización') + '</h2>' +
+        '<h2 style="margin:0 0 1em;color:#555">' + (editingQuoteId ? APP.t('modal_title_edit_quote', 'Editar Cotización') : APP.t('modal_title_new_quote', 'Nueva Cotización')) + '</h2>' +
         '<form class="invoice-form" id="quote-form" onsubmit="saveQuote(event)" autocomplete="off">' +
           '<div class="form-row">' +
-            '<div><label for="quote-customer">Cliente *</label><select id="quote-customer" required><option value="">Seleccionar Cliente...</option></select></div>' +
-            '<div><label for="quote-date">Fecha</label><input type="date" id="quote-date"></div>' +
-            '<div><label for="quote-expiry">Vencimiento</label><input type="date" id="quote-expiry"></div>' +
+            '<div><label for="quote-customer" data-i18n="lbl_customer">Cliente *</label><select id="quote-customer" required><option value="" data-i18n="option_select_customer">Seleccionar Cliente...</option></select></div>' +
+            '<div><label for="quote-date" data-i18n="lbl_date">Fecha</label><input type="date" id="quote-date"></div>' +
+            '<div><label for="quote-expiry" data-i18n="lbl_due_date">Vencimiento</label><input type="date" id="quote-expiry"></div>' +
           '</div>' +
           '<div class="form-row">' +
-            '<div><label for="quote-number">N° Cotización</label><input type="text" id="quote-number" readonly></div>' +
-            '<div><label for="quote-currency">Moneda</label><select id="quote-currency"><option value="USD">USD - Dólar</option><option value="EUR">EUR - Euro</option><option value="MXN">MXN - Peso Mexicano</option><option value="COP">COP - Peso Colombiano</option><option value="ARS">ARS - Peso Argentino</option><option value="CLP">CLP - Peso Chileno</option></select></div>' +
+            '<div><label for="quote-number" data-i18n="lbl_quote_number">N° Cotización</label><input type="text" id="quote-number" readonly></div>' +
+            '<div><label for="quote-currency" data-i18n="lbl_currency">Moneda</label><select id="quote-currency"><option value="USD">USD - Dólar</option><option value="EUR">EUR - Euro</option><option value="MXN">MXN - Peso Mexicano</option><option value="COP">COP - Peso Colombiano</option><option value="ARS">ARS - Peso Argentino</option><option value="CLP">CLP - Peso Chileno</option></select></div>' +
           '</div>' +
-          '<div style="margin:1em 0"><div style="font-weight:bold;color:#555;font-size:1.05em;margin-bottom:.75em;padding-bottom:.4em;border-bottom:2px solid #ccc">Artículos</div>' +
-            '<div class="scroll-table"><table class="items-table" id="quote-items-table"><thead><tr><th style="width:5em">Cantidad</th><th style="width:8em">Código</th><th style="min-width:12em">Descripción</th><th style="width:9em">Precio Unitario</th><th style="width:7em">Descuento %</th><th style="width:9em">Impuesto</th><th style="width:9em">Total</th><th style="width:2em"></th></tr></thead><tbody id="quote-items-body"></tbody></table></div>' +
-            '<button type="button" class="btn btn-secondary" onclick="addQuoteItem()" style="margin-top:.5em;min-width:auto">+ Agregar Artículo</button>' +
+          '<div style="margin:1em 0"><div style="font-weight:bold;color:#555;font-size:1.05em;margin-bottom:.75em;padding-bottom:.4em;border-bottom:2px solid #ccc" data-i18n="section_items">Artículos</div>' +
+            '<div class="scroll-table"><table class="items-table" id="quote-items-table"><thead><tr><th style="width:5em" data-i18n="th_qty">Cantidad</th><th style="width:8em" data-i18n="th_code">Código</th><th style="min-width:12em" data-i18n="th_description">Descripción</th><th style="width:9em" data-i18n="th_unit_price">Precio Unitario</th><th style="width:7em" data-i18n="th_discount_pct">Descuento %</th><th style="width:9em" data-i18n="th_tax">Impuesto</th><th style="width:9em" data-i18n="th_total">Total</th><th style="width:2em"></th></tr></thead><tbody id="quote-items-body"></tbody></table></div>' +
+            '<button type="button" class="btn btn-secondary" onclick="addQuoteItem()" style="margin-top:.5em;min-width:auto" data-i18n="btn_add_item">+ Agregar Artículo</button>' +
           '</div>' +
           '<div class="totals" id="quote-totals-section">' +
-            '<div class="total-row"><span class="label">Subtotal</span><span class="value" id="qt-subtotal">$ 0.00</span></div>' +
-            '<div class="total-row"><span class="label">Descuento</span><span class="value" id="qt-discount">$ 0.00</span></div>' +
-            '<div class="total-row"><span class="label">Impuestos</span><span class="value" id="qt-tax">$ 0.00</span></div>' +
-            '<div class="total-row grand"><span class="label">Total General</span><span class="value" id="qt-grand">$ 0.00</span></div>' +
+            '<div class="total-row"><span class="label" data-i18n="lbl_subtotal">Subtotal</span><span class="value" id="qt-subtotal">$ 0.00</span></div>' +
+            '<div class="total-row"><span class="label" data-i18n="lbl_discount">Descuento</span><span class="value" id="qt-discount">$ 0.00</span></div>' +
+            '<div class="total-row"><span class="label" data-i18n="lbl_tax">Impuestos</span><span class="value" id="qt-tax">$ 0.00</span></div>' +
+            '<div class="total-row grand"><span class="label" data-i18n="lbl_grand_total">Total General</span><span class="value" id="qt-grand">$ 0.00</span></div>' +
           '</div>' +
           '<div class="form-row">' +
-            '<div><label for="quote-notes">Notas</label><textarea id="quote-notes" rows="3" placeholder="Notas visibles en la cotización"></textarea></div>' +
-            '<div><label for="quote-private-notes">Notas Privadas</label><textarea id="quote-private-notes" rows="3" placeholder="Notas internas"></textarea></div>' +
+            '<div><label for="quote-notes" data-i18n="lbl_public_note">Notas</label><textarea id="quote-notes" rows="3" data-i18n-placeholder="placeholder_quote_notes" placeholder="Notas visibles en la cotización"></textarea></div>' +
+            '<div><label for="quote-private-notes" data-i18n="lbl_private_note">Notas Privadas</label><textarea id="quote-private-notes" rows="3" data-i18n-placeholder="placeholder_private_note" placeholder="Notas internas"></textarea></div>' +
           '</div>' +
           '<div class="modal-footer">' +
-            '<button type="button" class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>' +
-            '<button type="button" class="btn-secondary" onclick="saveQuoteDraft()">Guardar Borrador</button>' +
-            '<button type="submit" class="btn">Guardar y Enviar</button>' +
+            '<button type="button" class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" data-i18n="btn_cancel">Cancelar</button>' +
+            '<button type="button" class="btn-secondary" onclick="saveQuoteDraft()" data-i18n="btn_save_draft">Guardar Borrador</button>' +
+            '<button type="submit" class="btn" data-i18n="btn_save_and_send">Guardar y Enviar</button>' +
           '</div>' +
         '</form>' +
       '</div>';
@@ -306,7 +306,7 @@
 
     function populateCustomerDropdown() {
       const sel = document.getElementById('quote-customer');
-      sel.innerHTML = '<option value="">Seleccionar Cliente...</option>';
+      sel.innerHTML = '<option value="" data-i18n="option_select_customer">Seleccionar Cliente...</option>';
       customers.forEach(c => {
         sel.innerHTML += '<option value="' + APP.esc(c.id) + '">' + APP.esc(c.name) + (c.email ? ' (' + APP.esc(c.email) + ')' : '') + '</option>';
       });
@@ -320,8 +320,8 @@
       tr.id = rowId;
       tr.innerHTML =
         '<td><input type="number" class="item-qty" value="' + (data.quantity || 1) + '" min="0.01" step="0.01" oninput="calculateQuoteRow(\'' + rowId + '\')"></td>' +
-        '<td><input type="text" class="item-code" value="' + APP.esc(data.item_code || data.code || '') + '" list="item-codes" onchange="onQuoteItemCodeChange(\'' + rowId + '\')" placeholder="Código"></td>' +
-        '<td><input type="text" class="item-desc" value="' + APP.esc(data.description || data.name || '') + '" placeholder="Descripción"></td>' +
+        '<td><input type="text" class="item-code" value="' + APP.esc(data.item_code || data.code || '') + '" list="item-codes" onchange="onQuoteItemCodeChange(\'' + rowId + '\')" data-i18n-placeholder="placeholder_code" placeholder="Código"></td>' +
+        '<td><input type="text" class="item-desc" value="' + APP.esc(data.description || data.name || '') + '" data-i18n-placeholder="placeholder_description" placeholder="Descripción"></td>' +
         '<td><input type="number" class="item-price" value="' + (data.unit_price || data.price || 0) + '" step="0.01" min="0" oninput="calculateQuoteRow(\'' + rowId + '\')"></td>' +
         '<td><input type="number" class="item-discount" value="' + (data.discount || 0) + '" step="0.01" min="0" max="100" oninput="calculateQuoteRow(\'' + rowId + '\')"></td>' +
         '<td><select class="item-tax" onchange="calculateQuoteRow(\'' + rowId + '\')">' + taxOpts + '</select></td>' +
@@ -504,28 +504,28 @@
         const items = data.items || [];
         let itemsHtml = '';
         if (items.length > 0) {
-          itemsHtml = '<table class="items-table" style="margin:.5em 0"><thead><tr><th>Descripción</th><th>Cant</th><th>Precio</th><th>Total</th></tr></thead><tbody>' +
+          itemsHtml = '<table class="items-table" style="margin:.5em 0"><thead><tr><th data-i18n="th_description">Descripción</th><th data-i18n="th_qty">Cant</th><th data-i18n="th_price">Precio</th><th data-i18n="th_total">Total</th></tr></thead><tbody>' +
             items.map(item => '<tr><td>' + APP.esc(item.description || item.name || '') + '</td><td>' + APP.esc(item.quantity || 1) + '</td><td>' + APP.formatMoney(item.price || 0) + '</td><td>' + APP.formatMoney((item.price || 0) * (item.quantity || 1)) + '</td></tr>').join('') +
           '</tbody></table>';
         }
         const html =
           '<div class="modal-content">' +
             '<button class="modal-close" onclick="this.closest(\'div[style]\').remove()">&times;</button>' +
-            '<h2>Cotización ' + APP.esc(data.quote_number || data.number || id) + '</h2>' +
+            '<h2>' + APP.t('lbl_quote', 'Cotización') + ' ' + APP.esc(data.quote_number || data.number || id) + '</h2>' +
             '<div style="margin-bottom:1em">' +
-              '<p><strong>Cliente:</strong> ' + APP.esc(data.customer_name || data.customer || '-') + '</p>' +
-              '<p><strong>Fecha:</strong> ' + (data.date || data.issue_date || '-') + '</p>' +
-              '<p><strong>Vencimiento:</strong> ' + (data.expiry_date || data.valid_until || '-') + '</p>' +
-              '<p><strong>Estado:</strong> <span class="status ' + statusClass + '">' + statusLabel + '</span></p>' +
+              '<p><strong data-i18n="th_customer">Cliente:</strong> ' + APP.esc(data.customer_name || data.customer || '-') + '</p>' +
+              '<p><strong data-i18n="th_date">Fecha:</strong> ' + (data.date || data.issue_date || '-') + '</p>' +
+              '<p><strong data-i18n="th_due_date">Vencimiento:</strong> ' + (data.expiry_date || data.valid_until || '-') + '</p>' +
+              '<p><strong data-i18n="th_status">Estado:</strong> <span class="status ' + statusClass + '">' + statusLabel + '</span></p>' +
             '</div>' +
             itemsHtml +
             '<div class="totals">' +
-              '<div class="total-row">Subtotal: ' + subtotal + '</div>' +
-              (data.discount ? '<div class="total-row">Descuento: ' + discount + '</div>' : '') +
-              (data.tax ? '<div class="total-row">Impuesto: ' + tax + '</div>' : '') +
-              '<div class="total-row grand">Total: ' + total + '</div>' +
+              '<div class="total-row"><span data-i18n="lbl_subtotal">Subtotal:</span> ' + subtotal + '</div>' +
+              (data.discount ? '<div class="total-row"><span data-i18n="lbl_discount">Descuento:</span> ' + discount + '</div>' : '') +
+              (data.tax ? '<div class="total-row"><span data-i18n="lbl_tax">Impuesto:</span> ' + tax + '</div>' : '') +
+              '<div class="total-row grand"><span data-i18n="lbl_total">Total:</span> ' + total + '</div>' +
             '</div>' +
-            (data.notes ? '<div style="margin-top:1em"><strong>Notas:</strong><p>' + APP.esc(data.notes) + '</p></div>' : '') +
+            (data.notes ? '<div style="margin-top:1em"><strong data-i18n="lbl_notes">Notas:</strong><p>' + APP.esc(data.notes) + '</p></div>' : '') +
           '</div>';
         const overlay = document.createElement('div');
         overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:60;display:flex;align-items:center;justify-content:center;overflow-y:auto';
@@ -538,7 +538,7 @@
     }
 
     async function convertToInvoice(id) {
-      APP.confirm('Convertir a Factura', '¿Estás seguro de convertir esta cotización en factura? Se creará una nueva factura basada en esta cotización.', async () => {
+      APP.confirm(APP.t('confirm_convert_title', 'Convertir a Factura'), APP.t('confirm_convert_text', '¿Estás seguro de convertir esta cotización en factura? Se creará una nueva factura basada en esta cotización.'), async () => {
         try {
           const resp = await API.post('/api/quotes/' + id + '/convert');
           if (resp.error) {
@@ -554,7 +554,7 @@
     }
 
     function deleteQuote(id) {
-      APP.confirm('Eliminar Cotización', '¿Estás seguro de eliminar esta cotización? Esta acción no se puede deshacer.', async () => {
+      APP.confirm(APP.t('confirm_delete_title', 'Eliminar Cotización'), APP.t('confirm_delete_text', '¿Estás seguro de eliminar esta cotización? Esta acción no se puede deshacer.'), async () => {
         try {
           const resp = await API.del('/api/quotes/' + id);
           if (resp.error) {

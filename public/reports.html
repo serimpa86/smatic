@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reportes | Smatic</title>
+  <title data-i18n="page_title_reports">Reportes | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -14,20 +14,20 @@
         <span>Smatic</span>
       </div>
       <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
-        <li><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
-        <li class="active"><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+        <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+        <li class="active"><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
       </ul>
       <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
       </div>
     </nav>
   </div>
@@ -36,65 +36,65 @@
     <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-      Smatic - Reportes
+      <span data-i18n="breadcrumb_reports">Smatic - Reportes</span>
     </div>
   </div>
 
   <div class="container" id="main-content">
     <div class="page-header">
-      <h1>Reportes</h1>
+      <h1 data-i18n="page_title_reports">Reportes</h1>
     </div>
 
     <div id="stats-container" class="stats-grid">
-      <div class="stat-card"><div class="stat-value" id="stat-invoiced">$0</div><div class="stat-label">Total Facturado</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-paid">$0</div><div class="stat-label">Total Cobrado</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-due">$0</div><div class="stat-label">Pendiente</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-invoiced">$0</div><div class="stat-label" data-i18n="stat_total_invoiced">Total Facturado</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-paid">$0</div><div class="stat-label" data-i18n="stat_total_paid">Total Cobrado</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-due">$0</div><div class="stat-label" data-i18n="stat_total_due">Pendiente</div></div>
     </div>
 
     <div class="card">
-      <div class="card-header">Reporte de Ventas</div>
+      <div class="card-header" data-i18n="card_sales_report">Reporte de Ventas</div>
       <div class="filters">
-        <label style="font-size:.9em;color:#555">Desde:</label>
+        <label style="font-size:.9em;color:#555" data-i18n="lbl_from">Desde:</label>
         <input type="date" id="sales-from">
-        <label style="font-size:.9em;color:#555">Hasta:</label>
+        <label style="font-size:.9em;color:#555" data-i18n="lbl_to">Hasta:</label>
         <input type="date" id="sales-to">
-        <button onclick="loadSalesReport()">Filtrar</button>
-        <button class="btn-secondary" onclick="resetSalesFilter()">Limpiar</button>
+        <button onclick="loadSalesReport()" data-i18n="btn_filter">Filtrar</button>
+        <button class="btn-secondary" onclick="resetSalesFilter()" data-i18n="btn_clear">Limpiar</button>
       </div>
       <div id="sales-total" style="text-align:right;font-size:1.1em;font-weight:bold;color:#444;margin-bottom:.5em"></div>
       <div class="scroll-table">
         <table class="record-list" id="sales-table">
           <thead>
             <tr>
-              <th>N° Factura</th>
-              <th>Cliente</th>
-              <th>Fecha</th>
-              <th>Estado</th>
-              <th>Total</th>
+              <th data-i18n="th_invoice_number">N° Factura</th>
+              <th data-i18n="th_customer">Cliente</th>
+              <th data-i18n="th_date">Fecha</th>
+              <th data-i18n="th_status">Estado</th>
+              <th data-i18n="th_total">Total</th>
             </tr>
           </thead>
           <tbody id="sales-body">
-            <tr><td colspan="5" class="text-center" style="color:#999">Cargando...</td></tr>
+            <tr><td colspan="5" class="text-center" style="color:#999" data-i18n="loading">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-header">Reporte de Clientes</div>
+      <div class="card-header" data-i18n="card_customer_report">Reporte de Clientes</div>
       <div class="scroll-table">
         <table class="record-list" id="customer-report-table">
           <thead>
             <tr>
-              <th>Cliente</th>
-              <th>Email</th>
-              <th>Facturas</th>
-              <th>Total Comprado</th>
-              <th>Saldo Pendiente</th>
+              <th data-i18n="th_customer">Cliente</th>
+              <th data-i18n="th_email">Email</th>
+              <th data-i18n="th_invoices_count">Facturas</th>
+              <th data-i18n="th_total_purchased">Total Comprado</th>
+              <th data-i18n="th_balance">Saldo Pendiente</th>
             </tr>
           </thead>
           <tbody id="customer-report-body">
-            <tr><td colspan="5" class="text-center" style="color:#999">Cargando...</td></tr>
+            <tr><td colspan="5" class="text-center" style="color:#999" data-i18n="loading">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -150,7 +150,7 @@
         const invoices = data.invoices || data.sales || data.data || [];
         const totalSum = data.total || data.totalSum || 0;
 
-        document.getElementById('sales-total').textContent = 'Total: ' + APP.formatMoney(totalSum);
+        document.getElementById('sales-total').textContent = APP.t('lbl_total') + ': ' + APP.formatMoney(totalSum);
 
         if (!invoices.length) {
           tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color:#999">No hay facturas en este período.</td></tr>';

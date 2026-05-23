@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | Smatic</title>
+  <title data-i18n="page_title_dashboard">Dashboard | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -14,20 +14,20 @@
         <span>Smatic</span>
       </div>
       <ul>
-        <li class="active"><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
-        <li><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+        <li class="active"><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+        <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
       </ul>
       <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
       </div>
     </nav>
   </div>
@@ -36,57 +36,57 @@
     <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-      Smatic - Panel Principal
+      <span data-i18n="breadcrumb_dashboard">Smatic - Panel Principal</span>
     </div>
   </div>
 
   <div class="container" id="main-content">
     <div class="page-header">
-      <h1>Panel Principal</h1>
+      <h1 data-i18n="page_title_dashboard">Panel Principal</h1>
     </div>
 
     <div id="stats-container" class="stats-grid">
-      <div class="stat-card"><div class="stat-value" id="stat-invoiced">$0</div><div class="stat-label">Total Facturado</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-paid">$0</div><div class="stat-label">Total Cobrado</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-due">$0</div><div class="stat-label">Pendiente</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-customers">0</div><div class="stat-label">Clientes</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-overdue">0</div><div class="stat-label">Vencidas</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-invoiced">$0</div><div class="stat-label" data-i18n="stat_total_invoiced">Total Facturado</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-paid">$0</div><div class="stat-label" data-i18n="stat_total_paid">Total Cobrado</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-due">$0</div><div class="stat-label" data-i18n="stat_total_due">Pendiente</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-customers">0</div><div class="stat-label" data-i18n="stat_total_customers">Clientes</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-overdue">0</div><div class="stat-label" data-i18n="stat_overdue">Vencidas</div></div>
     </div>
 
     <div class="card">
-      <div class="card-header">Crear</div>
+      <div class="card-header" data-i18n="card_create">Crear</div>
       <div class="create-grid">
         <a href="new-invoice.html" class="create-item" data-action="invoice">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <span>Factura</span>
+          <span data-i18n="create_invoice">Factura</span>
         </a>
         <a href="new-invoice.html?recurring=1" class="create-item" data-action="recurring">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          <span>Factura Recurrente</span>
+          <span data-i18n="create_recurring_invoice">Factura Recurrente</span>
         </a>
         <a href="customers.html" class="create-item" data-action="customer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span>Cliente</span>
+          <span data-i18n="create_customer">Cliente</span>
         </a>
         <a href="new-quote.html" class="create-item" data-action="quote">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13l-1 2h3l-1 2"/><path d="M15 13l-1 2h3l-1 2"/></svg>
-          <span>Cotización</span>
+          <span data-i18n="create_quote">Cotización</span>
         </a>
         <a href="credit-notes.html" class="create-item" data-action="credit-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-          <span>Nota de Crédito</span>
+          <span data-i18n="create_credit_note">Nota de Crédito</span>
         </a>
         <a href="payments.html" class="create-item" data-action="payment">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          <span>Pago</span>
+          <span data-i18n="create_payment">Pago</span>
         </a>
         <a href="items.html" class="create-item" data-action="item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          <span>Producto</span>
+          <span data-i18n="create_item">Producto</span>
         </a>
         <a href="settings.html?tab=users" class="create-item" data-action="invite">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-          <span>Invitrar Usuario</span>
+          <span data-i18n="create_invite_user">Invitar Usuario</span>
         </a>
       </div>
     </div>
@@ -94,24 +94,24 @@
     <div class="dash-columns">
       <div class="dash-col-main">
         <div class="card">
-          <div class="card-header">Facturas Pendientes</div>
+          <div class="card-header" data-i18n="card_pending_invoices">Facturas Pendientes</div>
           <div class="filters">
-            <input type="text" id="pending-search" placeholder="Buscar por número o cliente..." oninput="filterPendingInvoices()">
+            <input type="text" id="pending-search" data-i18n-placeholder="placeholder_search_pending" placeholder="Buscar por número o cliente..." oninput="filterPendingInvoices()">
           </div>
           <div class="scroll-table">
             <table class="record-list" id="pending-table">
               <thead>
                 <tr>
-                  <th>Fecha</th>
-                  <th>N° Factura</th>
-                  <th>Cliente</th>
-                  <th>Total</th>
-                  <th>Estado</th>
-                  <th>Acción</th>
+                  <th data-i18n="th_date">Fecha</th>
+                  <th data-i18n="th_invoice_number">N° Factura</th>
+                  <th data-i18n="th_customer">Cliente</th>
+                  <th data-i18n="th_total">Total</th>
+                  <th data-i18n="th_status">Estado</th>
+                  <th data-i18n="th_action">Acción</th>
                 </tr>
               </thead>
               <tbody id="pending-body">
-                <tr><td colspan="6" class="text-center" style="color:#999">Cargando...</td></tr>
+                <tr><td colspan="6" class="text-center" style="color:#999" data-i18n="loading">Cargando...</td></tr>
               </tbody>
             </table>
           </div>
@@ -119,17 +119,17 @@
       </div>
       <div class="dash-col-side">
         <div class="card">
-          <div class="card-header">Ingresos por mes</div>
+          <div class="card-header" data-i18n="card_monthly_income">Ingresos por mes</div>
           <div class="chart-container">
             <canvas id="income-chart" width="300" height="180"></canvas>
-            <div id="chart-empty" class="chart-empty hidden">No hay datos de ingresos</div>
+            <div id="chart-empty" class="chart-empty hidden" data-i18n="msg_no_income_data">No hay datos de ingresos</div>
           </div>
         </div>
         <div id="first-time" class="hidden first-time-card">
           <div class="card">
-            <div class="card-header">¡Bienvenido a Smatic!</div>
-            <p style="color:#666;margin:.5em 0 1em">Crea tu primera factura para empezar a facturar.</p>
-            <button onclick="window.location.href='new-invoice.html'" style="width:100%">Crear Primera Factura</button>
+            <div class="card-header" data-i18n="card_welcome">¡Bienvenido a Smatic!</div>
+            <p style="color:#666;margin:.5em 0 1em" data-i18n="msg_first_invoice">Crea tu primera factura para empezar a facturar.</p>
+            <button onclick="window.location.href='new-invoice.html'" style="width:100%" data-i18n="btn_create_first_invoice">Crear Primera Factura</button>
           </div>
         </div>
       </div>
@@ -195,7 +195,7 @@
           '<td>' + APP.esc(inv.customer_name || '-') + '</td>' +
           '<td>' + APP.formatMoney(inv.total) + '</td>' +
           '<td><span class="status ' + statusClass + '">' + APP.esc(statusLabel) + '</span></td>' +
-          '<td><a href="invoices.html?id=' + inv.id + '" class="btn btn-secondary" style="min-width:auto;font-size:.8em;padding:.2em .6em">Ver</a></td>' +
+          '<td><a href="invoices.html?id=' + inv.id + '" class="btn btn-secondary" style="min-width:auto;font-size:.8em;padding:.2em .6em" data-i18n="btn_view">Ver</a></td>' +
           '</tr>';
       }).join('');
     }

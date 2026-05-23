@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin | Smatic</title>
+  <title data-i18n="page_title_admin">Admin | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
     .admin-tabs { display: flex; gap: 0; margin-bottom: 1em; border-bottom: 2px solid #ccc; }
@@ -34,49 +34,49 @@
 <body>
   <div class="navigation-wrapper" id="sidebar">
     <nav class="navigation">
-      <div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic Admin</span></div>
+      <div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span data-i18n="sidebar_brand_admin">Smatic Admin</span></div>
       <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
-        <li class="active"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+        <li class="active"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
       </ul>
-      <div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a></div>
+      <div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a></div>
     </nav>
   </div>
 
   <div class="header-wrapper">
     <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
-    <div class="breadcrumbs">⚡ Smatic - Administración del Sistema</div>
+    <div class="breadcrumbs" data-i18n="breadcrumb_admin">⚡ Smatic - Administración del Sistema</div>
   </div>
 
   <div class="container">
-    <div class="page-header"><h1>Panel de Administración</h1></div>
+    <div class="page-header"><h1 data-i18n="page_title_admin">Panel de Administración</h1></div>
 
     <div id="admin-error" class="hidden" style="background:#f8d7da;color:#721c24;padding:.5em;margin-bottom:1em;display:none"></div>
 
     <div class="admin-tabs" id="admin-tabs">
-      <div class="admin-tab active" data-tab="tab-dashboard">Dashboard</div>
-      <div class="admin-tab" data-tab="tab-users">Usuarios</div>
-      <div class="admin-tab" data-tab="tab-config">Config. Sistema</div>
-      <div class="admin-tab" data-tab="tab-audit">Auditoría</div>
-      <div class="admin-tab" data-tab="tab-data">Datos Globales</div>
+      <div class="admin-tab active" data-i18n="tab_dashboard" data-tab="tab-dashboard">Dashboard</div>
+      <div class="admin-tab" data-i18n="tab_users" data-tab="tab-users">Usuarios</div>
+      <div class="admin-tab" data-i18n="tab_system_config" data-tab="tab-config">Config. Sistema</div>
+      <div class="admin-tab" data-i18n="tab_audit" data-tab="tab-audit">Auditoría</div>
+      <div class="admin-tab" data-i18n="tab_global_data" data-tab="tab-data">Datos Globales</div>
     </div>
 
     <div id="tab-dashboard" class="admin-section active">
       <div class="stat-grid" id="stats-grid">
-        <div class="stat-box"><div class="num" id="s-users">-</div><div class="lbl">Usuarios totales</div></div>
-        <div class="stat-box"><div class="num" id="s-active">-</div><div class="lbl">Usuarios activos</div></div>
-        <div class="stat-box"><div class="num" id="s-invoices">-</div><div class="lbl">Facturas emitidas</div></div>
-        <div class="stat-box"><div class="num" id="s-revenue">-</div><div class="lbl">Ingresos cobrados</div></div>
-        <div class="stat-box"><div class="num" id="s-due">-</div><div class="lbl">Pendiente cobro</div></div>
-        <div class="stat-box"><div class="num" id="s-customers">-</div><div class="lbl">Clientes totales</div></div>
-        <div class="stat-box"><div class="num" id="s-items">-</div><div class="lbl">Productos</div></div>
-        <div class="stat-box"><div class="num" id="s-dbsize">-</div><div class="lbl">Tamaño BD</div></div>
+        <div class="stat-box"><div class="num" id="s-users">-</div><div class="lbl" data-i18n="stat_total_users">Usuarios totales</div></div>
+        <div class="stat-box"><div class="num" id="s-active">-</div><div class="lbl" data-i18n="stat_active_users">Usuarios activos</div></div>
+        <div class="stat-box"><div class="num" id="s-invoices">-</div><div class="lbl" data-i18n="stat_invoices_issued">Facturas emitidas</div></div>
+        <div class="stat-box"><div class="num" id="s-revenue">-</div><div class="lbl" data-i18n="stat_revenue_collected">Ingresos cobrados</div></div>
+        <div class="stat-box"><div class="num" id="s-due">-</div><div class="lbl" data-i18n="stat_pending_collection">Pendiente cobro</div></div>
+        <div class="stat-box"><div class="num" id="s-customers">-</div><div class="lbl" data-i18n="stat_total_customers">Clientes totales</div></div>
+        <div class="stat-box"><div class="num" id="s-items">-</div><div class="lbl" data-i18n="stat_products">Productos</div></div>
+        <div class="stat-box"><div class="num" id="s-dbsize">-</div><div class="lbl" data-i18n="stat_db_size">Tamaño BD</div></div>
       </div>
       <div style="display:flex;gap:1em;flex-wrap:wrap">
-        <button onclick="downloadBackup()">📦 Descargar Backup BD</button>
+        <button onclick="downloadBackup()">📦 <span data-i18n="btn_download_backup">Descargar Backup BD</span></button>
       </div>
     </div>
 
@@ -86,12 +86,12 @@
           <span id="user-count" style="color:#666;font-size:.9em"></span>
           <span id="user-stats" style="color:#666;font-size:.9em;margin-left:1em"></span>
         </div>
-        <div class="actions"><button onclick="showUserModal()">+ Nuevo Usuario</button></div>
+        <div class="actions"><button onclick="showUserModal()">+ <span data-i18n="btn_new_user">Nuevo Usuario</span></button></div>
       </div>
       <div class="filters">
-        <input id="user-search" placeholder="Buscar usuarios..." oninput="loadUsers()">
+        <input id="user-search" data-i18n-placeholder="placeholder_search_users" placeholder="Buscar usuarios..." oninput="loadUsers()">
         <select id="user-role-filter" onchange="loadUsers()">
-          <option value="">Todos los roles</option>
+          <option value=""><span data-i18n="filter_all_roles">Todos los roles</span></option>
           <option value="superadmin">Superadmin</option>
           <option value="admin">Admin</option>
           <option value="user">Usuario</option>
@@ -102,64 +102,64 @@
 
     <div id="tab-config" class="admin-section">
       <form id="system-config-form" onsubmit="return saveSystemConfig()">
-        <h3 style="color:#555;border-bottom:1px solid #eee;padding-bottom:.5em">Información del Sistema</h3>
+        <h3 data-i18n="section_system_info" style="color:#555;border-bottom:1px solid #eee;padding-bottom:.5em">Información del Sistema</h3>
         <div class="config-grid" style="margin-bottom:1em">
-          <div><label>Nombre de la aplicación</label><input name="app_name" id="cfg-app_name"></div>
-          <div><label>Tagline</label><input name="app_tagline" id="cfg-app_tagline"></div>
-          <div><label>Nombre de la compañía</label><input name="company_name" id="cfg-company_name"></div>
-          <div><label>Email de soporte</label><input name="support_email" id="cfg-support_email" type="email"></div>
-          <div><label>Máximo de usuarios</label><input name="max_users" id="cfg-max_users" type="number"></div>
+          <div><label data-i18n="lbl_app_name">Nombre de la aplicación</label><input name="app_name" id="cfg-app_name"></div>
+          <div><label data-i18n="lbl_tagline">Tagline</label><input name="app_tagline" id="cfg-app_tagline"></div>
+          <div><label data-i18n="lbl_company_name">Nombre de la compañía</label><input name="company_name" id="cfg-company_name"></div>
+          <div><label data-i18n="lbl_support_email">Email de soporte</label><input name="support_email" id="cfg-support_email" type="email"></div>
+          <div><label data-i18n="lbl_max_users">Máximo de usuarios</label><input name="max_users" id="cfg-max_users" type="number"></div>
           <div>
-            <label>Registro público</label>
+            <label data-i18n="lbl_public_signup">Registro público</label>
             <select name="allow_public_signup" id="cfg-allow_public_signup">
-              <option value="1">Permitido</option><option value="0">Deshabilitado</option>
+              <option value="1" data-i18n="option_allowed">Permitido</option><option value="0" data-i18n="option_disabled">Deshabilitado</option>
             </select>
           </div>
           <div>
-            <label>Modo mantenimiento</label>
+            <label data-i18n="lbl_maintenance_mode">Modo mantenimiento</label>
             <select name="maintenance_mode" id="cfg-maintenance_mode">
-              <option value="0">Desactivado</option><option value="1">Activado</option>
+              <option value="0" data-i18n="option_disabled">Desactivado</option><option value="1" data-i18n="option_enabled">Activado</option>
             </select>
           </div>
         </div>
-        <h3 style="color:#555;border-bottom:1px solid #eee;padding-bottom:.5em">Configuración SMTP (Email)</h3>
+        <h3 data-i18n="section_smtp_config" style="color:#555;border-bottom:1px solid #eee;padding-bottom:.5em">Configuración SMTP (Email)</h3>
         <div class="config-grid" style="margin-bottom:1em">
-          <div><label>SMTP Host</label><input name="smtp_host" id="cfg-smtp_host"></div>
-          <div><label>SMTP Puerto</label><input name="smtp_port" id="cfg-smtp_port" type="number"></div>
-          <div><label>SMTP Usuario</label><input name="smtp_user" id="cfg-smtp_user"></div>
-          <div><label>SMTP Contraseña</label><input name="smtp_pass" id="cfg-smtp_pass" type="password" placeholder="••••••••"></div>
-          <div><label>Email desde</label><input name="smtp_from_email" id="cfg-smtp_from_email" type="email"></div>
-          <div><label>Nombre desde</label><input name="smtp_from_name" id="cfg-smtp_from_name"></div>
+          <div><label data-i18n="lbl_smtp_host">SMTP Host</label><input name="smtp_host" id="cfg-smtp_host"></div>
+          <div><label data-i18n="lbl_smtp_port">SMTP Puerto</label><input name="smtp_port" id="cfg-smtp_port" type="number"></div>
+          <div><label data-i18n="lbl_smtp_user">SMTP Usuario</label><input name="smtp_user" id="cfg-smtp_user"></div>
+          <div><label data-i18n="lbl_smtp_password">SMTP Contraseña</label><input name="smtp_pass" id="cfg-smtp_pass" type="password" data-i18n-placeholder="placeholder_smtp_password" placeholder="••••••••"></div>
+          <div><label data-i18n="lbl_smtp_from_email">Email desde</label><input name="smtp_from_email" id="cfg-smtp_from_email" type="email"></div>
+          <div><label data-i18n="lbl_smtp_from_name">Nombre desde</label><input name="smtp_from_name" id="cfg-smtp_from_name"></div>
         </div>
-        <h3 style="color:#555;border-bottom:1px solid #eee;padding-bottom:.5em">Pasarelas de Pago</h3>
+        <h3 data-i18n="section_payment_gateways" style="color:#555;border-bottom:1px solid #eee;padding-bottom:.5em">Pasarelas de Pago</h3>
         <div class="config-grid" style="margin-bottom:1em">
-          <div><label>Stripe Public Key</label><input name="stripe_public_key" id="cfg-stripe_public_key"></div>
-          <div><label>Stripe Secret Key</label><input name="stripe_secret_key" id="cfg-stripe_secret_key" type="password"></div>
-          <div><label>PayPal Client ID</label><input name="paypal_client_id" id="cfg-paypal_client_id"></div>
-          <div><label>PayPal Secret</label><input name="paypal_secret" id="cfg-paypal_secret" type="password"></div>
+          <div><label data-i18n="lbl_stripe_public_key">Stripe Public Key</label><input name="stripe_public_key" id="cfg-stripe_public_key"></div>
+          <div><label data-i18n="lbl_stripe_secret_key">Stripe Secret Key</label><input name="stripe_secret_key" id="cfg-stripe_secret_key" type="password"></div>
+          <div><label data-i18n="lbl_paypal_client_id">PayPal Client ID</label><input name="paypal_client_id" id="cfg-paypal_client_id"></div>
+          <div><label data-i18n="lbl_paypal_secret">PayPal Secret</label><input name="paypal_secret" id="cfg-paypal_secret" type="password"></div>
         </div>
-        <button type="submit">💾 Guardar Configuración del Sistema</button>
+        <button type="submit">💾 <span data-i18n="btn_save_system_config">Guardar Configuración del Sistema</span></button>
       </form>
     </div>
 
     <div id="tab-audit" class="admin-section">
       <div class="page-header" style="margin-bottom:.5em">
         <span style="color:#666;font-size:.9em" id="audit-count"></span>
-        <button class="btn-danger" onclick="clearAuditLog()">🗑 Limpiar Log</button>
+        <button class="btn-danger" onclick="clearAuditLog()">🗑 <span data-i18n="btn_clear_log">Limpiar Log</span></button>
       </div>
       <div id="audit-log-list"></div>
     </div>
 
     <div id="tab-data" class="admin-section">
-      <h3 style="color:#555">Clientes de todos los usuarios</h3>
-      <div class="filters"><input id="global-customer-search" placeholder="Buscar clientes..." oninput="loadAllCustomers()"></div>
-      <div class="scroll-table"><table class="record-list"><thead><tr><th>Usuario</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Grupo</th></tr></thead><tbody id="global-customers-body"></tbody></table></div>
+      <h3 data-i18n="section_all_customers" style="color:#555">Clientes de todos los usuarios</h3>
+      <div class="filters"><input id="global-customer-search" data-i18n-placeholder="placeholder_search_customers" placeholder="Buscar clientes..." oninput="loadAllCustomers()"></div>
+      <div class="scroll-table"><table class="record-list"><thead><tr><th data-i18n="th_user">Usuario</th><th data-i18n="th_name">Nombre</th><th data-i18n="th_email">Email</th><th data-i18n="th_phone">Teléfono</th><th data-i18n="th_group">Grupo</th></tr></thead><tbody id="global-customers-body"></tbody></table></div>
       <hr style="margin:2em 0">
-      <h3 style="color:#555">Facturas de todos los usuarios</h3>
+      <h3 data-i18n="section_all_invoices" style="color:#555">Facturas de todos los usuarios</h3>
       <div class="filters">
-        <select id="global-inv-status" onchange="loadAllInvoices()"><option value="">Todos</option><option value="paid">Pagadas</option><option value="sent">Enviadas</option><option value="overdue">Vencidas</option></select>
+        <select id="global-inv-status" onchange="loadAllInvoices()"><option value="" data-i18n="filter_all">Todos</option><option value="paid" data-i18n="status_paid">Pagadas</option><option value="sent" data-i18n="status_sent">Enviadas</option><option value="overdue" data-i18n="status_overdue">Vencidas</option></select>
       </div>
-      <div class="scroll-table"><table class="record-list"><thead><tr><th>Usuario</th><th>N° Factura</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead><tbody id="global-invoices-body"></tbody></table></div>
+      <div class="scroll-table"><table class="record-list"><thead><tr><th data-i18n="th_user">Usuario</th><th data-i18n="th_invoice_number">N° Factura</th><th data-i18n="th_customer">Cliente</th><th data-i18n="th_total">Total</th><th data-i18n="th_status">Estado</th></tr></thead><tbody id="global-invoices-body"></tbody></table></div>
     </div>
   </div>
 
@@ -167,27 +167,27 @@
   <div id="user-modal" class="modal-overlay" style="display:none">
     <div class="modal-content">
       <button class="modal-close" onclick="closeUserModal()">&times;</button>
-      <h2 id="user-modal-title">Nuevo Usuario</h2>
+      <h2 id="user-modal-title" data-i18n="modal_title_new_user">Nuevo Usuario</h2>
       <form onsubmit="return saveUser()">
-        <div style="margin-bottom:.5em"><label>Email:</label><input id="um-email" type="email" style="width:100%"></div>
-        <div style="margin-bottom:.5em"><label>Nombre:</label><input id="um-name" style="width:100%"></div>
-        <div style="margin-bottom:.5em"><label>Contraseña:</label><input id="um-password" type="password" style="width:100%" placeholder="Mín. 6 caracteres"></div>
-        <div style="margin-bottom:.5em"><label>Rol:</label>
+        <div style="margin-bottom:.5em"><label data-i18n="lbl_email">Email:</label><input id="um-email" type="email" style="width:100%"></div>
+        <div style="margin-bottom:.5em"><label data-i18n="lbl_name">Nombre:</label><input id="um-name" style="width:100%"></div>
+        <div style="margin-bottom:.5em"><label data-i18n="lbl_password">Contraseña:</label><input id="um-password" type="password" style="width:100%" data-i18n-placeholder="placeholder_password_min" placeholder="Mín. 6 caracteres"></div>
+        <div style="margin-bottom:.5em"><label data-i18n="lbl_role">Rol:</label>
           <select id="um-role" style="width:100%">
-            <option value="user">Usuario</option>
-            <option value="admin">Admin</option>
-            <option value="superadmin">Super Admin</option>
+            <option value="user" data-i18n="role_user">Usuario</option>
+            <option value="admin" data-i18n="role_admin">Admin</option>
+            <option value="superadmin" data-i18n="role_superadmin">Super Admin</option>
           </select>
         </div>
-        <div style="margin-bottom:.5em"><label>Activo:</label>
+        <div style="margin-bottom:.5em"><label data-i18n="lbl_active">Activo:</label>
           <select id="um-active" style="width:100%">
-            <option value="1">Sí</option><option value="0">No</option>
+            <option value="1" data-i18n="option_yes">Sí</option><option value="0" data-i18n="option_no">No</option>
           </select>
         </div>
         <input type="hidden" id="um-id">
         <div class="modal-footer">
-          <button type="button" class="btn-secondary" onclick="closeUserModal()">Cancelar</button>
-          <button type="submit">Guardar</button>
+          <button type="button" class="btn-secondary" onclick="closeUserModal()" data-i18n="btn_cancel">Cancelar</button>
+          <button type="submit" data-i18n="btn_save">Guardar</button>
         </div>
       </form>
     </div>
@@ -288,19 +288,23 @@
         try {
           const u = await api('/api/admin/users/' + id);
           document.getElementById('user-modal-title').textContent = 'Editar Usuario';
+          document.getElementById('user-modal-title').setAttribute('data-i18n', 'modal_title_edit_user');
           document.getElementById('um-email').value = u.email || '';
           document.getElementById('um-name').value = u.name || '';
           document.getElementById('um-password').value = '';
           document.getElementById('um-password').placeholder = 'Dejar vacío para no cambiar';
+          document.getElementById('um-password').setAttribute('data-i18n-placeholder', 'placeholder_password_empty');
           document.getElementById('um-role').value = u.role || 'user';
           document.getElementById('um-active').value = u.is_active;
         } catch (e) { APP.showMessage(e.message, 'error'); closeUserModal(); }
       } else {
         document.getElementById('user-modal-title').textContent = 'Nuevo Usuario';
+        document.getElementById('user-modal-title').setAttribute('data-i18n', 'modal_title_new_user');
         document.getElementById('um-email').value = '';
         document.getElementById('um-name').value = '';
         document.getElementById('um-password').value = '';
         document.getElementById('um-password').placeholder = 'Mín. 6 caracteres';
+        document.getElementById('um-password').setAttribute('data-i18n-placeholder', 'placeholder_password_min');
         document.getElementById('um-role').value = 'user';
         document.getElementById('um-active').value = '1';
       }
