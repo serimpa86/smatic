@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -127,7 +127,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
       await APP.init();
-      await loadCustomers();
+await loadCustomers();
       loadPayments();
     });
 
@@ -403,7 +403,7 @@
         }
       });
     }
-    if (APP.currentUser && APP.currentUser.role === 'superadmin') { document.getElementById('admin-nav-link').classList.remove('hidden'); }
-  </script>
+</script>
 </body>
 </html>
+

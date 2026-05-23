@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -259,7 +259,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
       await APP.init();
-      document.getElementById('date').value = new Date().toISOString().split('T')[0];
+document.getElementById('date').value = new Date().toISOString().split('T')[0];
       const due = new Date(); due.setDate(due.getDate() + 30);
       document.getElementById('due-date').value = due.toISOString().split('T')[0];
       await Promise.all([loadCustomers(), loadItems(), loadTaxes(), loadSettings()]);
@@ -871,7 +871,7 @@
         sidebar.style.display = '';
       }
     });
-    if (APP.currentUser && APP.currentUser.role === 'superadmin') { document.getElementById('admin-nav-link').classList.remove('hidden'); }
-  </script>
+</script>
 </body>
 </html>
+
