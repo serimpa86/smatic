@@ -426,7 +426,7 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
       const html = `
         <div class="item-selector-modal">
           <div style="margin-bottom:10px"><input type="text" id="item-search-input" data-i18n-placeholder="placeholder_search_item" placeholder="Buscar por código o descripción..." oninput="filterItemSelector()" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px"></div>
-          <div class="scroll-table" style="max-height:400px">
+          <div class="scroll-table" style="max-height:600px">
             <table class="items-table">
               <thead><tr><th data-i18n="th_code">Código</th><th data-i18n="th_description">Descripción</th><th class="text-right" data-i18n="th_price">Precio</th></tr></thead>
               <tbody id="item-selector-body">${rows || '<tr><td colspan="3" class="text-center" style="color:#999" data-i18n="msg_no_items">Sin artículos</td></tr>'}</tbody>
