@@ -71,7 +71,8 @@
     .pulldown-parent textarea.item-desc { min-height: 0; height: auto; padding: .35em; resize: none; }
     .pulldown-arrow { display: flex; align-items: center; padding: 0 5px; cursor: pointer; background: #f5f5f5; border: 1px solid #dadada; border-left: none; color: #666; font-size: 10px; text-decoration: none; user-select: none; }
     .pulldown-arrow:hover { background: #e8e8e8; }
-    .pulldown-option-container { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: #fff; border: 1px solid #ccc; border-radius: 0 0 4px 4px; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+    .pulldown-option-container { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: #fff; border: 1px solid #ccc; border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+    .pulldown-option-container.up { top: auto; bottom: 100%; border-radius: 4px 4px 0 0; }
     .pulldown-option-container a { display: block; padding: 6px 8px; font-size: .85em; color: #333; text-decoration: none; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
     .pulldown-option-container a:hover { background: #f0f0f0; }
     .pulldown-option-container a.new-item { color: #555; font-weight: bold; border-top: 1px solid #ddd; }
@@ -501,11 +502,21 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
       container.style.display = 'block';
     }
 
+    function positionPulldown(container) {
+      container.classList.remove('up');
+      const rect = container.parentElement.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      if (spaceBelow < container.offsetHeight) {
+        container.classList.add('up');
+      }
+    }
+
     function showCodePulldown(rowId) {
       const container = document.querySelector('#pp-code-' + rowId + ' .pulldown-option-container');
       if (!container) return;
       const input = document.querySelector('#pp-code-' + rowId + ' .item-code');
       renderPulldownOptions(container, items, rowId, 'code', input ? input.value : '');
+      positionPulldown(container);
     }
 
     function showDescPulldown(rowId) {
@@ -513,6 +524,7 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
       if (!container) return;
       const textarea = document.querySelector('#pp-desc-' + rowId + ' .item-desc');
       renderPulldownOptions(container, items, rowId, 'description', textarea ? textarea.value : '');
+      positionPulldown(container);
     }
 
     function toggleCodePulldown(rowId) {
