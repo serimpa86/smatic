@@ -229,7 +229,7 @@ button:disabled { opacity: 0.6; pointer-events: none; }
 .inner-overlay-large { max-width: 50em; margin: 0 auto; }
 
 /* Scroll table */
-.scroll-table { overflow-x: auto; }
+
 .scroll-table table { min-width: 50em; }
 
 /* Create grid */
