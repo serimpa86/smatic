@@ -329,7 +329,7 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
           <div class="form-row"><div><label data-i18n="lbl_name_required">Nombre *</label><input id="new-cust-name" data-i18n-placeholder="placeholder_customer_name" placeholder="Nombre del cliente"></div></div>
           <div class="form-row"><div><label data-i18n="lbl_email">Email</label><input type="email" id="new-cust-email" data-i18n-placeholder="placeholder_email" placeholder="Email"></div><div><label data-i18n="lbl_phone">Teléfono</label><input id="new-cust-phone" data-i18n-placeholder="placeholder_phone" placeholder="Teléfono"></div></div>
           <div class="form-row"><div><label data-i18n="lbl_billing_address">Dirección de Facturación</label><textarea id="new-cust-billing" data-i18n-placeholder="placeholder_address" placeholder="Dirección"></textarea></div><div><label data-i18n="lbl_shipping_address">Dirección de Envío</label><textarea id="new-cust-shipping" data-i18n-placeholder="placeholder_address" placeholder="Dirección"></textarea></div></div>
-          <div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()" data-i18n="btn_cancel">Cancelar</button><button class="btn" onclick="saveNewCustomer()" data-i18n="btn_save_customer">Guardar Cliente</button></div>
+          <div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest('div[style]').remove()" data-i18n="btn_cancel">Cancelar</button><button class="btn" onclick="saveNewCustomer()" data-i18n="btn_save_customer">Guardar Cliente</button></div>
         </div>`;
       APP.modal(content, APP.t('modal_title_add_new_customer', 'Agregar Nuevo Cliente'));
     }
@@ -347,7 +347,7 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
         });
         if (result.errorcode) { APP.showMessage(result.errormsg || 'Error al crear cliente', 'error'); return; }
         APP.showMessage('Cliente creado exitosamente', 'success');
-        document.querySelector('.modal-overlay').remove();
+        document.querySelector('div[style*="position:fixed"]')?.remove();
         await loadCustomers();
         document.getElementById('customer').value = result.id;
         const c = customers.find(x => x.id === result.id);
@@ -477,7 +477,7 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
         }
       }
       calculateRow(rowId);
-      document.querySelector('.modal-overlay')?.remove();
+      document.querySelector('div[style*="position:fixed"]')?.remove();
     }
 
     // --- Pulldown functions ---
@@ -609,7 +609,7 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
           <div class="form-row"><div><label data-i18n="lbl_description">Descripción</label><textarea id="new-item-desc" data-i18n-placeholder="placeholder_description" placeholder="Descripción"></textarea></div></div>
           <div class="form-row"><div><label data-i18n="lbl_price_required">Precio *</label><input type="number" id="new-item-price" step="0.01" min="0" data-i18n-placeholder="placeholder_price" placeholder="0.00"></div></div>
           <div class="form-row"><div><label data-i18n="lbl_tax_rate_pct">Tasa de Impuesto (%)</label><input type="number" id="new-item-tax" step="0.01" min="0" placeholder="0"></div></div>
-          <div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()" data-i18n="btn_cancel">Cancelar</button><button class="btn" onclick="saveNewItemFromInvoice('${rowId}', '${field}')" data-i18n="btn_save_item">Guardar Artículo</button></div>
+          <div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest('div[style]').remove()" data-i18n="btn_cancel">Cancelar</button><button class="btn" onclick="saveNewItemFromInvoice('${rowId}', '${field}')" data-i18n="btn_save_item">Guardar Artículo</button></div>
         </div>`;
       APP.modal(content, APP.t('modal_title_new_item', 'Nuevo Artículo'));
     }
@@ -628,7 +628,7 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
         });
         if (result.errorcode) { APP.showMessage(result.errormsg || 'Error al crear artículo', 'error'); return; }
         APP.showMessage('Artículo creado exitosamente', 'success');
-        document.querySelector('.modal-overlay').remove();
+        document.querySelector('div[style*="position:fixed"]').remove();
         const data = await API.get('/api/items');
         items = data.items || [];
         const newItem = items.find(i => i.id == result.id);
