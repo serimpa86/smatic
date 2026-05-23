@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagos | Smatic</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 60; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2em 0; }
+    .modal-content { background: #fff; margin: auto; padding: 2em; border-radius: 8px; max-width: 600px; width: 95%; box-shadow: 0 4px 20px rgba(0,0,0,0.2); position: relative; }
+    .modal-close { position: absolute; top: .8em; right: 1em; font-size: 1.5em; cursor: pointer; color: #999; background: none; border: none; }
+    .modal-close:hover { color: #333; }
+    .modal-footer { display: flex; gap: .5em; justify-content: flex-end; margin-top: 1.5em; }
+    .invoice-form { background: #fff; padding: 1.5em; border: 1px solid #e0e0e0; }
+    .invoice-form .form-row { display: flex; gap: 1em; margin-bottom: .75em; flex-wrap: wrap; }
+    .invoice-form .form-row > * { flex: 1; min-width: 14em; }
+    .invoice-form label { display: block; font-size: .85em; color: #666; margin-bottom: .25em; font-weight: 600; }
+    .invoice-form input, .invoice-form textarea, .invoice-form select { width: 100%; }
+    .invoice-form textarea { min-height: 4em; resize: vertical; }
+    .filters { margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+  <div class="navigation-wrapper" id="sidebar">
+    <nav class="navigation">
+      <div class="sidebar-brand">
+        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+        <span>Smatic</span>
+      </div>
+      <ul>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
+        <li class="active"><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
+        <li><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
+        <li><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+      </ul>
+      <div class="sidebar-bottom">
+        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="header-wrapper">
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+    <div class="breadcrumbs">
+      <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+      Smatic - Pagos
+    </div>
+  </div>
+
+  <div class="container" id="main-content">
+    <div class="page-header">
+      <h1>Pagos</h1>
+      <div class="actions">
+        <button onclick="openCreateModal()">+ Nuevo Pago</button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <select id="filter-method">
+        <option value="">Todos los métodos</option>
+        <option value="cash">Efectivo</option>
+        <option value="check">Cheque</option>
+        <option value="credit_card">Tarjeta de Crédito</option>
+        <option value="debit_card">Tarjeta de Débito</option>
+        <option value="bank_transfer">Transferencia Bancaria</option>
+        <option value="online">Pago en Línea</option>
+      </select>
+      <div class="search-box">
+        <input type="text" id="filter-search" placeholder="Buscar pago, cliente o factura...">
+        <button onclick="applyFilters()">Buscar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="scroll-table">
+        <table class="record-list" id="payments-table">
+          <thead>
+            <tr>
+              <th>N° Pago</th>
+              <th>Cliente</th>
+              <th>Factura</th>
+              <th>Fecha</th>
+              <th>Método</th>
+              <th>Referencia</th>
+              <th>Monto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="payments-body">
+            <tr><td colspan="8" class="text-center" style="color:#999">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="pagination" class="pagination"></div>
+  </div>
+
+  <div id="infobar"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let currentPage = 1;
+    let paymentsData = [];
+    let customers = [];
+    let unpaidInvoices = [];
+    let editingPaymentId = null;
+
+    const PAYMENT_METHODS = {
+      'cash': 'Efectivo',
+      'check': 'Cheque',
+      'credit_card': 'Tarjeta de Crédito',
+      'debit_card': 'Tarjeta de Débito',
+      'bank_transfer': 'Transferencia Bancaria',
+      'online': 'Pago en Línea'
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+      await APP.init();
+      await loadCustomers();
+      loadPayments();
+    });
+
+    document.addEventListener('click', (e) => {
+      const sidebar = document.getElementById('sidebar');
+      if (window.innerWidth <= 768 && sidebar.style.display === 'block' && !sidebar.contains(e.target) && !e.target.closest('.hamburger')) {
+        sidebar.style.display = '';
+      }
+    });
+
+    document.getElementById('filter-search').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') applyFilters();
+    });
+
+    async function loadCustomers() {
+      try {
+        const data = await API.get('/api/customers');
+        customers = data.customers || [];
+      } catch (e) { console.error('Error loading customers', e); }
+    }
+
+    async function loadPayments(page) {
+      page = page || currentPage;
+      const method = document.getElementById('filter-method').value;
+      const search = document.getElementById('filter-search').value;
+
+      let url = '/api/payments?page=' + page + '&limit=20';
+      if (method) url += '&method=' + encodeURIComponent(method);
+      if (search) url += '&search=' + encodeURIComponent(search);
+
+      const tbody = document.getElementById('payments-body');
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center"><div class="spinner"></div></td></tr>';
+
+      try {
+        const resp = await API.get(url);
+        const list = resp.payments || resp.data || resp;
+        paymentsData = Array.isArray(list) ? list : [];
+        currentPage = page;
+        renderPayments();
+        renderPagination(resp.total || resp.count || paymentsData.length, resp.pages);
+      } catch (e) {
+        console.error('Error loading payments', e);
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="color:#999">Error al cargar pagos.</td></tr>';
+      }
+    }
+
+    function renderPayments() {
+      const tbody = document.getElementById('payments-body');
+      if (!paymentsData || paymentsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="color:#999">No hay pagos registrados.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = paymentsData.map(p => {
+        const pId = APP.esc(p.id);
+        const pNum = APP.esc(p.payment_number || p.number || pId);
+        const customer = APP.esc(p.customer_name || p.customer || '-');
+        const invoice = p.invoice_number || p.invoice_id || '-';
+        const date = p.date || p.payment_date || '-';
+        const method = PAYMENT_METHODS[p.method] || p.method || '-';
+        const ref = APP.esc(p.reference || '');
+        const amount = APP.formatMoney(p.amount);
+        return '<tr>' +
+          '<td>' + pNum + '</td>' +
+          '<td>' + customer + '</td>' +
+          '<td>' + APP.esc(invoice) + '</td>' +
+          '<td>' + date + '</td>' +
+          '<td>' + method + '</td>' +
+          '<td>' + ref + '</td>' +
+          '<td>' + amount + '</td>' +
+          '<td>' +
+            '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="openEditModal(\'' + pId + '\')">Editar</button> ' +
+            '<button class="btn-secondary" style="min-width:auto;font-size:.85em;color:#dc3545" onclick="deletePayment(\'' + pId + '\')">Eliminar</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function renderPagination(total, pages) {
+      const container = document.getElementById('pagination');
+      if (!total || total <= 20) {
+        container.innerHTML = '';
+        return;
+      }
+      const p = pages || Math.ceil(total / 20);
+      let html = '<button onclick="loadPayments(1)"' + (currentPage === 1 ? ' disabled' : '') + '>&laquo;</button>';
+      for (let i = 1; i <= p; i++) {
+        html += '<button onclick="loadPayments(' + i + ')"' + (i === currentPage ? ' style="font-weight:bold;background:#555;color:#fff"' : '') + '>' + i + '</button>';
+      }
+      html += '<button onclick="loadPayments(' + p + ')"' + (currentPage === p ? ' disabled' : '') + '>&raquo;</button>';
+      container.innerHTML = html;
+    }
+
+    function applyFilters() {
+      currentPage = 1;
+      loadPayments(1);
+    }
+
+    function openCreateModal() {
+      editingPaymentId = null;
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = getPaymentFormHtml();
+      document.body.appendChild(overlay);
+      document.getElementById('payment-date').value = new Date().toISOString().split('T')[0];
+      populatePaymentCustomerDropdown();
+    }
+
+    function getPaymentFormHtml(data) {
+      data = data || {};
+      const title = editingPaymentId ? 'Editar Pago' : 'Nuevo Pago';
+      return '<div class="modal-content">' +
+        '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>' +
+        '<h2 style="margin:0 0 1em;color:#555">' + title + '</h2>' +
+        '<form class="invoice-form" id="payment-form" onsubmit="savePayment(event)" autocomplete="off">' +
+          '<div class="form-row">' +
+            '<div><label for="payment-customer">Cliente *</label><select id="payment-customer" required onchange="onPaymentCustomerChange()"><option value="">Seleccionar Cliente...</option></select></div>' +
+            '<div><label for="payment-invoice">Factura *</label><select id="payment-invoice" required><option value="">Seleccionar Factura...</option></select></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div><label for="payment-date">Fecha</label><input type="date" id="payment-date" value="' + (data.date || '') + '"></div>' +
+            '<div><label for="payment-method">Método de Pago *</label><select id="payment-method" required>' +
+              '<option value="">Seleccionar...</option>' +
+              '<option value="cash" ' + (data.method === 'cash' ? 'selected' : '') + '>Efectivo</option>' +
+              '<option value="check" ' + (data.method === 'check' ? 'selected' : '') + '>Cheque</option>' +
+              '<option value="credit_card" ' + (data.method === 'credit_card' ? 'selected' : '') + '>Tarjeta de Crédito</option>' +
+              '<option value="debit_card" ' + (data.method === 'debit_card' ? 'selected' : '') + '>Tarjeta de Débito</option>' +
+              '<option value="bank_transfer" ' + (data.method === 'bank_transfer' ? 'selected' : '') + '>Transferencia Bancaria</option>' +
+              '<option value="online" ' + (data.method === 'online' ? 'selected' : '') + '>Pago en Línea</option>' +
+            '</select></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div><label for="payment-reference">Referencia</label><input type="text" id="payment-reference" value="' + APP.esc(data.reference || '') + '" placeholder="N° de cheque, transacción, etc."></div>' +
+            '<div><label for="payment-amount">Monto *</label><input type="number" id="payment-amount" step="0.01" min="0.01" required value="' + (data.amount || '') + '"></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div><label for="payment-notes">Notas</label><textarea id="payment-notes" rows="3" placeholder="Notas del pago">' + APP.esc(data.notes || '') + '</textarea></div>' +
+          '</div>' +
+          '<div class="modal-footer">' +
+            '<button type="button" class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>' +
+            '<button type="submit" class="btn">' + (editingPaymentId ? 'Guardar Cambios' : 'Registrar Pago') + '</button>' +
+          '</div>' +
+        '</form>' +
+      '</div>';
+    }
+
+    function populatePaymentCustomerDropdown(selectedId) {
+      const sel = document.getElementById('payment-customer');
+      sel.innerHTML = '<option value="">Seleccionar Cliente...</option>';
+      customers.forEach(c => {
+        sel.innerHTML += '<option value="' + APP.esc(c.id) + '" ' + (c.id === selectedId ? 'selected' : '') + '>' + APP.esc(c.name) + (c.email ? ' (' + APP.esc(c.email) + ')' : '') + '</option>';
+      });
+    }
+
+    async function onPaymentCustomerChange() {
+      const customerId = document.getElementById('payment-customer').value;
+      const invoiceSel = document.getElementById('payment-invoice');
+      invoiceSel.innerHTML = '<option value="">Cargando facturas...</option>';
+      invoiceSel.disabled = true;
+      if (!customerId) {
+        invoiceSel.innerHTML = '<option value="">Seleccionar Factura...</option>';
+        invoiceSel.disabled = false;
+        return;
+      }
+      try {
+        const resp = await API.get('/api/payments/unpaid/' + customerId);
+        unpaidInvoices = resp.invoices || resp.data || resp;
+        if (!Array.isArray(unpaidInvoices)) unpaidInvoices = [];
+        invoiceSel.innerHTML = '<option value="">Seleccionar Factura...</option>';
+        if (unpaidInvoices.length === 0) {
+          invoiceSel.innerHTML += '<option value="" disabled>No hay facturas pendientes</option>';
+        } else {
+          unpaidInvoices.forEach(inv => {
+            const invId = inv.id || inv.invoice_id;
+            const invNum = inv.invoice_number || inv.number || invId;
+            const due = APP.formatMoney(inv.due || inv.balance || inv.total);
+            invoiceSel.innerHTML += '<option value="' + APP.esc(invId) + '">' + APP.esc(invNum) + ' - Saldo: ' + due + '</option>';
+          });
+        }
+      } catch (e) {
+        console.error('Error loading unpaid invoices', e);
+        invoiceSel.innerHTML = '<option value="">Error al cargar facturas</option>';
+      }
+      invoiceSel.disabled = false;
+    }
+
+    async function openEditModal(id) {
+      const p = paymentsData.find(x => x.id === id);
+      if (!p) return;
+      editingPaymentId = id;
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = getPaymentFormHtml(p);
+      document.body.appendChild(overlay);
+      await loadCustomers();
+      populatePaymentCustomerDropdown(p.customer_id);
+
+      const invoiceSel = document.getElementById('payment-invoice');
+      if (p.customer_id) {
+        try {
+          const resp = await API.get('/api/payments/unpaid/' + p.customer_id);
+          unpaidInvoices = resp.invoices || resp.data || resp;
+          if (!Array.isArray(unpaidInvoices)) unpaidInvoices = [];
+          invoiceSel.innerHTML = '<option value="">Seleccionar Factura...</option>';
+          unpaidInvoices.forEach(inv => {
+            const invId = inv.id || inv.invoice_id;
+            const invNum = inv.invoice_number || inv.number || invId;
+            const due = APP.formatMoney(inv.due || inv.balance || inv.total);
+            invoiceSel.innerHTML += '<option value="' + APP.esc(invId) + '" ' + (invId === p.invoice_id ? 'selected' : '') + '>' + APP.esc(invNum) + ' - Saldo: ' + due + '</option>';
+          });
+        } catch (e) {
+          console.error('Error loading unpaid invoices', e);
+          invoiceSel.innerHTML = '<option value="">' + APP.esc(p.invoice_id || 'Seleccionar Factura...') + '</option>';
+        }
+      }
+    }
+
+    async function savePayment(e) {
+      e.preventDefault();
+      const customerId = document.getElementById('payment-customer').value;
+      const invoiceId = document.getElementById('payment-invoice').value;
+      const date = document.getElementById('payment-date').value;
+      const method = document.getElementById('payment-method').value;
+      const reference = document.getElementById('payment-reference').value.trim();
+      const amount = parseFloat(document.getElementById('payment-amount').value);
+      const notes = document.getElementById('payment-notes').value.trim();
+
+      if (!customerId || !invoiceId || !method || !amount) {
+        APP.showMessage('Completa todos los campos obligatorios', 'error');
+        return;
+      }
+
+      const data = {
+        customer_id: customerId,
+        invoice_id: invoiceId,
+        date: date || new Date().toISOString().split('T')[0],
+        method: method,
+        reference: reference,
+        amount: Math.round(amount * 100) / 100,
+        notes: notes
+      };
+
+      const btn = e.target.querySelector('.btn[type="submit"]');
+      if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+
+      try {
+        if (editingPaymentId) {
+          await API.put('/api/payments/' + editingPaymentId, data);
+          APP.showMessage('Pago actualizado correctamente', 'success');
+        } else {
+          await API.post('/api/payments', data);
+          APP.showMessage('Pago registrado correctamente', 'success');
+        }
+        document.querySelector('.modal-overlay').remove();
+        loadPayments(currentPage);
+      } catch (e) {
+        APP.showMessage('Error al guardar el pago', 'error');
+        if (btn) { btn.disabled = false; btn.textContent = editingPaymentId ? 'Guardar Cambios' : 'Registrar Pago'; }
+      }
+    }
+
+    function deletePayment(id) {
+      APP.confirm('Eliminar Pago', '¿Estás seguro de eliminar este pago? Se actualizará el estado de la factura asociada.', async () => {
+        try {
+          const resp = await API.del('/api/payments/' + id);
+          if (resp.error) {
+            APP.showMessage(resp.error, 'error');
+          } else {
+            APP.showMessage('Pago eliminado correctamente', 'success');
+            loadPayments(currentPage);
+          }
+        } catch (e) {
+          APP.showMessage('Error al eliminar el pago', 'error');
+        }
+      });
+    }
+    if (APP.currentUser && APP.currentUser.role === 'superadmin') { document.getElementById('admin-nav-link').classList.remove('hidden'); }
+  </script>
+</body>
+</html>

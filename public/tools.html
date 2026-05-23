@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Herramientas | Smatic</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5em; margin-bottom: 2em; }
+    @media (max-width: 48em) { .tools-grid { grid-template-columns: 1fr; } }
+    .tool-card { background: #fff; border: 1px solid #e0e0e0; padding: 1.5em; }
+    .tool-card h3 { color: #555; margin: 0 0 .5em; font-size: 1.1em; }
+    .tool-card p { color: #666; font-size: .9em; margin-bottom: 1em; }
+    .tool-card textarea { width: 100%; min-height: 6em; font-family: monospace; font-size: .85em; padding: .5em; margin-bottom: .5em; resize: vertical; }
+    .tool-card .file-upload { display: flex; align-items: center; gap: .5em; margin-bottom: .5em; flex-wrap: wrap; }
+    .tool-card .file-upload input[type="file"] { font-size: .9em; min-height: auto; }
+    .tool-card .or-divider { text-align: center; color: #aaa; font-size: .85em; margin: .5em 0; }
+    .tool-card .import-actions { display: flex; gap: .5em; flex-wrap: wrap; }
+    .export-buttons { display: flex; gap: .5em; flex-wrap: wrap; }
+    .export-buttons button { display: flex; align-items: center; gap: .3em; }
+    .import-result { margin-top: .5em; font-size: .9em; padding: .5em; display: none; }
+    .import-result.success { display: block; background: #d4edda; color: #155724; }
+    .import-result.error { display: block; background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div class="navigation-wrapper" id="sidebar">
+    <nav class="navigation">
+      <div class="sidebar-brand">
+        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+        <span>Smatic</span>
+      </div>
+      <ul>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
+        <li><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
+        <li><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
+        <li><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
+        <li class="active"><a href="tools.html"><span class="nav-icon">🔧</span> Herramientas</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+      </ul>
+      <div class="sidebar-bottom">
+        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="header-wrapper">
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+    <div class="breadcrumbs">
+      <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+      Smatic - Herramientas
+    </div>
+  </div>
+
+  <div class="container" id="main-content">
+    <div class="page-header">
+      <h1>Herramientas</h1>
+    </div>
+
+    <h2 style="color:#555;font-size:1.2em;margin-bottom:.5em">Importar Datos</h2>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <h3>Importar Clientes</h3>
+        <p>Sube un archivo CSV o pega JSON con los datos de clientes.</p>
+        <div class="file-upload">
+          <input type="file" id="import-customers-file" accept=".csv,.txt">
+          <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-customers-file').click()">Seleccionar CSV</button>
+        </div>
+        <div class="or-divider">— o pega JSON —</div>
+        <textarea id="import-customers-json" placeholder='[{"name":"Cliente Ejemplo","email":"cliente@ejemplo.com","phone":"123456789"}]'></textarea>
+        <div class="import-actions">
+          <button onclick="importFromFile('customers')">Importar CSV</button>
+          <button class="btn-secondary" onclick="importFromJson('customers')">Importar JSON</button>
+        </div>
+        <div id="import-customers-result" class="import-result"></div>
+      </div>
+
+      <div class="tool-card">
+        <h3>Importar Productos</h3>
+        <p>Sube un archivo CSV o pega JSON con los datos de productos/servicios.</p>
+        <div class="file-upload">
+          <input type="file" id="import-items-file" accept=".csv,.txt">
+          <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-items-file').click()">Seleccionar CSV</button>
+        </div>
+        <div class="or-divider">— o pega JSON —</div>
+        <textarea id="import-items-json" placeholder='[{"name":"Producto Ej.","price":100,"description":"Descripción"}]'></textarea>
+        <div class="import-actions">
+          <button onclick="importFromFile('items')">Importar CSV</button>
+          <button class="btn-secondary" onclick="importFromJson('items')">Importar JSON</button>
+        </div>
+        <div id="import-items-result" class="import-result"></div>
+      </div>
+
+      <div class="tool-card">
+        <h3>Importar Facturas</h3>
+        <p>Sube un archivo CSV o pega JSON con los datos de facturas.</p>
+        <div class="file-upload">
+          <input type="file" id="import-invoices-file" accept=".csv,.txt">
+          <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-invoices-file').click()">Seleccionar CSV</button>
+        </div>
+        <div class="or-divider">— o pega JSON —</div>
+        <textarea id="import-invoices-json" placeholder='[{"customer_name":"Cliente","total":150,"status":"sent","date":"2026-01-15"}]'></textarea>
+        <div class="import-actions">
+          <button onclick="importFromFile('invoices')">Importar CSV</button>
+          <button class="btn-secondary" onclick="importFromJson('invoices')">Importar JSON</button>
+        </div>
+        <div id="import-invoices-result" class="import-result"></div>
+      </div>
+    </div>
+
+    <h2 style="color:#555;font-size:1.2em;margin-bottom:.5em">Exportar Datos</h2>
+    <div class="card">
+      <div class="export-buttons">
+        <button onclick="exportCSV('customers')">📥 Exportar Clientes CSV</button>
+        <button onclick="exportCSV('invoices')">📥 Exportar Facturas CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="infobar"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+      await APP.init();
+    });
+
+    document.addEventListener('click', (e) => {
+      const sidebar = document.getElementById('sidebar');
+      if (window.innerWidth <= 768 && sidebar.style.display === 'block' && !sidebar.contains(e.target) && !e.target.closest('.hamburger')) {
+        sidebar.style.display = '';
+      }
+    });
+
+    document.querySelectorAll('#sidebar input[type="file"]').forEach(el => {
+      el.addEventListener('click', (e) => e.stopPropagation());
+    });
+
+    function parseCSV(text) {
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      if (!lines.length) return [];
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+      const results = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length !== headers.length) continue;
+        const row = {};
+        headers.forEach((h, idx) => { row[h] = values[idx]; });
+        results.push(row);
+      }
+      return results;
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === ',' && !inQuotes) {
+          result.push(current.trim().replace(/^"|"$/g, ''));
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current.trim().replace(/^"|"$/g, ''));
+      return result;
+    }
+
+    function showResult(elementId, success, message) {
+      const el = document.getElementById(elementId);
+      el.className = 'import-result ' + (success ? 'success' : 'error');
+      el.textContent = message;
+      el.style.display = 'block';
+      if (success) {
+        setTimeout(() => { el.style.display = 'none'; }, 5000);
+      }
+    }
+
+    async function importFromFile(type) {
+      const fileInput = document.getElementById('import-' + type + '-file');
+      const file = fileInput.files[0];
+      if (!file) {
+        showResult('import-' + type + '-result', false, 'Selecciona un archivo CSV primero.');
+        return;
+      }
+      const text = await file.text();
+      const data = parseCSV(text);
+      if (!data.length) {
+        showResult('import-' + type + '-result', false, 'El archivo CSV está vacío o tiene un formato inválido.');
+        return;
+      }
+      await doImport(type, data);
+    }
+
+    async function importFromJson(type) {
+      const textarea = document.getElementById('import-' + type + '-json');
+      const text = textarea.value.trim();
+      if (!text) {
+        showResult('import-' + type + '-result', false, 'Pega el JSON en el campo de texto.');
+        return;
+      }
+      try {
+        const data = JSON.parse(text);
+        if (!Array.isArray(data)) {
+          showResult('import-' + type + '-result', false, 'El JSON debe ser un arreglo de objetos.');
+          return;
+        }
+        await doImport(type, data);
+      } catch (e) {
+        showResult('import-' + type + '-result', false, 'JSON inválido: ' + e.message);
+      }
+    }
+
+    async function doImport(type, data) {
+      const endpoint = '/api/tools/import/' + type;
+      const btn = document.querySelector('#import-' + type + '-result').parentElement.querySelector('.import-actions button');
+      if (btn) btn.disabled = true;
+      try {
+        const result = await API.post(endpoint, { data: data });
+        if (result.error) {
+          showResult('import-' + type + '-result', false, result.error);
+        } else {
+          const count = result.imported || result.count || data.length;
+          showResult('import-' + type + '-result', true, count + ' registro(s) importado(s) exitosamente.');
+          document.getElementById('import-' + type + '-json').value = '';
+          document.getElementById('import-' + type + '-file').value = '';
+        }
+      } catch (e) {
+        showResult('import-' + type + '-result', false, 'Error al importar: ' + (e.message || 'Error de conexión'));
+      }
+      if (btn) btn.disabled = false;
+    }
+
+    async function exportCSV(type) {
+      try {
+        const data = await API.get('/api/tools/export/' + type);
+        const rows = data[type] || data.data || data;
+        if (!rows || !rows.length) {
+          APP.showMessage('No hay datos para exportar.', 'error');
+          return;
+        }
+        const headers = Object.keys(rows[0]);
+        let csv = headers.map(h => '"' + String(h).replace(/"/g, '""') + '"').join(',') + '\r\n';
+        rows.forEach(row => {
+          const line = headers.map(h => {
+            const val = row[h] !== undefined && row[h] !== null ? String(row[h]) : '';
+            return '"' + val.replace(/"/g, '""') + '"';
+          });
+          csv += line.join(',') + '\r\n';
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = type + '_export_' + new Date().toISOString().split('T')[0] + '.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+        APP.showMessage('Exportación completada.', 'success');
+      } catch (e) {
+        APP.showMessage('Error al exportar: ' + (e.message || 'Error de conexión'), 'error');
+      }
+    }
+    if (APP.currentUser && APP.currentUser.role === 'superadmin') { document.getElementById('admin-nav-link').classList.remove('hidden'); }
+  </script>
+</body>
+</html>

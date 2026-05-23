@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reembolsos | Smatic</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 60; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2em 0; }
+    .modal-content { background: #fff; margin: auto; padding: 2em; border-radius: 8px; max-width: 600px; width: 95%; box-shadow: 0 4px 20px rgba(0,0,0,0.2); position: relative; }
+    .modal-close { position: absolute; top: .8em; right: 1em; font-size: 1.5em; cursor: pointer; color: #999; background: none; border: none; }
+    .modal-close:hover { color: #333; }
+    .modal-footer { display: flex; gap: .5em; justify-content: flex-end; margin-top: 1.5em; }
+    .invoice-form { background: #fff; padding: 1.5em; border: 1px solid #e0e0e0; }
+    .invoice-form .form-row { display: flex; gap: 1em; margin-bottom: .75em; flex-wrap: wrap; }
+    .invoice-form .form-row > * { flex: 1; min-width: 14em; }
+    .invoice-form label { display: block; font-size: .85em; color: #666; margin-bottom: .25em; font-weight: 600; }
+    .invoice-form input, .invoice-form textarea, .invoice-form select { width: 100%; }
+    .invoice-form textarea { min-height: 4em; resize: vertical; }
+  </style>
+</head>
+<body>
+  <div class="navigation-wrapper" id="sidebar">
+    <nav class="navigation">
+      <div class="sidebar-brand">
+        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+        <span>Smatic</span>
+      </div>
+      <ul>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
+        <li><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
+        <li class="active"><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
+        <li><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+      </ul>
+      <div class="sidebar-bottom">
+        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="header-wrapper">
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+    <div class="breadcrumbs">
+      <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+      Smatic - Reembolsos
+    </div>
+  </div>
+
+  <div class="container" id="main-content">
+    <div class="page-header">
+      <h1>Reembolsos</h1>
+      <div class="actions">
+        <button onclick="showCreateModal()">+ Nuevo Reembolso</button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="search-box">
+        <input type="text" id="filter-search" placeholder="Buscar por número o cliente...">
+        <button onclick="applyFilters()">Buscar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="scroll-table">
+        <table class="record-list" id="refunds-table">
+          <thead>
+            <tr>
+              <th>N° Reembolso</th>
+              <th>Cliente</th>
+              <th>Pago Relacionado</th>
+              <th>Fecha</th>
+              <th>Monto</th>
+              <th>Razón</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="refunds-body">
+            <tr><td colspan="7" class="text-center" style="color:#999">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="pagination" class="pagination"></div>
+  </div>
+
+  <div id="infobar"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let refunds = [];
+    let payments = [];
+    let customers = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+      await APP.init();
+      loadRefunds();
+    });
+
+    document.addEventListener('click', (e) => {
+      const sidebar = document.getElementById('sidebar');
+      if (window.innerWidth <= 768 && sidebar.style.display === 'block' && !sidebar.contains(e.target) && !e.target.closest('.hamburger')) {
+        sidebar.style.display = '';
+      }
+    });
+
+    document.getElementById('filter-search').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') applyFilters();
+    });
+
+    async function loadRefunds() {
+      try {
+        const search = document.getElementById('filter-search').value;
+        let url = '/api/refunds';
+        if (search) url += '?search=' + encodeURIComponent(search);
+        const data = await API.get(url);
+        refunds = data.refunds || [];
+        renderRefunds();
+      } catch (e) { console.error(e); }
+    }
+
+    function applyFilters() { loadRefunds(); }
+
+    function renderRefunds() {
+      const tbody = document.getElementById('refunds-body');
+      if (!refunds.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="color:#999">Sin reembolsos</td></tr>';
+        return;
+      }
+      tbody.innerHTML = refunds.map(r => `
+        <tr>
+          <td>${APP.esc(r.refund_number)}</td>
+          <td>${APP.esc(r.customer_name || '—')}</td>
+          <td>${r.payment_number ? APP.esc(r.payment_number) : '—'}</td>
+          <td>${r.date || '—'}</td>
+          <td>${APP.formatMoney(r.amount || 0)}</td>
+          <td>${APP.esc((r.reason || '').substring(0, 40))}</td>
+          <td>
+            <button class="btn-sm btn-outline" onclick="viewRefund('${r.id}')">Ver</button>
+            <button class="btn-sm btn-outline" onclick="deleteRefund('${r.id}')" style="color:#dc3545;border-color:#dc3545">Eliminar</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function showCreateModal() {
+      try {
+        const [payData, custData] = await Promise.all([
+          API.get('/api/payments'),
+          API.get('/api/customers')
+        ]);
+        payments = payData.payments || [];
+        customers = custData.customers || [];
+      } catch (e) { console.error(e); }
+
+      const payOpts = payments.map(p => `<option value="${p.id}" data-cust="${APP.esc(p.customer_name || '')}" data-amount="${p.amount || 0}">${APP.esc(p.payment_number)} - ${APP.esc(p.customer_name)} (${APP.formatMoney(p.amount)})</option>`).join('');
+      const html = `
+        <div class="invoice-form">
+          <div class="form-row">
+            <div><label>Pago Relacionado</label><select id="ref-payment" onchange="refPaymentChange()"><option value="">— Sin pago —</option>${payOpts}</select></div>
+            <div><label>Cliente</label><select id="ref-customer"><option value="">Seleccionar...</option>${customers.map(c => '<option value="' + c.id + '">' + APP.esc(c.name) + '</option>').join('')}</select></div>
+          </div>
+          <div class="form-row">
+            <div><label>Fecha</label><input type="date" id="ref-date" value="${new Date().toISOString().split('T')[0]}"></div>
+            <div><label>Monto</label><input type="number" id="ref-amount" step="0.01" min="0"></div>
+          </div>
+          <div class="form-row">
+            <div><label>Razón</label><textarea id="ref-reason" placeholder="Motivo del reembolso"></textarea></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()">Cancelar</button>
+            <button class="btn" onclick="saveRefund()">Guardar Reembolso</button>
+          </div>
+        </div>`;
+      APP.modal(html, 'Nuevo Reembolso');
+    }
+
+    window.refPaymentChange = function() {
+      const sel = document.getElementById('ref-payment');
+      const opt = sel.options[sel.selectedIndex];
+      if (opt && opt.value) {
+        const custName = opt.getAttribute('data-cust') || '';
+        const amount = opt.getAttribute('data-amount') || 0;
+        document.getElementById('ref-amount').value = amount;
+        const cust = customers.find(c => c.name === custName);
+        if (cust) document.getElementById('ref-customer').value = cust.id;
+      }
+    };
+
+    window.saveRefund = async function() {
+      const payId = document.getElementById('ref-payment').value;
+      const custId = document.getElementById('ref-customer').value;
+      const date = document.getElementById('ref-date').value;
+      const amount = parseFloat(document.getElementById('ref-amount').value) || 0;
+      const reason = document.getElementById('ref-reason').value.trim();
+      const cust = customers.find(c => c.id === custId);
+      if (!amount) { APP.showMessage('Ingrese un monto', 'error'); return; }
+      try {
+        const result = await API.post('/api/refunds', {
+          payment_id: payId || null,
+          customer_id: custId || null,
+          customer_name: cust ? cust.name : '',
+          amount,
+          reason,
+          date
+        });
+        if (result.errorcode) { APP.showMessage(result.errormsg || 'Error', 'error'); return; }
+        APP.showMessage('Reembolso creado: ' + result.refund_number, 'success');
+        document.querySelector('.modal-overlay')?.remove();
+        loadRefunds();
+      } catch (e) { APP.showMessage('Error al crear reembolso', 'error'); }
+    };
+
+    window.viewRefund = async function(id) {
+      try {
+        const r = await API.get('/api/refunds/' + id);
+        const html = `
+          <div style="min-width:350px">
+            <p><strong>N° Reembolso:</strong> ${APP.esc(r.refund_number)}</p>
+            <p><strong>Cliente:</strong> ${APP.esc(r.customer_name || '—')}</p>
+            <p><strong>Fecha:</strong> ${r.date || '—'}</p>
+            <p><strong>Monto:</strong> ${APP.formatMoney(r.amount)}</p>
+            ${r.reason ? '<p><strong>Razón:</strong> ' + APP.esc(r.reason) + '</p>' : ''}
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove()">Cerrar</button></div>
+          </div>`;
+        APP.modal(html, 'Reembolso #' + r.refund_number);
+      } catch (e) { APP.showMessage('Error al cargar reembolso', 'error'); }
+    };
+
+    window.deleteRefund = async function(id) {
+      if (!confirm('¿Eliminar este reembolso?')) return;
+      try {
+        await API.del('/api/refunds/' + id);
+        APP.showMessage('Reembolso eliminado', 'success');
+        loadRefunds();
+      } catch (e) { APP.showMessage('Error al eliminar', 'error'); }
+    };
+
+    if (APP.currentUser && APP.currentUser.role === 'superadmin') { document.getElementById('admin-nav-link').classList.remove('hidden'); }
+  </script>
+</body>
+</html>

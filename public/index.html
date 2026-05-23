@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smatic - Sistema de Facturación Inteligente</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+    .lp-header { display: flex; align-items: center; justify-content: space-between; padding: 1em 4em; background: #fff; border-bottom: 1px solid #eef0f4; position: sticky; top: 0; z-index: 100; }
+    .lp-header .logo { display: flex; align-items: center; gap: .6em; font-size: 1.3em; font-weight: 700; color: #444; }
+    .lp-header .logo img { width: 2em; height: 2em; }
+    .lp-header .logo span { color: #555; }
+    .lp-nav { display: flex; align-items: center; gap: 2em; }
+    .lp-nav a { text-decoration: none; color: #555; font-size: .95em; font-weight: 500; transition: color .2s; }
+    .lp-nav a:hover { color: #555; }
+    .lp-nav .btn-header { background: #3a3a3a; color: #fff; padding: .6em 1.5em; border-radius: 6px; font-weight: 600; text-decoration: none; font-size: .9em; transition: background .2s; }
+    .lp-nav .btn-header:hover { background: #222; }
+    .hero { display: flex; align-items: center; justify-content: space-between; padding: 5em 4em; max-width: 1200px; margin: 0 auto; gap: 3em; }
+    .hero-text { flex: 1; }
+    .hero-text h1 { font-size: 3em; font-weight: 800; color: #1a1a2e; line-height: 1.15; margin-bottom: .4em; }
+    .hero-text h1 span { color: #444; }
+    .hero-text p { font-size: 1.15em; color: #666; margin-bottom: 2em; max-width: 28em; }
+    .hero-buttons { display: flex; gap: 1em; flex-wrap: wrap; }
+    .hero-buttons .btn-primary { background: #3a3a3a; color: #fff; padding: .9em 2.2em; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1em; transition: background .2s, transform .1s; display: inline-block; }
+    .hero-buttons .btn-primary:hover { background: #222; transform: translateY(-1px); }
+    .hero-buttons .btn-secondary-lp { background: #fff; color: #555; border: 2px solid #555; padding: .85em 2.2em; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1em; transition: background .2s; display: inline-block; }
+    .hero-buttons .btn-secondary-lp:hover { background: #f0f0f0; }
+    .hero-image { flex: 1; text-align: center; }
+    .hero-image img { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
+    .hero-image .placeholder { background: linear-gradient(135deg, #e8e8e8, #f0f0f0); padding: 4em 2em; border-radius: 16px; color: #555; font-size: 1.2em; font-weight: 600; }
+    .features { padding: 5em 4em; background: #f8faff; }
+    .features h2 { text-align: center; font-size: 2.2em; font-weight: 700; color: #1a1a2e; margin-bottom: .3em; }
+    .features .subtitle { text-align: center; color: #888; font-size: 1.1em; margin-bottom: 3em; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2em; max-width: 1100px; margin: 0 auto; }
+    .feature-card { background: #fff; padding: 2.5em 2em; border-radius: 12px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #eef0f4; transition: transform .2s, box-shadow .2s; }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
+    .feature-card .icon { font-size: 2.8em; margin-bottom: .5em; display: block; }
+    .feature-card h3 { font-size: 1.2em; font-weight: 700; color: #1a1a2e; margin-bottom: .5em; }
+    .feature-card p { font-size: .95em; color: #777; line-height: 1.5; }
+    .cta-section { padding: 5em 4em; text-align: center; background: #3a3a3a; color: #fff; }
+    .cta-section h2 { font-size: 2.2em; font-weight: 700; margin-bottom: .4em; }
+    .cta-section p { font-size: 1.1em; opacity: .9; margin-bottom: 2em; }
+    .cta-section .btn-cta { background: #fff; color: #555; padding: 1em 2.5em; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 1.05em; transition: transform .1s; display: inline-block; }
+    .cta-section .btn-cta:hover { transform: translateY(-2px); }
+    .cta-section .btn-cta-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.4); padding: 1em 2.5em; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.05em; margin-left: 1em; transition: border .2s; display: inline-block; }
+    .cta-section .btn-cta-outline:hover { border-color: #fff; }
+    .lp-footer { padding: 2em 4em; text-align: center; color: #999; font-size: .9em; border-top: 1px solid #eef0f4; background: #fafbfc; }
+    .lp-footer strong { color: #555; }
+    @media (max-width: 48em) {
+      .lp-header { padding: 1em; flex-wrap: wrap; gap: 1em; }
+      .lp-nav { gap: 1em; }
+      .hero { flex-direction: column; padding: 3em 1.5em; text-align: center; }
+      .hero-text h1 { font-size: 2em; }
+      .hero-text p { max-width: 100%; }
+      .hero-buttons { justify-content: center; }
+      .features { padding: 3em 1.5em; }
+      .features-grid { grid-template-columns: 1fr; }
+      .cta-section { padding: 3em 1.5em; }
+      .cta-section .btn-cta-outline { margin-left: 0; margin-top: 1em; }
+    }
+  </style>
+</head>
+<body>
+  <header class="lp-header">
+    <div class="logo">
+      <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+      <span>Smatic</span>
+    </div>
+    <nav class="lp-nav">
+      <a href="#features">Características</a>
+      <a href="login.html">Iniciar Sesión</a>
+      <a href="signup.html" class="btn-header">Empieza Gratis</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Facturación <span>Online Inteligente</span></h1>
+      <p>Crea, envía y gestiona facturas profesionales en minutos. La plataforma todo-en-uno para freelancers y pequeñas empresas.</p>
+      <div class="hero-buttons">
+        <a href="signup.html" class="btn-primary">Empieza Gratis</a>
+        <a href="login.html" class="btn-secondary-lp">Iniciar Sesión</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <div class="placeholder">📊 Panel de control inteligente</div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <h2>Todo lo que necesitas para facturar</h2>
+    <p class="subtitle">Herramientas diseñadas para simplificar tu facturación diaria.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="icon">📄</span>
+        <h3>Crea Cotizaciones y Facturas en Línea</h3>
+        <p>Genera cotizaciones y facturas profesionales con plantillas personalizables. Envía a tus clientes al instante.</p>
+      </div>
+      <div class="feature-card">
+        <span class="icon">⚡</span>
+        <h3>Optimiza la Creación de Facturas</h3>
+        <p>Automatiza el proceso de creación con datos de cliente pre-cargados, productos y tasas de impuesto.</p>
+      </div>
+      <div class="feature-card">
+        <span class="icon">🔄</span>
+        <h3>Ahorra Tiempo con Facturas Recurrentes</h3>
+        <p>Configura facturas recurrentes para clientes frecuentes y olvídate de crear la misma factura cada mes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Comienza a facturar hoy</h2>
+    <p>Únete a miles de profesionales que confían en Smatic para su facturación.</p>
+    <div>
+      <a href="signup.html" class="btn-cta">Crear Cuenta Gratis</a>
+      <a href="login.html" class="btn-cta-outline">Iniciar Sesión</a>
+    </div>
+  </section>
+
+  <footer class="lp-footer">
+    &copy; 2026 <strong>Smatic</strong> — Sistema de Facturación Inteligente. Todos los derechos reservados.
+  </footer>
+</body>
+</html>

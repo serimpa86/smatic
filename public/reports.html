@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes | Smatic</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div class="navigation-wrapper" id="sidebar">
+    <nav class="navigation">
+      <div class="sidebar-brand">
+        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+        <span>Smatic</span>
+      </div>
+      <ul>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
+        <li><a href="quotes.html"><span class="nav-icon">📝</span> Cotizaciones</a></li>
+        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> Notas de Crédito</a></li>
+        <li><a href="payments.html"><span class="nav-icon">💳</span> Pagos</a></li>
+        <li><a href="refunds.html"><span class="nav-icon">💸</span> Reembolsos</a></li>
+        <li><a href="items.html"><span class="nav-icon">📦</span> Productos</a></li>
+        <li class="active"><a href="reports.html"><span class="nav-icon">📈</span> Reportes</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
+        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+      </ul>
+      <div class="sidebar-bottom">
+        <a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="header-wrapper">
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+    <div class="breadcrumbs">
+      <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+      Smatic - Reportes
+    </div>
+  </div>
+
+  <div class="container" id="main-content">
+    <div class="page-header">
+      <h1>Reportes</h1>
+    </div>
+
+    <div id="stats-container" class="stats-grid">
+      <div class="stat-card"><div class="stat-value" id="stat-invoiced">$0</div><div class="stat-label">Total Facturado</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-paid">$0</div><div class="stat-label">Total Cobrado</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-due">$0</div><div class="stat-label">Pendiente</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Reporte de Ventas</div>
+      <div class="filters">
+        <label style="font-size:.9em;color:#555">Desde:</label>
+        <input type="date" id="sales-from">
+        <label style="font-size:.9em;color:#555">Hasta:</label>
+        <input type="date" id="sales-to">
+        <button onclick="loadSalesReport()">Filtrar</button>
+        <button class="btn-secondary" onclick="resetSalesFilter()">Limpiar</button>
+      </div>
+      <div id="sales-total" style="text-align:right;font-size:1.1em;font-weight:bold;color:#444;margin-bottom:.5em"></div>
+      <div class="scroll-table">
+        <table class="record-list" id="sales-table">
+          <thead>
+            <tr>
+              <th>N° Factura</th>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="sales-body">
+            <tr><td colspan="5" class="text-center" style="color:#999">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Reporte de Clientes</div>
+      <div class="scroll-table">
+        <table class="record-list" id="customer-report-table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Email</th>
+              <th>Facturas</th>
+              <th>Total Comprado</th>
+              <th>Saldo Pendiente</th>
+            </tr>
+          </thead>
+          <tbody id="customer-report-body">
+            <tr><td colspan="5" class="text-center" style="color:#999">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="infobar"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+      await APP.init();
+      loadDashboardStats();
+      loadSalesReport();
+      loadCustomerReport();
+    });
+
+    document.addEventListener('click', (e) => {
+      const sidebar = document.getElementById('sidebar');
+      if (window.innerWidth <= 768 && sidebar.style.display === 'block' && !sidebar.contains(e.target) && !e.target.closest('.hamburger')) {
+        sidebar.style.display = '';
+      }
+    });
+
+    async function loadDashboardStats() {
+      try {
+        const data = await API.get('/api/reports/dashboard');
+        document.getElementById('stat-invoiced').textContent = APP.formatMoney(data.totalInvoiced);
+        document.getElementById('stat-paid').textContent = APP.formatMoney(data.totalPaid);
+        document.getElementById('stat-due').textContent = APP.formatMoney(data.totalDue);
+      } catch (e) {
+        console.error('Error loading dashboard stats', e);
+      }
+    }
+
+    async function loadSalesReport() {
+      const from = document.getElementById('sales-from').value;
+      const to = document.getElementById('sales-to').value;
+      let url = '/api/reports/sales';
+      const params = [];
+      if (from) params.push('date_from=' + encodeURIComponent(from));
+      if (to) params.push('date_to=' + encodeURIComponent(to));
+      if (params.length) url += '?' + params.join('&');
+
+      const tbody = document.getElementById('sales-body');
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center"><div class="spinner"></div></td></tr>';
+
+      try {
+        const data = await API.get(url);
+        const invoices = data.invoices || data.sales || data.data || [];
+        const totalSum = data.total || data.totalSum || 0;
+
+        document.getElementById('sales-total').textContent = 'Total: ' + APP.formatMoney(totalSum);
+
+        if (!invoices.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color:#999">No hay facturas en este período.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = invoices.map(inv => {
+          const total = inv.total || inv.total_amount || 0;
+          return '<tr>' +
+            '<td><a href="invoices.html?id=' + APP.esc(inv.id) + '">' + APP.esc(inv.invoice_number || inv.number || '') + '</a></td>' +
+            '<td>' + APP.esc(inv.customer_name || inv.customer || '-') + '</td>' +
+            '<td>' + (inv.date || inv.issue_date || '-') + '</td>' +
+            '<td><span class="status ' + APP.getStatusClass(inv.status) + '">' + APP.getStatusLabel(inv.status) + '</span></td>' +
+            '<td>' + APP.formatMoney(total) + '</td>' +
+          '</tr>';
+        }).join('');
+      } catch (e) {
+        console.error('Error loading sales report', e);
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color:#999">Error al cargar reporte de ventas.</td></tr>';
+      }
+    }
+
+    function resetSalesFilter() {
+      document.getElementById('sales-from').value = '';
+      document.getElementById('sales-to').value = '';
+      loadSalesReport();
+    }
+
+    async function loadCustomerReport() {
+      const tbody = document.getElementById('customer-report-body');
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center"><div class="spinner"></div></td></tr>';
+
+      try {
+        const data = await API.get('/api/reports/customers');
+        const customers = data.customers || data.data || [];
+
+        if (!customers.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color:#999">No hay clientes con facturas.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = customers.map(c => {
+          const invoiceCount = c.invoice_count || c.total_invoices || c.count || 0;
+          const totalPurchased = c.total_purchased || c.total_spent || c.total || 0;
+          const balance = c.balance || c.outstanding || c.due || 0;
+          return '<tr>' +
+            '<td>' + APP.esc(c.name || c.customer_name || '-') + '</td>' +
+            '<td>' + APP.esc(c.email || '') + '</td>' +
+            '<td>' + invoiceCount + '</td>' +
+            '<td>' + APP.formatMoney(totalPurchased) + '</td>' +
+            '<td>' + APP.formatMoney(balance) + '</td>' +
+          '</tr>';
+        }).join('');
+      } catch (e) {
+        console.error('Error loading customer report', e);
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color:#999">Error al cargar reporte de clientes.</td></tr>';
+      }
+    }
+    if (APP.currentUser && APP.currentUser.role === 'superadmin') { document.getElementById('admin-nav-link').classList.remove('hidden'); }
+  </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro | Smatic</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div class="gateway-container" role="main">
+    <form id="form_signup" onsubmit="return false;">
+      <h1>Crear Cuenta</h1>
+      <div style="margin-bottom:.5em">
+        <label for="signup_name">Nombre / Empresa:</label>
+        <input id="signup_name" class="input--large" style="width:100%" placeholder="Tu nombre o empresa">
+      </div>
+      <div style="margin-bottom:.5em">
+        <label for="signup_email">Correo electrónico:</label>
+        <input id="signup_email" class="input--large" style="width:100%" type="email" placeholder="Correo electrónico" autocomplete="username">
+      </div>
+      <div style="margin-bottom:.5em">
+        <label for="signup_password">Contraseña:</label>
+        <input id="signup_password" class="input--large" style="width:100%" type="password" placeholder="Contraseña (mín. 6 caracteres)" autocomplete="new-password">
+      </div>
+      <button id="btn_signup" class="btn--large btn--stack" style="float:right" onclick="signupSubmit()">Crear Cuenta</button>
+      <div class="link-bottom_container" style="clear:both;padding-top:1em">
+        ¿Ya tienes cuenta? <a href="login.html">Inicia Sesión</a>
+      </div>
+    </form>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/config.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (API.isAuthenticated()) { window.location.href = '/dashboard.html'; }
+    });
+
+    async function signupSubmit() {
+      const name = document.getElementById('signup_name').value.trim();
+      const email = document.getElementById('signup_email').value.trim();
+      const password = document.getElementById('signup_password').value;
+      if (!email || !password || password.length < 6) {
+        showError('Completa todos los campos. La contraseña debe tener al menos 6 caracteres.');
+        return;
+      }
+      document.getElementById('btn_signup').disabled = true;
+      try {
+        const r = await API.signup(email, password, name);
+        if (r.token) {
+          window.location.href = '/dashboard.html?first=1';
+        } else {
+          showError(r.errormsg || 'Error al crear cuenta');
+          document.getElementById('btn_signup').disabled = false;
+        }
+      } catch (e) {
+        showError('Error de conexión');
+        document.getElementById('btn_signup').disabled = false;
+      }
+    }
+
+    function showError(msg) {
+      const existing = document.querySelector('.error-msg');
+      if (existing) existing.remove();
+      const div = document.createElement('div');
+      div.className = 'error-msg';
+      div.style.cssText = 'background:#f8d7da;color:#721c24;padding:.5em;margin-bottom:.5em;text-align:center';
+      div.textContent = msg;
+      document.querySelector('.gateway-container').insertBefore(div, document.querySelector('.gateway-container').firstChild);
+    }
+  </script>
+</body>
+</html>

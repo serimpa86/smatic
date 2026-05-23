@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión | Smatic</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div class="gateway-container" role="main">
+    <form id="form_login" onsubmit="return false;">
+      <h1 id="login-title">Iniciar Sesión</h1>
+      <div id="email_container">
+        <label for="login_email">Correo electrónico:</label>
+        <input id="login_email" class="input--large" name="email" style="width:100%" type="email" placeholder="Correo electrónico" autofocus autocomplete="username">
+      </div>
+      <div id="login_password-container" style="display:none">
+        <label for="login_password">Contraseña:</label>
+        <input id="login_password" class="input--large" name="password" style="width:100%" type="password" placeholder="Contraseña" autocomplete="current-password">
+      </div>
+      <div id="login_btn-container">
+        <button style="float:right" id="btn_next" class="btn--large btn--stack" onclick="loginNext()">Siguiente</button>
+        <button style="display:none" id="btn_back" class="btn--large btn--stack btn-secondary" onclick="loginBack()">← Atrás</button>
+        <button style="float:right;display:none" id="btn_login" class="btn--large btn--stack" onclick="loginSubmit()">Iniciar Sesión</button>
+      </div>
+      <div class="link-bottom_container">
+        <span id="login_newaccount">¿No tienes cuenta? <a href="signup.html">Regístrate</a></span>
+        <a id="login_forgotpassword" style="display:none" href="#">¿Olvidaste tu contraseña?</a>
+      </div>
+    </form>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/config.js"></script>
+  <script>
+    let loginEmail = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (API.isAuthenticated()) { window.location.href = '/dashboard.html'; return; }
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('error')) showError(params.get('error'));
+    });
+
+    function showError(msg) {
+      const container = document.querySelector('.gateway-container');
+      const errDiv = document.createElement('div');
+      errDiv.style.cssText = 'background:#f8d7da;color:#721c24;padding:.5em;margin-bottom:.5em;text-align:center';
+      errDiv.textContent = msg;
+      container.insertBefore(errDiv, container.firstChild);
+    }
+
+    async function loginNext() {
+      const email = document.getElementById('login_email').value.trim();
+      if (!email || !email.includes('@')) {
+        document.getElementById('login_email').style.border = '1px solid #dc3545';
+        return;
+      }
+      document.getElementById('login_email').style.border = '';
+      document.getElementById('btn_next').disabled = true;
+      try {
+        const r = await API.validateEmail(email);
+        loginEmail = email;
+        localStorage.setItem('email', email);
+        document.getElementById('email_container').style.display = 'none';
+        document.getElementById('btn_next').style.display = 'none';
+        document.getElementById('login_password-container').style.display = 'block';
+        document.getElementById('btn_back').style.display = 'inline-block';
+        document.getElementById('btn_login').style.display = 'inline-block';
+        document.getElementById('login_newaccount').style.display = 'none';
+        document.getElementById('login_forgotpassword').style.display = 'inline-block';
+        document.getElementById('login_password').focus();
+      } catch (e) {
+        showError('Error al validar email');
+      }
+      document.getElementById('btn_next').disabled = false;
+    }
+
+    function loginBack() {
+      document.getElementById('email_container').style.display = 'block';
+      document.getElementById('btn_next').style.display = 'inline-block';
+      document.getElementById('login_password-container').style.display = 'none';
+      document.getElementById('btn_back').style.display = 'none';
+      document.getElementById('btn_login').style.display = 'none';
+      document.getElementById('login_newaccount').style.display = 'inline-block';
+      document.getElementById('login_forgotpassword').style.display = 'none';
+      document.getElementById('login_email').focus();
+    }
+
+    async function loginSubmit() {
+      const password = document.getElementById('login_password').value;
+      if (!password) { document.getElementById('login_password').style.border = '1px solid #dc3545'; return; }
+      document.getElementById('btn_login').disabled = true;
+      try {
+        const r = await API.login(loginEmail, password);
+        if (r.token) {
+          window.location.href = '/dashboard.html';
+        } else {
+          showError(r.errormsg || 'Credenciales inválidas');
+          document.getElementById('btn_login').disabled = false;
+        }
+      } catch (e) {
+        showError('Error de conexión');
+        document.getElementById('btn_login').disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

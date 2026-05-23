@@ -1,0 +1,128 @@
+const APP = {
+  currentUser: null,
+  settings: null,
+  lang: {},
+
+  async init() {
+    if (!API.isAuthenticated()) return;
+    try {
+      const user = await API.get('/api/user');
+      this.currentUser = user;
+      if (user.language) {
+        localStorage.setItem('lang', user.language);
+      }
+    } catch (e) { return; }
+    try {
+      const s = await API.get('/api/settings');
+      this.settings = s;
+    } catch (e) {}
+    await this.loadLang();
+    this.initNavigation();
+  },
+
+  async loadLang() {
+    const lang = localStorage.getItem('lang') || CONFIG.defaultLang;
+    try {
+      const r = await fetch('/lang/' + lang + '.json');
+      this.lang = await r.json();
+    } catch (e) {
+      this.lang = {};
+    }
+  },
+
+  t(key, def) {
+    return this.lang[key] || def || key;
+  },
+
+  initNavigation() {
+    document.querySelectorAll('.nav-link').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = el.getAttribute('href');
+        if (href) window.location.href = href;
+      });
+    });
+  },
+
+  showMessage(msg, type) {
+    type = type || 'info';
+    const bar = document.getElementById('infobar');
+    if (!bar) return;
+    bar.innerHTML = '<div style="width:80%;margin:0 auto;padding:.2rem 0"><span>' + this.esc(msg) + '</span><span onclick="this.parentElement.parentElement.style.display=\'none\'" style="float:right;cursor:pointer">&times;</span></div>';
+    bar.style.display = 'block';
+    bar.style.background = type === 'error' ? '#f8d7da' : type === 'success' ? '#d4edda' : '#fff3cd';
+    setTimeout(() => { bar.style.display = 'none'; }, 5000);
+  },
+
+  esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  },
+
+  formatMoney(amount, symbol) {
+    symbol = symbol || (this.settings && this.settings.currency_symbol) || CONFIG.currencySymbol;
+    return symbol + ' ' + Number(amount || 0).toFixed(2);
+  },
+
+  formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString();
+  },
+
+  getStatusClass(status) {
+    const map = {
+      'draft': 'status-draft',
+      'sent': 'status-sent',
+      'paid': 'status-paid',
+      'partial': 'status-partial',
+      'overdue': 'status-overdue',
+      'cancelled': 'status-cancelled',
+      'open': 'status-open',
+      'converted': 'status-converted'
+    };
+    return map[status] || 'status-default';
+  },
+
+  getStatusLabel(status) {
+    const map = {
+      'draft': 'Borrador',
+      'sent': 'Enviada',
+      'paid': 'Pagada',
+      'partial': 'Parcial',
+      'overdue': 'Vencida',
+      'cancelled': 'Cancelada',
+      'open': 'Abierta',
+      'converted': 'Convertida'
+    };
+    return map[status] || status;
+  },
+
+  async confirm(title, text, cbYes) {
+    const div = document.createElement('div');
+    div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:100;display:flex;align-items:center;justify-content:center';
+    div.innerHTML = `<div style="background:#fff;padding:2em;border-radius:8px;max-width:400px;box-shadow:0 4px 20px rgba(0,0,0,0.2)">
+      <h3 style="margin:0 0 .5em">${this.esc(title)}</h3>
+      <p>${this.esc(text)}</p>
+      <div style="text-align:right;margin-top:1em">
+        <button class="btn btn-secondary" onclick="this.closest('div[style]').remove()">Cancelar</button>
+        <button class="btn" onclick="this.closest('div[style]').remove();(${cbYes.toString()})()">Aceptar</button>
+      </div>
+    </div>`;
+    document.body.appendChild(div);
+  },
+
+  modal(html, title) {
+    const div = document.createElement('div');
+    div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:100;display:flex;align-items:center;justify-content:center;overflow-y:auto';
+    div.innerHTML = `<div style="background:#fff;margin:2em;padding:2em;border-radius:8px;max-width:600px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.2);position:relative">
+      ${title ? '<h2 style="margin:0 0 1em;color:' + CONFIG.secondaryColor + '">' + this.esc(title) + '</h2>' : ''}
+      <span onclick="this.closest(\'div[style]\').remove()" style="position:absolute;top:1em;right:1em;font-size:1.5em;cursor:pointer;color:#999">&times;</span>
+      ${html}
+    </div>`;
+    document.body.appendChild(div);
+    return div.querySelector('.modal-content') || div;
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => APP.init());

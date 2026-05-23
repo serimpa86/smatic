@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Smatic</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .admin-tabs { display: flex; gap: 0; margin-bottom: 1em; border-bottom: 2px solid #ccc; }
+    .admin-tab { padding: .7em 1.2em; cursor: pointer; background: #f5f5f5; border: 1px solid #ddd; border-bottom: none; margin-right: .2em; font-size: .9em; }
+    .admin-tab.active { background: #555; color: #fff; border-color: #555; }
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+    .user-card { background: #fff; border: 1px solid #e0e0e0; padding: 1em; margin-bottom: .5em; display: flex; justify-content: space-between; align-items: center; }
+    .user-card .user-info { flex: 1; }
+    .user-card .user-role { display: inline-block; padding: .15em .5em; font-size: .8em; border-radius: 3px; font-weight: bold; }
+    .role-superadmin { background: #dc3545; color: #fff; }
+    .role-admin { background: #ffc107; color: #000; }
+    .role-user { background: #17a2b8; color: #fff; }
+    .badge-active { color: #28a745; }
+    .badge-inactive { color: #dc3545; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(12em, 1fr)); gap: .8em; margin-bottom: 1em; }
+    .stat-box { background: #fff; border: 1px solid #e0e0e0; padding: 1em; text-align: center; }
+    .stat-box .num { font-size: 1.8em; font-weight: bold; color: #444; }
+    .stat-box .lbl { font-size: .8em; color: #666; }
+    .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(22em, 1fr)); gap: 1em; }
+    .config-grid label { display: block; font-size: .85em; color: #666; margin-bottom: .2em; }
+    .config-grid input, .config-grid select { width: 100%; }
+    .config-full { grid-column: 1 / -1; }
+    .log-entry { padding: .4em 0; border-bottom: 1px solid #eee; font-size: .85em; }
+    .log-entry .log-time { color: #999; margin-right: 1em; }
+  </style>
+</head>
+<body>
+  <div class="navigation-wrapper" id="sidebar">
+    <nav class="navigation">
+      <div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic Admin</span></div>
+      <ul>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Panel Principal</a></li>
+        <li class="active"><a href="admin.html"><span class="nav-icon">⚡</span> Administración</a></li>
+        <li><a href="customers.html"><span class="nav-icon">👥</span> Clientes</a></li>
+        <li><a href="invoices.html"><span class="nav-icon">📄</span> Facturas</a></li>
+        <li><a href="settings.html"><span class="nav-icon">⚙️</span> Configuración</a></li>
+      </ul>
+      <div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a></div>
+    </nav>
+  </div>
+
+  <div class="header-wrapper">
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+    <div class="breadcrumbs">⚡ Smatic - Administración del Sistema</div>
+  </div>
+
+  <div class="container">
+    <div class="page-header"><h1>Panel de Administración</h1></div>
+
+    <div id="admin-error" class="hidden" style="background:#f8d7da;color:#721c24;padding:.5em;margin-bottom:1em;display:none"></div>
+
+    <div class="admin-tabs" id="admin-tabs">
+      <div class="admin-tab active" data-tab="tab-dashboard">Dashboard</div>
+      <div class="admin-tab" data-tab="tab-users">Usuarios</div>
+      <div class="admin-tab" data-tab="tab-config">Config. Sistema</div>
+      <div class="admin-tab" data-tab="tab-audit">Auditoría</div>
+      <div class="admin-tab" data-tab="tab-data">Datos Globales</div>
+    </div>
+
+    <div id="tab-dashboard" class="admin-section active">
+      <div class="stat-grid" id="stats-grid">
+        <div class="stat-box"><div class="num" id="s-users">-</div><div class="lbl">Usuarios totales</div></div>
+        <div class="stat-box"><div class="num" id="s-active">-</div><div class="lbl">Usuarios activos</div></div>
+        <div class="stat-box"><div class="num" id="s-invoices">-</div><div class="lbl">Facturas emitidas</div></div>
+        <div class="stat-box"><div class="num" id="s-revenue">-</div><div class="lbl">Ingresos cobrados</div></div>
+        <div class="stat-box"><div class="num" id="s-due">-</div><div class="lbl">Pendiente cobro</div></div>
+        <div class="stat-box"><div class="num" id="s-customers">-</div><div class="lbl">Clientes totales</div></div>
+        <div class="stat-box"><div class="num" id="s-items">-</div><div class="lbl">Productos</div></div>
+        <div class="stat-box"><div class="num" id="s-dbsize">-</div><div class="lbl">Tamaño BD</div></div>
+      </div>
+      <div style="display:flex;gap:1em;flex-wrap:wrap">
+        <button onclick="downloadBackup()">📦 Descargar Backup BD</button>
+      </div>
+    </div>
+
+    <div id="tab-users" class="admin-section">
+      <div class="page-header" style="margin-bottom:.5em">
+        <div>
+          <span id="user-count" style="color:#666;font-size:.9em"></span>
+          <span id="user-stats" style="color:#666;font-size:.9em;margin-left:1em"></span>
+        </div>
+        <div class="actions"><button onclick="showUserModal()">+ Nuevo Usuario</button></div>
+      </div>
+      <div class="filters">
+        <input id="user-search" placeholder="Buscar usuarios..." oninput="loadUsers()">
+        <select id="user-role-filter" onchange="loadUsers()">
+          <option value="">Todos los roles</option>
+          <option value="superadmin">Superadmin</option>
+          <option value="admin">Admin</option>
+          <option value="user">Usuario</option>
+        </select>
+      </div>
+      <div id="users-list"></div>
+    </div>
+
+    <div id="tab-config" class="admin-section">
+      <form id="system-config-form" onsubmit="return saveSystemConfig()">
+        <h3 style="color:#555;border-bottom:1px solid #eee;padding-bottom:.5em">Información del Sistema</h3>
+        <div class="config-grid" style="margin-bottom:1em">
+          <div><label>Nombre de la aplicación</label><input name="app_name" id="cfg-app_name"></div>
+          <div><label>Tagline</label><input name="app_tagline" id="cfg-app_tagline"></div>
+          <div><label>Nombre de la compañía</label><input name="company_name" id="cfg-company_name"></div>
+          <div><label>Email de soporte</label><input name="support_email" id="cfg-support_email" type="email"></div>
+          <div><label>Máximo de usuarios</label><input name="max_users" id="cfg-max_users" type="number"></div>
+          <div>
+            <label>Registro público</label>
+            <select name="allow_public_signup" id="cfg-allow_public_signup">
+              <option value="1">Permitido</option><option value="0">Deshabilitado</option>
+            </select>
+          </div>
+          <div>
+            <label>Modo mantenimiento</label>
+            <select name="maintenance_mode" id="cfg-maintenance_mode">
+              <option value="0">Desactivado</option><option value="1">Activado</option>
+            </select>
+          </div>
+        </div>
+        <h3 style="color:#555;border-bottom:1px solid #eee;padding-bottom:.5em">Configuración SMTP (Email)</h3>
+        <div class="config-grid" style="margin-bottom:1em">
+          <div><label>SMTP Host</label><input name="smtp_host" id="cfg-smtp_host"></div>
+          <div><label>SMTP Puerto</label><input name="smtp_port" id="cfg-smtp_port" type="number"></div>
+          <div><label>SMTP Usuario</label><input name="smtp_user" id="cfg-smtp_user"></div>
+          <div><label>SMTP Contraseña</label><input name="smtp_pass" id="cfg-smtp_pass" type="password" placeholder="••••••••"></div>
+          <div><label>Email desde</label><input name="smtp_from_email" id="cfg-smtp_from_email" type="email"></div>
+          <div><label>Nombre desde</label><input name="smtp_from_name" id="cfg-smtp_from_name"></div>
+        </div>
+        <h3 style="color:#555;border-bottom:1px solid #eee;padding-bottom:.5em">Pasarelas de Pago</h3>
+        <div class="config-grid" style="margin-bottom:1em">
+          <div><label>Stripe Public Key</label><input name="stripe_public_key" id="cfg-stripe_public_key"></div>
+          <div><label>Stripe Secret Key</label><input name="stripe_secret_key" id="cfg-stripe_secret_key" type="password"></div>
+          <div><label>PayPal Client ID</label><input name="paypal_client_id" id="cfg-paypal_client_id"></div>
+          <div><label>PayPal Secret</label><input name="paypal_secret" id="cfg-paypal_secret" type="password"></div>
+        </div>
+        <button type="submit">💾 Guardar Configuración del Sistema</button>
+      </form>
+    </div>
+
+    <div id="tab-audit" class="admin-section">
+      <div class="page-header" style="margin-bottom:.5em">
+        <span style="color:#666;font-size:.9em" id="audit-count"></span>
+        <button class="btn-danger" onclick="clearAuditLog()">🗑 Limpiar Log</button>
+      </div>
+      <div id="audit-log-list"></div>
+    </div>
+
+    <div id="tab-data" class="admin-section">
+      <h3 style="color:#555">Clientes de todos los usuarios</h3>
+      <div class="filters"><input id="global-customer-search" placeholder="Buscar clientes..." oninput="loadAllCustomers()"></div>
+      <div class="scroll-table"><table class="record-list"><thead><tr><th>Usuario</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Grupo</th></tr></thead><tbody id="global-customers-body"></tbody></table></div>
+      <hr style="margin:2em 0">
+      <h3 style="color:#555">Facturas de todos los usuarios</h3>
+      <div class="filters">
+        <select id="global-inv-status" onchange="loadAllInvoices()"><option value="">Todos</option><option value="paid">Pagadas</option><option value="sent">Enviadas</option><option value="overdue">Vencidas</option></select>
+      </div>
+      <div class="scroll-table"><table class="record-list"><thead><tr><th>Usuario</th><th>N° Factura</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead><tbody id="global-invoices-body"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- User Modal -->
+  <div id="user-modal" class="modal-overlay" style="display:none">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeUserModal()">&times;</button>
+      <h2 id="user-modal-title">Nuevo Usuario</h2>
+      <form onsubmit="return saveUser()">
+        <div style="margin-bottom:.5em"><label>Email:</label><input id="um-email" type="email" style="width:100%"></div>
+        <div style="margin-bottom:.5em"><label>Nombre:</label><input id="um-name" style="width:100%"></div>
+        <div style="margin-bottom:.5em"><label>Contraseña:</label><input id="um-password" type="password" style="width:100%" placeholder="Mín. 6 caracteres"></div>
+        <div style="margin-bottom:.5em"><label>Rol:</label>
+          <select id="um-role" style="width:100%">
+            <option value="user">Usuario</option>
+            <option value="admin">Admin</option>
+            <option value="superadmin">Super Admin</option>
+          </select>
+        </div>
+        <div style="margin-bottom:.5em"><label>Activo:</label>
+          <select id="um-active" style="width:100%">
+            <option value="1">Sí</option><option value="0">No</option>
+          </select>
+        </div>
+        <input type="hidden" id="um-id">
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeUserModal()">Cancelar</button>
+          <button type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let editingUserId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+      await APP.init();
+      if (APP.currentUser && APP.currentUser.role !== 'superadmin') {
+        document.getElementById('admin-error').style.display = 'block';
+        document.getElementById('admin-error').textContent = 'Acceso denegado: solo Super Administradores. Redirigiendo...';
+        setTimeout(() => window.location.href = '/dashboard.html', 2000);
+        return;
+      }
+      initTabs();
+      loadDashboard();
+      loadUsers();
+      loadSystemConfig();
+      loadAuditLog();
+      loadAllCustomers();
+      loadAllInvoices();
+    });
+
+    function initTabs() {
+      document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.tab).classList.add('active');
+        });
+      });
+    }
+
+    async function api(path, opts = {}) {
+      try {
+        const headers = { 'Authorization': 'Bearer ' + API._token };
+        if (opts.body && !(opts.body instanceof FormData)) headers['Content-Type'] = 'application/json';
+        const r = await fetch(path, { method: opts.method || 'GET', headers, body: opts.body ? (opts.body instanceof FormData ? opts.body : JSON.stringify(opts.body)) : undefined });
+        const j = await r.json();
+        if (j.errorcode) throw new Error(j.errormsg || 'API Error');
+        return j;
+      } catch (e) { if (e.message !== 'API Error') throw e; throw e; }
+    }
+
+    async function loadDashboard() {
+      try {
+        const d = await api('/api/admin/stats');
+        document.getElementById('s-users').textContent = d.users;
+        document.getElementById('s-active').textContent = d.activeUsers;
+        document.getElementById('s-invoices').textContent = d.totalInvoices;
+        document.getElementById('s-revenue').textContent = APP.formatMoney(d.totalRevenue);
+        document.getElementById('s-due').textContent = APP.formatMoney(d.totalDue);
+        document.getElementById('s-customers').textContent = d.totalCustomers;
+        document.getElementById('s-items').textContent = d.totalItems;
+        document.getElementById('s-dbsize').textContent = (d.dbSize / 1024).toFixed(0) + ' KB';
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadUsers() {
+      try {
+        const search = document.getElementById('user-search').value;
+        const role = document.getElementById('user-role-filter').value;
+        const d = await api('/api/admin/users?search=' + encodeURIComponent(search) + '&role=' + encodeURIComponent(role));
+        document.getElementById('user-count').textContent = d.total + ' usuarios';
+        document.getElementById('user-stats').textContent = `(SA:${d.stats.superadmins} A:${d.stats.admins} U:${d.stats.users})`;
+        const list = document.getElementById('users-list');
+        if (!d.users.length) { list.innerHTML = '<p style="color:#999;text-align:center;padding:2em">No hay usuarios</p>'; return; }
+        list.innerHTML = d.users.map(u => `
+          <div class="user-card">
+            <div class="user-info">
+              <strong>${APP.esc(u.name || 'Sin nombre')}</strong>
+              <span style="color:#666;font-size:.9em">${APP.esc(u.email)}</span>
+              <span class="user-role role-${u.role}">${u.role}</span>
+              <span class="${u.is_active ? 'badge-active' : 'badge-inactive'}">${u.is_active ? '● Activo' : '○ Inactivo'}</span>
+              <span style="color:#999;font-size:.8em;display:block">Creado: ${u.created_at}</span>
+            </div>
+            <div style="display:flex;gap:.3em;flex-wrap:wrap">
+              <button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="showUserModal('${u.id}')">✏️</button>
+              <button class="btn-danger" style="min-width:auto;font-size:.85em" onclick="deleteUser('${u.id}','${APP.esc(u.email)}')">🗑</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function showUserModal(id) {
+      editingUserId = id || null;
+      document.getElementById('user-modal').style.display = 'flex';
+      document.getElementById('um-id').value = id || '';
+      if (id) {
+        try {
+          const u = await api('/api/admin/users/' + id);
+          document.getElementById('user-modal-title').textContent = 'Editar Usuario';
+          document.getElementById('um-email').value = u.email || '';
+          document.getElementById('um-name').value = u.name || '';
+          document.getElementById('um-password').value = '';
+          document.getElementById('um-password').placeholder = 'Dejar vacío para no cambiar';
+          document.getElementById('um-role').value = u.role || 'user';
+          document.getElementById('um-active').value = u.is_active;
+        } catch (e) { APP.showMessage(e.message, 'error'); closeUserModal(); }
+      } else {
+        document.getElementById('user-modal-title').textContent = 'Nuevo Usuario';
+        document.getElementById('um-email').value = '';
+        document.getElementById('um-name').value = '';
+        document.getElementById('um-password').value = '';
+        document.getElementById('um-password').placeholder = 'Mín. 6 caracteres';
+        document.getElementById('um-role').value = 'user';
+        document.getElementById('um-active').value = '1';
+      }
+    }
+
+    function closeUserModal() { document.getElementById('user-modal').style.display = 'none'; editingUserId = null; }
+
+    async function saveUser() {
+      const id = document.getElementById('um-id').value;
+      const data = {
+        email: document.getElementById('um-email').value,
+        name: document.getElementById('um-name').value,
+        role: document.getElementById('um-role').value,
+        is_active: parseInt(document.getElementById('um-active').value)
+      };
+      const password = document.getElementById('um-password').value;
+      if (password) data.password = password;
+      try {
+        if (id) { await api('/api/admin/users/' + id, { method: 'PUT', body: data }); }
+        else {
+          if (!password || password.length < 6) { APP.showMessage('Contraseña debe tener al menos 6 caracteres', 'error'); return false; }
+          await api('/api/admin/users', { method: 'POST', body: data });
+        }
+        closeUserModal();
+        loadUsers();
+        APP.showMessage(id ? 'Usuario actualizado' : 'Usuario creado', 'success');
+      } catch (e) { APP.showMessage(e.message, 'error'); }
+      return false;
+    }
+
+    async function deleteUser(id, email) {
+      APP.confirm('Eliminar Usuario', '¿Eliminar permanentemente a ' + email + '? Todos sus datos (facturas, clientes, productos) serán borrados.', async () => {
+        try { await api('/api/admin/users/' + id, { method: 'DELETE' }); loadUsers(); APP.showMessage('Usuario eliminado', 'success'); } catch (e) { APP.showMessage(e.message, 'error'); }
+      });
+    }
+
+    async function loadSystemConfig() {
+      try {
+        const c = await api('/api/admin/system');
+        for (const [k, v] of Object.entries(c)) {
+          const el = document.getElementById('cfg-' + k);
+          if (el) el.value = v !== null && v !== undefined ? v : '';
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    async function saveSystemConfig() {
+      const form = document.getElementById('system-config-form');
+      const data = {};
+      form.querySelectorAll('[name]').forEach(el => { data[el.name] = el.value; });
+      try {
+        await api('/api/admin/system', { method: 'PUT', body: data });
+        APP.showMessage('Configuración del sistema guardada', 'success');
+      } catch (e) { APP.showMessage(e.message, 'error'); }
+      return false;
+    }
+
+    async function loadAuditLog() {
+      try {
+        const d = await api('/api/admin/audit-log');
+        document.getElementById('audit-count').textContent = d.total + ' registros';
+        const list = document.getElementById('audit-log-list');
+        if (!d.logs.length) { list.innerHTML = '<p style="color:#999;text-align:center;padding:1em">Sin registros</p>'; return; }
+        list.innerHTML = d.logs.map(l => `<div class="log-entry"><span class="log-time">${l.created_at}</span><strong>${APP.esc(l.action)}</strong> ${APP.esc(l.details)}</div>`).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function clearAuditLog() {
+      APP.confirm('Limpiar Log', '¿Eliminar todos los registros de auditoría?', async () => {
+        try { await api('/api/admin/audit-log/clear'); loadAuditLog(); APP.showMessage('Log limpiado', 'success'); } catch (e) { APP.showMessage(e.message, 'error'); }
+      });
+    }
+
+    async function loadAllCustomers() {
+      try {
+        const search = document.getElementById('global-customer-search').value;
+        const d = await api('/api/admin/all-customers?search=' + encodeURIComponent(search));
+        const tbody = document.getElementById('global-customers-body');
+        if (!d.customers.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color:#999">Sin clientes</td></tr>'; return; }
+        tbody.innerHTML = d.customers.map(c => `<tr><td>${APP.esc(c.user_email)}</td><td>${APP.esc(c.name)}</td><td>${APP.esc(c.email||'-')}</td><td>${APP.esc(c.phone||'-')}</td><td>${APP.esc(c.group_name||'-')}</td></tr>`).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadAllInvoices() {
+      try {
+        const status = document.getElementById('global-inv-status').value;
+        const d = await api('/api/admin/all-invoices?status=' + encodeURIComponent(status));
+        const tbody = document.getElementById('global-invoices-body');
+        if (!d.invoices.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color:#999">Sin facturas</td></tr>'; return; }
+        tbody.innerHTML = d.invoices.map(i => `<tr>
+          <td>${APP.esc(i.user_email)}</td>
+          <td>${APP.esc(i.invoice_number)}</td>
+          <td>${APP.esc(i.customer_name||'-')}</td>
+          <td>${APP.formatMoney(i.total)}</td>
+          <td><span class="status ${APP.getStatusClass(i.status)}">${APP.getStatusLabel(i.status)}</span></td>
+        </tr>`).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function downloadBackup() {
+      try {
+        const r = await fetch('/api/admin/db/backup', { headers: { 'Authorization': 'Bearer ' + API._token } });
+        const blob = await r.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'smatic-backup-' + new Date().toISOString().split('T')[0] + '.db';
+        a.click();
+        APP.showMessage('Backup descargado', 'success');
+      } catch (e) { APP.showMessage('Error descargando backup', 'error'); }
+    }
+
+    document.addEventListener('click', (e) => {
+      const s = document.getElementById('sidebar');
+      if (window.innerWidth <= 768 && s.style.display === 'block' && !s.contains(e.target) && !e.target.closest('.hamburger')) s.style.display = '';
+    });
+  </script>
+</body>
+</html>
