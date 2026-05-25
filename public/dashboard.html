@@ -1,276 +1,165 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="page_title_dashboard">Dashboard | Smatic</title>
-  <link rel="stylesheet" href="css/main.css">
+<!DOCTYPE html><html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title data-i18n="page_title_dashboard">Panel Principal | Smatic</title><link rel="stylesheet" href="css/main.css">
+<style>
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.6em;margin-bottom:1em}
+.kpi-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:1em;text-align:center;transition:box-shadow .15s}
+.kpi-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.kpi-value{font-size:1.4em;font-weight:700;color:#007bff}
+.kpi-label{font-size:.8em;color:#888;margin-top:.2em}
+.kpi-icon{font-size:1.5em;margin-bottom:.2em}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:1em}
+@media(max-width:768px){.dash-grid{grid-template-columns:1fr}}
+.dash-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}
+.dash-card-header{padding:.5em .8em;font-weight:700;font-size:.9em;border-bottom:1px solid #e0e0e0;background:#f8f9fa}
+.dash-card-body{padding:.5em .8em}
+.dash-table{width:100%;border-collapse:collapse;font-size:.85em}
+.dash-table th{text-align:left;padding:.3em .5em;border-bottom:1px solid #eee;color:#888;font-weight:600;font-size:.8em;text-transform:uppercase}
+.dash-table td{padding:.3em .5em;border-bottom:1px solid #f0f0f0}
+.dash-table tr:hover{background:#f8f9fa}
+.status-badge{display:inline-block;padding:.1em .4em;border-radius:3px;font-size:.75em;font-weight:600}
+.st-paid{background:#d4edda;color:#155724}
+.st-draft{background:#e8e8e8;color:#555}
+.st-sent{background:#fff3cd;color:#856404}
+.st-overdue{background:#f8d7da;color:#721c24}
+.st-cancelled{background:#f8d7da;color:#721c24}
+.canvas-container{position:relative;height:180px;margin:.5em 0}
+.canvas-container canvas{width:100%;height:100%}
+.activity-feed{padding:0;margin:0;list-style:none}
+.activity-feed li{padding:.3em 0;border-bottom:1px solid #f0f0f0;font-size:.85em;display:flex;justify-content:space-between}
+.activity-feed li .af-date{color:#aaa;font-size:.8em;white-space:nowrap;margin-left:.5em}
+.quick-actions{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.4em;margin:.3em 0}
+.quick-actions a{display:flex;flex-direction:column;align-items:center;padding:.6em;border:1px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;font-size:.8em;transition:all .15s}
+.quick-actions a:hover{border-color:#007bff;background:#f0f7ff}
+.quick-actions .qa-icon{font-size:1.3em;margin-bottom:.2em}
+</style>
 </head>
 <body>
-  <div class="navigation-wrapper" id="sidebar">
-    <nav class="navigation">
-      <div class="sidebar-brand">
-        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-        <span>Smatic</span>
-      </div>
-      <ul>
-        <li class="active"><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
-        <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
-      </ul>
-      <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
-      </div>
-    </nav>
-  </div>
+<div class="navigation-wrapper"><nav class="navigation">
+<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
+<ul>
+<li class="active"><a href="dashboard.html">📊 <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+<li><a href="customers.html">👥 <span data-i18n="nav_customers">Clientes</span></a></li>
+<li><a href="invoices.html">📄 <span data-i18n="nav_invoices">Facturas</span></a></li>
+<li><a href="quotes.html">📝 <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+<li><a href="credit-notes.html">📒 <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+<li><a href="payments.html">💳 <span data-i18n="nav_payments">Pagos</span></a></li>
+<li><a href="refunds.html">💸 <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+<li><a href="items.html">📦 <span data-i18n="nav_items">Productos</span></a></li>
+<li><a href="reports.html">📈 <span data-i18n="nav_reports">Reportes</span></a></li>
+<li><a href="settings.html">⚙️ <span data-i18n="nav_settings">Configuración</span></a></li>
+<li id="admin-nav-link" class="hidden"><a href="admin.html">⚡ <span data-i18n="nav_admin">Administración</span></a></li>
+</ul>
+<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a></div>
+</nav></div>
+<div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span data-i18n="breadcrumb_dashboard">Smatic - Panel Principal</span></div></div>
+<div class="container">
+<div class="page-header"><h1 data-i18n="page_title_dashboard">Panel Principal</h1><div class="actions"><span id="greeting" style="font-size:.9em;color:#666;margin-right:1em"></span></div></div>
 
-  <div class="header-wrapper">
-    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
-    <div class="breadcrumbs">
-      <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-      <span data-i18n="breadcrumb_dashboard">Smatic - Panel Principal</span>
-    </div>
-  </div>
+<div class="kpi-grid" id="kpiGrid">
+<div class="kpi-card"><div class="kpi-icon">💰</div><div class="kpi-value" id="kpiInvoiced">$0</div><div class="kpi-label" data-i18n="kpi_total_invoiced">Total Facturado</div></div>
+<div class="kpi-card"><div class="kpi-icon">💳</div><div class="kpi-value" id="kpiCollected">$0</div><div class="kpi-label" data-i18n="kpi_total_collected">Total Cobrado</div></div>
+<div class="kpi-card"><div class="kpi-icon">⏳</div><div class="kpi-value" id="kpiPending">$0</div><div class="kpi-label" data-i18n="kpi_pending">Pendiente</div></div>
+<div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-value" id="kpiOverdue">0</div><div class="kpi-label" data-i18n="kpi_overdue">Vencidas</div></div>
+<div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-value" id="kpiCustomers">0</div><div class="kpi-label" data-i18n="kpi_customers">Clientes</div></div>
+<div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-value" id="kpiLowStock">0</div><div class="kpi-label" data-i18n="kpi_low_stock">Stock bajo</div></div>
+</div>
 
-  <div class="container" id="main-content">
-    <div class="page-header">
-      <h1 data-i18n="page_title_dashboard">Panel Principal</h1>
-    </div>
+<div class="quick-actions">
+<a href="new-invoice.html"><span class="qa-icon">📄</span> <span data-i18n="qa_new_invoice">Factura</span></a>
+<a href="new-quote.html"><span class="qa-icon">📝</span> <span data-i18n="qa_new_quote">Cotización</span></a>
+<a href="pos.html"><span class="qa-icon">🛒</span> <span data-i18n="qa_pos">Punto de Venta</span></a>
+<a href="customers.html?action=new"><span class="qa-icon">👤</span> <span data-i18n="qa_new_customer">Cliente</span></a>
+<a href="items.html?action=new"><span class="qa-icon">📦</span> <span data-i18n="qa_new_item">Producto</span></a>
+</div>
 
-    <div id="stats-container" class="stats-grid">
-      <div class="stat-card"><div class="stat-value" id="stat-invoiced">$0</div><div class="stat-label" data-i18n="stat_total_invoiced">Total Facturado</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-paid">$0</div><div class="stat-label" data-i18n="stat_total_paid">Total Cobrado</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-due">$0</div><div class="stat-label" data-i18n="stat_total_due">Pendiente</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-customers">0</div><div class="stat-label" data-i18n="stat_total_customers">Clientes</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-overdue">0</div><div class="stat-label" data-i18n="stat_overdue">Vencidas</div></div>
-    </div>
+<div class="dash-grid">
+<div class="dash-card"><div class="dash-card-header" data-i18n="card_monthly_sales">Ventas Mensuales</div><div class="dash-card-body"><div class="canvas-container"><canvas id="salesChart"></canvas></div></div></div>
+<div class="dash-card"><div class="dash-card-header" data-i18n="card_recent_invoices">Facturas Recientes</div><div class="dash-card-body"><table class="dash-table" id="recentInvoices"><tbody></tbody></table></div></div>
+<div class="dash-card"><div class="dash-card-header" data-i18n="card_recent_payments">Pagos Recientes</div><div class="dash-card-body"><table class="dash-table" id="recentPayments"><tbody></tbody></table></div></div>
+<div class="dash-card"><div class="dash-card-header" data-i18n="card_quick_actions">Acciones Rápidas</div><div class="dash-card-body">
+<a href="reports.html" style="display:block;padding:.4em;border:1px solid #eee;border-radius:4px;margin-bottom:.3em;text-decoration:none;color:#333;font-size:.85em">📈 <span data-i18n="qa_reports">Ver Reportes</span></a>
+<a href="settings.html" style="display:block;padding:.4em;border:1px solid #eee;border-radius:4px;margin-bottom:.3em;text-decoration:none;color:#333;font-size:.85em">⚙️ <span data-i18n="qa_settings">Configuración</span></a>
+<a href="modules.html" style="display:block;padding:.4em;border:1px solid #eee;border-radius:4px;text-decoration:none;color:#333;font-size:.85em">🧩 <span data-i18n="qa_modules">Módulos</span></a>
+</div></div>
+</div>
+</div>
+<script src="js/api.js"></script><script src="js/config.js"></script><script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if(!API.isAuthenticated()){window.location.href='/login.html';return;}
+  await APP.init();
+  if(APP.currentUser&&APP.currentUser.role==='superadmin')document.getElementById('admin-nav-link').classList.remove('hidden');
+  document.getElementById('greeting').textContent='👋 Hola, '+(APP.currentUser?APP.currentUser.name||APP.currentUser.email:'')+'!';
+  await loadDashboard();
+});
+const statusLabels={paid:'Pagada',draft:'Borrador',sent:'Enviada',overdue:'Vencida',cancelled:'Cancelada'};
+const statusClasses={paid:'st-paid',draft:'st-draft',sent:'st-sent',overdue:'st-overdue',cancelled:'st-cancelled'};
 
-    <div class="card">
-      <div class="card-header" data-i18n="card_create">Crear</div>
-      <div class="create-grid">
-        <a href="new-invoice.html" class="create-item" data-action="invoice">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <span data-i18n="create_invoice">Factura</span>
-        </a>
-        <a href="new-invoice.html?recurring=1" class="create-item" data-action="recurring">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          <span data-i18n="create_recurring_invoice">Factura Recurrente</span>
-        </a>
-        <a href="customers.html" class="create-item" data-action="customer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span data-i18n="create_customer">Cliente</span>
-        </a>
-        <a href="new-quote.html" class="create-item" data-action="quote">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13l-1 2h3l-1 2"/><path d="M15 13l-1 2h3l-1 2"/></svg>
-          <span data-i18n="create_quote">Cotización</span>
-        </a>
-        <a href="credit-notes.html" class="create-item" data-action="credit-note">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-          <span data-i18n="create_credit_note">Nota de Crédito</span>
-        </a>
-        <a href="payments.html" class="create-item" data-action="payment">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          <span data-i18n="create_payment">Pago</span>
-        </a>
-        <a href="items.html" class="create-item" data-action="item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          <span data-i18n="create_item">Producto</span>
-        </a>
-        <a href="settings.html?tab=users" class="create-item" data-action="invite">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-          <span data-i18n="create_invite_user">Invitar Usuario</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="dash-columns">
-      <div class="dash-col-main">
-        <div class="card">
-          <div class="card-header" data-i18n="card_pending_invoices">Facturas Pendientes</div>
-          <div class="filters">
-            <input type="text" id="pending-search" data-i18n-placeholder="placeholder_search_pending" placeholder="Buscar por número o cliente..." oninput="filterPendingInvoices()">
-          </div>
-          <div class="scroll-table">
-            <table class="record-list" id="pending-table">
-              <thead>
-                <tr>
-                  <th data-i18n="th_date">Fecha</th>
-                  <th data-i18n="th_invoice_number">N° Factura</th>
-                  <th data-i18n="th_customer">Cliente</th>
-                  <th data-i18n="th_total">Total</th>
-                  <th data-i18n="th_status">Estado</th>
-                  <th data-i18n="th_action">Acción</th>
-                </tr>
-              </thead>
-              <tbody id="pending-body">
-                <tr><td colspan="6" class="text-center" style="color:#999" data-i18n="loading">Cargando...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="dash-col-side">
-        <div class="card">
-          <div class="card-header" data-i18n="card_monthly_income">Ingresos por mes</div>
-          <div class="chart-container">
-            <canvas id="income-chart" width="300" height="180"></canvas>
-            <div id="chart-empty" class="chart-empty hidden" data-i18n="msg_no_income_data">No hay datos de ingresos</div>
-          </div>
-        </div>
-        <div id="first-time" class="hidden first-time-card">
-          <div class="card">
-            <div class="card-header" data-i18n="card_welcome">¡Bienvenido a Smatic!</div>
-            <p style="color:#666;margin:.5em 0 1em" data-i18n="msg_first_invoice">Crea tu primera factura para empezar a facturar.</p>
-            <button onclick="window.location.href='new-invoice.html'" style="width:100%" data-i18n="btn_create_first_invoice">Crear Primera Factura</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="js/api.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/app.js"></script>
-  <script>
-    let allPending = [];
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
-      await APP.init();
-
-      if (APP.currentUser && APP.currentUser.role === 'superadmin') {
-        document.getElementById('admin-nav-link').classList.remove('hidden');
-      }
-
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('first')) {
-        document.getElementById('first-time').classList.remove('hidden');
-      }
-
-      loadDashboard();
+async function loadDashboard(){
+  try{
+    const d=await API.get('/api/dashboard/stats');
+    document.getElementById('kpiInvoiced').textContent='$ '+APP.formatMoney(d.total_invoiced);
+    document.getElementById('kpiCollected').textContent='$ '+APP.formatMoney(d.total_collected);
+    document.getElementById('kpiPending').textContent='$ '+APP.formatMoney(d.pending_amount)+(d.pending_count?' ('+d.pending_count+')':'');
+    document.getElementById('kpiOverdue').textContent=d.overdue_count;
+    document.getElementById('kpiCustomers').textContent=d.customer_count;
+    document.getElementById('kpiLowStock').textContent=d.low_stock_count;
+    drawChart(d.monthly_sales||[]);
+    renderTable('recentInvoices',d.recent_invoices||[],['invoice_number','customer_name','total_amount','status','invoice_date'],['Número','Cliente','Total','Estado','Fecha']);
+    renderTable('recentPayments',d.recent_payments||[],['payment_date','invoice_number','amount','method'],['Fecha','Factura','Monto','Método']);
+    APP.applyLanguage();
+  }catch(e){}
+}
+function renderTable(id,data,fields,headers){
+  const el=document.getElementById(id);
+  if(!data.length){el.innerHTML='<tr><td style="text-align:center;padding:1em;color:#999">Sin datos</td></tr>';return;}
+  let h='<thead><tr>'+headers.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>';
+  for(const row of data){
+    let cells=fields.map(f=>{
+      let v=row[f];
+      if(f==='total_amount'||f==='amount')return '$ '+APP.formatMoney(v);
+      if(f==='status')return '<span class="status-badge '+(statusClasses[v]||'')+'">'+(statusLabels[v]||v)+'</span>';
+      return APP.esc(v||'');
     });
-
-    async function loadDashboard() {
-      try {
-        const data = await API.get('/api/reports/dashboard');
-        document.getElementById('stat-invoiced').textContent = APP.formatMoney(data.totalInvoiced);
-        document.getElementById('stat-paid').textContent = APP.formatMoney(data.totalPaid);
-        document.getElementById('stat-due').textContent = APP.formatMoney(data.totalDue);
-        document.getElementById('stat-customers').textContent = data.totalCustomers;
-        document.getElementById('stat-overdue').textContent = data.overdueInvoices;
-
-        allPending = data.pendingInvoices || [];
-        renderPendingInvoices(allPending);
-
-        renderChart(data.monthlyStats || []);
-
-        if (allPending.length > 0) {
-          document.getElementById('first-time').classList.add('hidden');
-        }
-      } catch (e) {
-        console.error('Error loading dashboard', e);
-      }
-    }
-
-    function renderPendingInvoices(list) {
-      const tbody = document.getElementById('pending-body');
-      if (!list || list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color:#999">No hay facturas pendientes.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = list.map(inv => {
-        const statusLabel = APP.getStatusLabel(inv.status);
-        const statusClass = APP.getStatusClass(inv.status);
-        return '<tr>' +
-          '<td>' + APP.esc(inv.date) + '</td>' +
-          '<td><a href="invoices.html?id=' + inv.id + '">' + APP.esc(inv.invoice_number) + '</a></td>' +
-          '<td>' + APP.esc(inv.customer_name || '-') + '</td>' +
-          '<td>' + APP.formatMoney(inv.total) + '</td>' +
-          '<td><span class="status ' + statusClass + '">' + APP.esc(statusLabel) + '</span></td>' +
-          '<td><a href="invoices.html?id=' + inv.id + '" class="btn btn-secondary" style="min-width:auto;font-size:.8em;padding:.2em .6em" data-i18n="btn_view">Ver</a></td>' +
-          '</tr>';
-      }).join('');
-    }
-
-    function filterPendingInvoices() {
-      const q = document.getElementById('pending-search').value.toLowerCase().trim();
-      if (!q) {
-        renderPendingInvoices(allPending);
-        return;
-      }
-      const filtered = allPending.filter(inv =>
-        (inv.invoice_number && inv.invoice_number.toLowerCase().includes(q)) ||
-        (inv.customer_name && inv.customer_name.toLowerCase().includes(q))
-      );
-      renderPendingInvoices(filtered);
-    }
-
-    function renderChart(monthlyStats) {
-      const canvas = document.getElementById('income-chart');
-      const emptyMsg = document.getElementById('chart-empty');
-      if (!monthlyStats || monthlyStats.length === 0) {
-        canvas.style.display = 'none';
-        emptyMsg.classList.remove('hidden');
-        return;
-      }
-      canvas.style.display = 'block';
-      emptyMsg.classList.add('hidden');
-
-      const sorted = monthlyStats.slice().sort((a, b) => a.month.localeCompare(b.month));
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width, h = canvas.height;
-      const padding = { top: 10, right: 10, bottom: 30, left: 50 };
-      const chartW = w - padding.left - padding.right;
-      const chartH = h - padding.top - padding.bottom;
-
-      ctx.clearRect(0, 0, w, h);
-
-      const maxTotal = Math.max(...sorted.map(s => s.total), 1);
-      const barWidth = Math.max(10, Math.min(30, chartW / sorted.length - 6));
-      const gap = (chartW - barWidth * sorted.length) / (sorted.length + 1);
-
-      ctx.font = '10px sans-serif';
-      ctx.fillStyle = '#888';
-      ctx.textAlign = 'center';
-
-      sorted.forEach((s, i) => {
-        const x = padding.left + gap + i * (barWidth + gap);
-        const barH = (s.total / maxTotal) * chartH;
-        const y = padding.top + chartH - barH;
-
-        const grad = ctx.createLinearGradient(x, y, x, padding.top + chartH);
-        grad.addColorStop(0, '#008a0f');
-        grad.addColorStop(1, '#4caf50');
-        ctx.fillStyle = grad;
-        ctx.fillRect(x, y, barWidth, barH);
-
-        ctx.fillStyle = '#888';
-        const label = s.month.slice(-2);
-        ctx.fillText(label, x + barWidth / 2, padding.top + chartH + 14);
-
-        ctx.fillStyle = '#444';
-        ctx.font = '9px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(APP.formatMoney(s.total), x + barWidth / 2, y - 3);
-        ctx.font = '10px sans-serif';
-      });
-
-      ctx.strokeStyle = '#e0e0e0';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(padding.left, padding.top);
-      ctx.lineTo(padding.left, padding.top + chartH);
-      ctx.lineTo(padding.left + chartW, padding.top + chartH);
-      ctx.stroke();
-    }
-  </script>
+    h+='<tr>'+cells.map(c=>'<td>'+c+'</td>').join('')+'</tr>';
+  }
+  h+='</tbody>';
+  el.innerHTML=h;
+}
+function drawChart(monthly){
+  const canvas=document.getElementById('salesChart');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const rect=canvas.parentElement.getBoundingClientRect();
+  canvas.width=rect.width*2;canvas.height=rect.height*2;
+  canvas.style.width=rect.width+'px';canvas.style.height=rect.height+'px';
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  if(!monthly.length){
+    ctx.fillStyle='#ccc';ctx.font='14px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Sin datos de ventas',W/2,H/2);
+    return;
+  }
+  const pad={t:20,b:30,l:40,r:20};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const vals=monthly.map(m=>m.total);
+  const max=Math.max(...vals,1);
+  const barW=cw/monthly.length*0.7;
+  const gap=cw/monthly.length*0.3;
+  ctx.fillStyle='#007bff';
+  monthly.forEach((m,i)=>{
+    const h=(m.total/max)*ch;
+    const x=pad.l+i*(barW+gap)+gap/2;
+    const y=pad.t+ch-h;
+    ctx.fillRect(x,y,barW,h);
+    ctx.fillStyle='#007bff';
+    ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillStyle='#666';
+    ctx.fillText('$'+Math.round(m.total),x+barW/2,y-4);
+    ctx.fillStyle='#999';ctx.font='9px sans-serif';
+    ctx.fillText(m.month.slice(5),x+barW/2,H-pad.b+14);
+    ctx.fillStyle='#007bff';
+  });
+}
+</script>
 </body>
 </html>

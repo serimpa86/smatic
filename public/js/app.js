@@ -22,6 +22,7 @@ const APP = {
     } catch (e) {}
     await this.loadLang();
     this.initNavigation();
+    this.mobileSidebar();
     this.injectModuleNav();
     this.renderCompanyInfo();
   },
@@ -137,10 +138,25 @@ const APP = {
     if (this.lang && Object.keys(this.lang).length > 0) this.applyLanguage();
   },
 
+  mobileSidebar() {
+    const sidebar = document.querySelector('.navigation-wrapper');
+    const hamburger = document.querySelector('.hamburger');
+    if (!sidebar || !hamburger) return;
+    hamburger.onclick = (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle('open');
+    };
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+        sidebar.classList.remove('open');
+      }
+    });
+  },
+
   async loadLang() {
     const lang = localStorage.getItem('lang') || CONFIG.defaultLang;
     try {
-      const r = await fetch('/lang/' + lang + '.json');
+      const r = await fetch('/locales/' + lang + '.json');
       this.lang = await r.json();
     } catch (e) {
       this.lang = {};
@@ -151,17 +167,13 @@ const APP = {
   applyLanguage() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
-      const translation = this.t(key, el.innerText);
+      const translation = this.t(key, el.innerText || el.textContent);
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         el.setAttribute('placeholder', translation);
       } else if (el.tagName === 'IMG') {
         el.setAttribute('alt', translation);
       } else {
-        el.childNodes.forEach(node => {
-          if (node.nodeType === 3) {
-            node.textContent = translation;
-          }
-        });
+        el.innerHTML = el.innerHTML.replace(el.innerText, translation);
       }
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
