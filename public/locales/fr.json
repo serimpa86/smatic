@@ -61,5 +61,6 @@
   "lang_en": "English",
   "lang_fr": "Français",
   "setting_language": "Langue",
-  "crm_tab_pipeline": "Pipeline"
+  "crm_tab_pipeline": "Pipeline",
+  "tab_gateway": "Passerelles de Paiement"
 }

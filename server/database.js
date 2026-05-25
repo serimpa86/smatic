@@ -192,6 +192,7 @@ async function initDb() {
     is_recurring INTEGER DEFAULT 0, recurring_frequency TEXT DEFAULT '',
     recurring_next_date TEXT DEFAULT '', recurring_end_date TEXT DEFAULT '',
     recurring_occurrences INTEGER DEFAULT 0, recurring_count INTEGER DEFAULT 0,
+    payment_link TEXT DEFAULT '', gateway_pref_id TEXT DEFAULT '',
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
   )`);
@@ -239,6 +240,7 @@ async function initDb() {
     payment_number TEXT DEFAULT '', date TEXT DEFAULT (date('now')),
     method TEXT DEFAULT '', reference TEXT DEFAULT '',
     amount REAL DEFAULT 0, notes TEXT DEFAULT '',
+    gateway TEXT DEFAULT '', gateway_payment_id TEXT DEFAULT '',
     created_at TEXT DEFAULT (datetime('now'))
   )`);
 
@@ -306,6 +308,10 @@ async function initDb() {
     printer_port TEXT DEFAULT '',
     modules_active TEXT DEFAULT '[]',
     setup_completed INTEGER DEFAULT 0,
+    mp_access_token TEXT DEFAULT '',
+    mp_public_key TEXT DEFAULT '',
+    mp_sandbox INTEGER DEFAULT 1,
+    mp_enabled INTEGER DEFAULT 0,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
   )`);
@@ -333,6 +339,14 @@ async function initDb() {
   try { exec("ALTER TABLE warehouses ADD COLUMN company_id TEXT"); } catch (e) {}
   try { exec("ALTER TABLE stock_levels ADD COLUMN company_id TEXT"); } catch (e) {}
   try { exec("ALTER TABLE stock_movements ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE companies ADD COLUMN mp_access_token TEXT DEFAULT ''"); } catch (e) {}
+  try { exec("ALTER TABLE companies ADD COLUMN mp_public_key TEXT DEFAULT ''"); } catch (e) {}
+  try { exec("ALTER TABLE companies ADD COLUMN mp_sandbox INTEGER DEFAULT 1"); } catch (e) {}
+  try { exec("ALTER TABLE companies ADD COLUMN mp_enabled INTEGER DEFAULT 0"); } catch (e) {}
+  try { exec("ALTER TABLE invoices ADD COLUMN payment_link TEXT DEFAULT ''"); } catch (e) {}
+  try { exec("ALTER TABLE invoices ADD COLUMN gateway_pref_id TEXT DEFAULT ''"); } catch (e) {}
+  try { exec("ALTER TABLE payments ADD COLUMN gateway TEXT DEFAULT ''"); } catch (e) {}
+  try { exec("ALTER TABLE payments ADD COLUMN gateway_payment_id TEXT DEFAULT ''"); } catch (e) {}
 
   exec(`CREATE TABLE IF NOT EXISTS chart_of_accounts (
     id TEXT PRIMARY KEY, company_id TEXT NOT NULL,

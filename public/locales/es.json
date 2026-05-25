@@ -61,5 +61,6 @@
   "lang_en": "English",
   "lang_fr": "Français",
   "setting_language": "Idioma",
-  "crm_tab_pipeline": "Embudo de ventas"
+  "crm_tab_pipeline": "Embudo de ventas",
+  "tab_gateway": "Pasarelas de Pago"
 }

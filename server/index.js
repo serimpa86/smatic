@@ -35,6 +35,7 @@ const posRoutes = require('./routes/pos');
 const projectsRoutes = require('./routes/projects');
 const modulesRoutes = require('./routes/modules');
 const dashboardRoutes = require('./routes/dashboard');
+const paymentsGatewayRoutes = require('./routes/payments-gateway');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -94,6 +95,7 @@ app.use('/api/pos', posRoutes);
 app.use('/api/projects', projectsRoutes);
 app.use('/api/modules', modulesRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/payments/gateway', paymentsGatewayRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
