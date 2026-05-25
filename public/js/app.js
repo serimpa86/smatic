@@ -53,6 +53,7 @@ const APP = {
           ['reports.html', '📈', 'nav_reports', 'Reportes'],
           ['tools.html', '🔧', 'nav_tools', 'Herramientas'],
           ['settings.html', '⚙️', 'nav_settings', 'Configuración'],
+          ['modules.html', '🧩', 'nav_modules', 'Módulos'],
           ['admin.html', '⚡', 'nav_admin', 'Administración', 'admin'],
         ]
       },
@@ -114,12 +115,6 @@ const APP = {
         label: 'nav_projects', module: 'projects',
         items: [
           ['projects.html', '📋', 'nav_projects', 'Proyectos'],
-        ]
-      },
-      {
-        label: 'nav_modules', module: 'vertical',
-        items: [
-          ['modules.html', '🧩', 'nav_modules', 'Módulos'],
         ]
       }
     ];
