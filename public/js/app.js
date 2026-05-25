@@ -220,7 +220,7 @@ const APP = {
     document.querySelectorAll('[data-module]').forEach(el => {
       const mod = el.getAttribute('data-module');
       if (el.tagName === 'LI' || el.classList.contains('nav-item')) {
-        el.classList.toggle('hidden', !modules.includes(mod));
+        el.classList.toggle('hidden', modules.length > 0 && mod && !modules.includes(mod));
       }
     });
   },
