@@ -317,13 +317,14 @@ const APP = {
 
   async confirm(title, text, cbYes) {
     const div = document.createElement('div');
+    div.className = 'modal-overlay';
     div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:100;display:flex;align-items:center;justify-content:center';
     div.innerHTML = `<div style="background:#fff;padding:2em;border-radius:8px;max-width:400px;box-shadow:0 4px 20px rgba(0,0,0,0.2)">
       <h3 style="margin:0 0 .5em">${this.esc(title)}</h3>
       <p>${this.esc(text)}</p>
       <div style="text-align:right;margin-top:1em">
-        <button class="btn btn-secondary" onclick="this.closest('.modal-ov').remove()">${this.t('btn_cancel', 'Cancelar')}</button>
-        <button class="btn" onclick="this.closest('.modal-ov').remove();(${cbYes.toString()})()">${this.t('btn_confirm', 'Aceptar')}</button>
+        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">${this.t('btn_cancel', 'Cancelar')}</button>
+        <button class="btn" onclick="this.closest('.modal-overlay').remove();(${cbYes.toString()})()">${this.t('btn_confirm', 'Aceptar')}</button>
       </div>
     </div>`;
     document.body.appendChild(div);
@@ -331,11 +332,11 @@ const APP = {
 
   modal(html, title) {
     const div = document.createElement('div');
-    div.className = 'modal-ov';
+    div.className = 'modal-overlay';
     div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:100;display:flex;align-items:center;justify-content:center;overflow-y:auto';
     div.innerHTML = `<div style="background:#fff;margin:2em;padding:2em;border-radius:8px;max-width:600px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.2);position:relative">
       ${title ? '<h2 style="margin:0 0 1em;color:' + CONFIG.secondaryColor + '">' + this.esc(title) + '</h2>' : ''}
-      <span onclick="this.closest('.modal-ov').remove()" style="position:absolute;top:1em;right:1em;font-size:1.5em;cursor:pointer;color:#999">&times;</span>
+      <span onclick="this.closest('.modal-overlay').remove()" style="position:absolute;top:1em;right:1em;font-size:1.5em;cursor:pointer;color:#999">&times;</span>
       ${html}
     </div>`;
     document.body.appendChild(div);
