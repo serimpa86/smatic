@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuración Inicial - Smatic ERP</title>
+<link rel="stylesheet" href="/css/main.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f0f2f5; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+.onboarding-container { background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,.12); width: 100%; max-width: 600px; padding: 2rem; margin: 2rem; }
+.header h1 { font-size: 1.5rem; color: #1a73e8; margin-bottom: .25rem; }
+.header p { color: #5f6368; font-size: .9rem; margin-bottom: 1.5rem; }
+.steps { display: flex; gap: 4px; margin-bottom: 2rem; }
+.step-dot { flex: 1; height: 4px; background: #e0e0e0; border-radius: 2px; transition: background .3s; }
+.step-dot.active { background: #1a73e8; }
+.step-dot.done { background: #34a853; }
+.step-content { display: none; }
+.step-content.active { display: block; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: .85rem; color: #333; margin-bottom: .3rem; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: .6rem .75rem; border: 1px solid #dadce0; border-radius: 6px; font-size: .9rem; transition: border .2s; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,.15); }
+.form-row { display: flex; gap: 1rem; }
+.form-row .form-group { flex: 1; }
+.btn { display: inline-block; padding: .65rem 1.5rem; border: none; border-radius: 6px; font-size: .9rem; cursor: pointer; font-weight: 500; transition: all .2s; }
+.btn-primary { background: #1a73e8; color: #fff; }
+.btn-primary:hover { background: #1557b0; }
+.btn-secondary { background: #f1f3f4; color: #333; }
+.btn-secondary:hover { background: #e0e0e0; }
+.actions { display: flex; justify-content: space-between; margin-top: 1.5rem; }
+.module-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.module-card { border: 2px solid #e0e0e0; border-radius: 8px; padding: .75rem; cursor: pointer; transition: all .2s; text-align: center; }
+.module-card:hover { border-color: #1a73e8; }
+.module-card.selected { border-color: #1a73e8; background: #e8f0fe; }
+.module-card .icon { font-size: 1.5rem; margin-bottom: .3rem; }
+.module-card .name { font-size: .85rem; font-weight: 500; }
+.module-card .desc { font-size: .75rem; color: #5f6368; }
+textarea { resize: vertical; min-height: 60px; }
+.success-screen { text-align: center; padding: 2rem 0; }
+.success-screen .icon { font-size: 4rem; color: #34a853; margin-bottom: 1rem; }
+.success-screen h2 { color: #333; margin-bottom: .5rem; }
+.success-screen p { color: #5f6368; margin-bottom: 1.5rem; }
+</style>
+</head>
+<body>
+<div class="onboarding-container">
+  <div class="header">
+    <h1>Configura tu empresa</h1>
+    <p>Completá estos pasos para empezar a usar Smatic ERP</p>
+  </div>
+  <div class="steps" id="steps"></div>
+  <form id="onboardingForm">
+    <div class="step-content active" data-step="1">
+      <h3>Datos de la empresa</h3>
+      <div class="form-group"><label>Nombre de la empresa</label><input type="text" id="companyName" required placeholder="Mi Empresa"></div>
+      <div class="form-group"><label>Dirección</label><input type="text" id="companyAddress" placeholder="Calle y número"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Teléfono</label><input type="text" id="companyPhone" placeholder="+54 11 1234-5678"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="companyEmail" placeholder="info@miempresa.com"></div>
+      </div>
+      <div class="form-group"><label>Sitio web</label><input type="text" id="companyWebsite" placeholder="https://miempresa.com"></div>
+      <div class="actions">
+        <div></div>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">Continuar</button>
+      </div>
+    </div>
+    <div class="step-content" data-step="2">
+      <h3>Datos fiscales</h3>
+      <div class="form-group"><label>CUIT</label><input type="text" id="companyCuit" placeholder="20-12345678-9" maxlength="13"></div>
+      <div class="form-group"><label>Categoría de IVA</label>
+        <select id="taxCategory">
+          <option value="responsable_inscripto">Responsable Inscripto</option>
+          <option value="responsable_monotributo">Monotributista</option>
+          <option value="exento">Exento</option>
+          <option value="consumidor_final">Consumidor Final</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Rubro / Industria</label><input type="text" id="industry" placeholder="Ej: Comercio, Servicios, Producción"></div>
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" onclick="prevStep()">Anterior</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">Continuar</button>
+      </div>
+    </div>
+    <div class="step-content" data-step="3">
+      <h3>Configuración AFIP / Moneda</h3>
+      <div class="form-group"><label>Entorno AFIP</label>
+        <select id="afipEnv">
+          <option value="testing">Testing (Homologación)</option>
+          <option value="production">Producción</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Punto de venta</label><input type="text" id="pointOfSale" value="0001" maxlength="4"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Moneda</label>
+          <select id="currency"><option value="ARS">ARS - Peso Argentino</option><option value="USD">USD - Dólar</option></select>
+        </div>
+        <div class="form-group"><label>Símbolo</label><input type="text" id="currencySymbol" value="$" maxlength="5"></div>
+      </div>
+      <div class="form-group"><label>Zona horaria</label>
+        <select id="timezone">
+          <option value="America/Argentina/Buenos_Aires">Argentina (Buenos Aires)</option>
+          <option value="America/Argentina/Cordoba">Argentina (Córdoba)</option>
+          <option value="America/Argentina/Mendoza">Argentina (Mendoza)</option>
+        </select>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" onclick="prevStep()">Anterior</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">Continuar</button>
+      </div>
+    </div>
+    <div class="step-content" data-step="4">
+      <h3>Certificados AFIP</h3>
+      <p style="color:#5f6368;font-size:.85rem;margin-bottom:1rem">Subí el certificado X.509 y la clave privada emitidos por AFIP/ARCA para poder facturar electrónicamente.</p>
+      <div class="form-group"><label>Certificado (formato PEM)</label><textarea id="afipCert" rows="6" placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"></textarea></div>
+      <div class="form-group"><label>Clave privada (formato PEM)</label><textarea id="afipKey" rows="6" placeholder="-----BEGIN RSA PRIVATE KEY-----&#10;...&#10;-----END RSA PRIVATE KEY-----"></textarea></div>
+      <div class="form-group" style="display:flex;align-items:center;gap:.5rem">
+        <input type="checkbox" id="skipCert" onchange="document.getElementById('certSection').style.display=this.checked?'none':'block'">
+        <label for="skipCert" style="margin:0">Configurar después</label>
+      </div>
+      <div id="certSection">
+        <div id="certStatus" style="margin-top:.5rem"></div>
+        <button type="button" class="btn btn-secondary" onclick="testAfipConnection()" style="margin-top:.5rem">Probar conexión AFIP</button>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" onclick="prevStep()">Anterior</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">Continuar</button>
+      </div>
+    </div>
+    <div class="step-content" data-step="5">
+      <h3>Impresora fiscal</h3>
+      <p style="color:#5f6368;font-size:.85rem;margin-bottom:1rem">Configurá la impresora fiscal para emitir comprobantes desde el POS.</p>
+      <div class="form-group"><label>Tipo de impresora</label>
+        <select id="printerType">
+          <option value="none">No tengo impresora fiscal</option>
+          <option value="hasar">Hasar</option>
+          <option value="epson">Epson</option>
+        </select>
+      </div>
+      <div id="printerConfig" style="display:none">
+        <div class="form-group"><label>Dirección IP / Host</label><input type="text" id="printerHost" value="127.0.0.1" placeholder="IP de la impresora"></div>
+        <div class="form-group"><label>Puerto</label><input type="text" id="printerPort" value="9100" placeholder="9100"></div>
+        <button type="button" class="btn btn-secondary" onclick="testPrinter()">Probar impresora</button>
+        <div id="printerTestResult" style="margin-top:.5rem"></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" onclick="prevStep()">Anterior</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">Continuar</button>
+      </div>
+    </div>
+    <div class="step-content" data-step="6">
+      <h3>Módulos activos</h3>
+      <p style="color:#5f6368;font-size:.85rem;margin-bottom:1rem">Seleccioná los módulos que querés usar.</p>
+      <div class="module-grid" id="moduleGrid">
+        <div class="module-card" data-module="invoices" onclick="toggleModule(this)">
+          <div class="icon">📄</div>
+          <div class="name">Facturación</div>
+          <div class="desc">Facturas, presupuestos, NC</div>
+        </div>
+        <div class="module-card selected" data-module="afip" onclick="toggleModule(this)">
+          <div class="icon">🔒</div>
+          <div class="name">AFIP</div>
+          <div class="desc">Factura electrónica AFIP</div>
+        </div>
+        <div class="module-card" data-module="stock" onclick="toggleModule(this)">
+          <div class="icon">📦</div>
+          <div class="name">Stock</div>
+          <div class="desc">Inventarios y depósitos</div>
+        </div>
+        <div class="module-card" data-module="purchases" onclick="toggleModule(this)">
+          <div class="icon">🛒</div>
+          <div class="name">Compras</div>
+          <div class="desc">Órdenes y proveedores</div>
+        </div>
+        <div class="module-card" data-module="accounting" onclick="toggleModule(this)">
+          <div class="icon">📊</div>
+          <div class="name">Contabilidad</div>
+          <div class="desc">Libro diario, balances</div>
+        </div>
+        <div class="module-card" data-module="crm" onclick="toggleModule(this)">
+          <div class="icon">👥</div>
+          <div class="name">CRM</div>
+          <div class="desc">Clientes y seguimiento</div>
+        </div>
+        <div class="module-card" data-module="pos" onclick="toggleModule(this)">
+          <div class="icon">💳</div>
+          <div class="name">POS</div>
+          <div class="desc">Punto de venta</div>
+        </div>
+        <div class="module-card" data-module="hr" onclick="toggleModule(this)">
+          <div class="icon">👔</div>
+          <div class="name">RRHH</div>
+          <div class="desc">Empleados y recibos</div>
+        </div>
+        <div class="module-card" data-module="projects" onclick="toggleModule(this)">
+          <div class="icon">📋</div>
+          <div class="name">Proyectos</div>
+          <div class="desc">Tareas y tiempos</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" onclick="prevStep()">Anterior</button>
+        <button type="button" class="btn btn-primary" onclick="finishSetup()">Finalizar</button>
+      </div>
+    </div>
+    <div class="step-content" data-step="7">
+      <div class="success-screen">
+        <div class="icon">✓</div>
+        <h2>¡Configuración completada!</h2>
+        <p>Tu empresa está lista para usar Smatic ERP.</p>
+        <button class="btn btn-primary" onclick="goToApp()">Ir al inicio</button>
+      </div>
+    </div>
+  </form>
+</div>
+<script src="/js/api.js"></script>
+<script>
+let currentStep = 1;
+
+const STEP_LABELS = ['Empresa', 'Fiscal', 'AFIP', 'Certificados', 'Impresora', 'Módulos'];
+
+function toggleModule(el) {
+  el.classList.toggle('selected');
+}
+
+function renderSteps() {
+  const container = document.getElementById('steps');
+  container.innerHTML = STEP_LABELS.map((label, i) => {
+    const num = i + 1;
+    let cls = '';
+    if (num === currentStep) cls = 'active';
+    else if (num < currentStep) cls = 'done';
+    return `<div class="step-dot ${cls}" title="${label}"></div>`;
+  }).join('');
+}
+
+function showStep(n) {
+  document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.step-content[data-step="${n}"]`).classList.add('active');
+  currentStep = n;
+  renderSteps();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function nextStep() {
+  try {
+    if (currentStep === 1) {
+      await API.post('/api/onboarding/step1', {
+        name: document.getElementById('companyName').value,
+        address: document.getElementById('companyAddress').value,
+        phone: document.getElementById('companyPhone').value,
+        email: document.getElementById('companyEmail').value,
+        website: document.getElementById('companyWebsite').value
+      });
+    } else if (currentStep === 2) {
+      await API.post('/api/onboarding/step2', {
+        cuit: document.getElementById('companyCuit').value,
+        taxCategory: document.getElementById('taxCategory').value,
+        industry: document.getElementById('industry').value
+      });
+    } else if (currentStep === 3) {
+      await API.post('/api/onboarding/step3', {
+        env: document.getElementById('afipEnv').value,
+        pointOfSale: document.getElementById('pointOfSale').value,
+        currency: document.getElementById('currency').value,
+        currencySymbol: document.getElementById('currencySymbol').value,
+        timezone: document.getElementById('timezone').value
+      });
+    } else if (currentStep === 4) {
+      if (!document.getElementById('skipCert').checked) {
+        await API.post('/api/onboarding/upload-cert', {
+          cert: document.getElementById('afipCert').value,
+          key: document.getElementById('afipKey').value
+        });
+      }
+    } else if (currentStep === 5) {
+      await API.post('/api/onboarding/save-printer', {
+        type: document.getElementById('printerType').value,
+        connection: document.getElementById('printerHost').value,
+        port: document.getElementById('printerPort').value
+      });
+    }
+    showStep(currentStep + 1);
+  } catch (e) {
+    alert('Error: ' + (e.message || 'Unknown error'));
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) showStep(currentStep - 1);
+}
+
+async function finishSetup() {
+  const modules = Array.from(document.querySelectorAll('.module-card.selected')).map(el => el.dataset.module);
+  try {
+    await API.post('/api/onboarding/step4', { modules });
+    await API.post('/api/onboarding/complete', {});
+    showStep(7);
+  } catch (e) {
+    alert('Error: ' + (e.message || 'Unknown error'));
+  }
+}
+
+function goToApp() {
+  window.location.href = '/';
+}
+
+async function testAfipConnection() {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Probando...';
+  try {
+    // Save certs first
+    await API.post('/api/onboarding/upload-cert', {
+      cert: document.getElementById('afipCert').value,
+      key: document.getElementById('afipKey').value
+    });
+    const res = await API.post('/api/afip/test-connection', {});
+    document.getElementById('certStatus').innerHTML = res.success
+      ? '<span style="color:#34a853">Conexión exitosa! Punto de venta: ' + (res.pointOfSale || 'N/A') + '</span>'
+      : '<span style="color:#d93025">Error: ' + (res.error || 'Desconocido') + '</span>';
+  } catch (e) {
+    document.getElementById('certStatus').innerHTML = '<span style="color:#d93025">Error: ' + e.message + '</span>';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Probar conexión AFIP';
+}
+
+async function testPrinter() {
+  const btn = event.target;
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = 'Probando...';
+  try {
+    await API.post('/api/onboarding/save-printer', {
+      type: document.getElementById('printerType').value,
+      connection: document.getElementById('printerHost').value,
+      port: document.getElementById('printerPort').value
+    });
+    const res = await API.post('/api/fiscal/test', {});
+    document.getElementById('printerTestResult').innerHTML = res.success
+      ? '<span style="color:#34a853">Impresora conectada!</span>'
+      : '<span style="color:#d93025">Error: ' + (res.error || 'No se pudo conectar') + '</span>';
+  } catch (e) {
+    document.getElementById('printerTestResult').innerHTML = '<span style="color:#d93025">Error: ' + e.message + '</span>';
+  }
+  btn.disabled = false;
+  btn.textContent = originalText;
+}
+
+document.getElementById('printerType').addEventListener('change', function() {
+  document.getElementById('printerConfig').style.display = this.value === 'none' ? 'none' : 'block';
+});
+
+renderSteps();
+</script>
+</body>
+</html>

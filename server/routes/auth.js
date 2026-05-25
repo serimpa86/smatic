@@ -60,7 +60,7 @@ router.post('/signup', (req, res) => {
 router.get('/api/user', authenticateToken, (req, res) => {
   const user = req.db.get('SELECT id, email, name, role, language, company_id FROM users WHERE id = ?', [req.userId]);
   if (!user) return res.json({ errorcode: 404, errormsg: 'User not found' });
-  const company = req.db.get('SELECT id as company_id, name as company_name, currency, currency_symbol, logo_url, business_name, cuit, address, phone, email as company_email, website FROM companies WHERE id = ?', [user.company_id]);
+  const company = req.db.get('SELECT id as company_id, name as company_name, currency, currency_symbol, logo_url, business_name, cuit, address, phone, email as company_email, website, setup_completed, modules_active FROM companies WHERE id = ?', [user.company_id]);
   res.json({ ...user, company: company || null });
 });
 

@@ -18,6 +18,9 @@ const toolRoutes = require('./routes/tools');
 const adminRoutes = require('./routes/admin');
 const creditNoteRoutes = require('./routes/credit-notes');
 const refundRoutes = require('./routes/refunds');
+const afipRoutes = require('./routes/afip');
+const fiscalRoutes = require('./routes/fiscal');
+const onboardingRoutes = require('./routes/onboarding');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +47,9 @@ app.use('/api/tools', toolRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/credit-notes', creditNoteRoutes);
 app.use('/api/refunds', refundRoutes);
+app.use('/api/afip', afipRoutes);
+app.use('/api/fiscal', fiscalRoutes);
+app.use('/api/onboarding', onboardingRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

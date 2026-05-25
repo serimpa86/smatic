@@ -11,6 +11,10 @@ const APP = {
       if (user.language) {
         localStorage.setItem('lang', user.language);
       }
+      if (user.company && user.company.setup_completed === 0 && !window.location.pathname.includes('onboarding')) {
+        window.location.href = '/onboarding.html';
+        return;
+      }
     } catch (e) { return; }
     try {
       const s = await API.get('/api/settings');
@@ -18,6 +22,21 @@ const APP = {
     } catch (e) {}
     await this.loadLang();
     this.initNavigation();
+    this.renderCompanyInfo();
+  },
+
+  renderCompanyInfo() {
+    if (!this.currentUser || !this.currentUser.company) return;
+    let el = document.getElementById('company-name');
+    if (!el) {
+      const brand = document.querySelector('.sidebar-brand');
+      if (!brand) return;
+      el = document.createElement('span');
+      el.className = 'company-name';
+      el.id = 'company-name';
+      brand.appendChild(el);
+    }
+    el.textContent = this.currentUser.company.name;
   },
 
   async loadLang() {
@@ -67,6 +86,20 @@ const APP = {
         const href = el.getAttribute('href');
         if (href) window.location.href = href;
       });
+    });
+    this.applyModuleVisibility();
+  },
+
+  applyModuleVisibility() {
+    const company = this.currentUser && this.currentUser.company;
+    if (!company) return;
+    let modules;
+    try { modules = company.modules_active ? JSON.parse(company.modules_active) : []; } catch(e) { modules = []; }
+    document.querySelectorAll('[data-module]').forEach(el => {
+      const mod = el.getAttribute('data-module');
+      if (el.tagName === 'LI' || el.classList.contains('nav-item')) {
+        el.classList.toggle('hidden', !modules.includes(mod));
+      }
     });
   },
 
