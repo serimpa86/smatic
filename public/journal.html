@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="page_title_journal">Libro Diario | Smatic</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+.entry-card { border: 1px solid #e0e0e0; margin-bottom: 1em; background: #fff; }
+.entry-header { padding: .75em 1em; background: #f9f9f9; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+.entry-header .entry-number { font-weight: bold; color: #444; }
+.entry-header .entry-date { color: #888; font-size: .9em; }
+.entry-body { padding: .5em 1em 1em; }
+.entry-body table { width: 100%; border-collapse: collapse; font-size: .9em; }
+.entry-body th { text-align: left; padding: .3em .5em; border-bottom: 2px solid #ddd; font-size: .85em; color: #666; }
+.entry-body td { padding: .3em .5em; border-bottom: 1px solid #eee; }
+.entry-body .text-right { text-align: right; }
+.entry-total { font-weight: bold; border-top: 2px solid #444 !important; }
+.entry-actions { display: flex; gap: .5em; }
+</style>
+</head>
+<body>
+<div class="navigation-wrapper" id="sidebar">
+  <nav class="navigation">
+    <div class="sidebar-brand">
+      <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+      <span>Smatic</span>
+    </div>
+    <ul>
+      <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+      <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+      <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+      <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+      <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+      <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+      <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+      <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+      <li><a href="chart-of-accounts.html"><span class="nav-icon">📋</span> <span data-i18n="nav_chart_of_accounts">Plan de Cuentas</span></a></li>
+      <li class="active"><a href="journal.html"><span class="nav-icon">📓</span> <span data-i18n="nav_journal">Libro Diario</span></a></li>
+      <li><a href="accounting-reports.html"><span class="nav-icon">📊</span> <span data-i18n="nav_accounting_reports">Informes Contables</span></a></li>
+      <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+      <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+      <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
+    </ul>
+    <div class="sidebar-bottom">
+      <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
+    </div>
+  </nav>
+</div>
+<div class="header-wrapper">
+  <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+  <div class="breadcrumbs">
+    <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+    <span data-i18n="breadcrumb_journal">Smatic - Libro Diario</span>
+  </div>
+</div>
+<div class="container" id="main-content">
+  <div class="page-header">
+    <h1 data-i18n="page_title_journal">Libro Diario</h1>
+    <div class="actions">
+      <button onclick="openNewEntry()">+ <span data-i18n="btn_new_entry">Nuevo Asiento</span></button>
+    </div>
+  </div>
+  <div class="filters">
+    <input type="date" id="filterFrom" onchange="loadEntries()">
+    <input type="date" id="filterTo" onchange="loadEntries()">
+    <button class="btn-secondary" onclick="document.getElementById('filterFrom').value='';document.getElementById('filterTo').value='';loadEntries()" data-i18n="btn_clear">Limpiar</button>
+  </div>
+  <div id="entriesContainer">
+    <div class="loading" data-i18n="loading">Cargando...</div>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+  await APP.init();
+  if (APP.currentUser && APP.currentUser.role === 'superadmin') {
+    document.getElementById('admin-nav-link').classList.remove('hidden');
+  }
+  loadEntries();
+});
+
+async function loadEntries() {
+  const from = document.getElementById('filterFrom').value;
+  const to = document.getElementById('filterTo').value;
+  let url = '/api/journal?limit=100';
+  if (from) url += '&from=' + from;
+  if (to) url += '&to=' + to;
+  try {
+    const data = await API.get(url);
+    renderEntries(data.entries || []);
+  } catch (e) {
+    document.getElementById('entriesContainer').innerHTML = '<div style="color:#d93025">Error al cargar asientos</div>';
+  }
+}
+
+function renderEntries(entries) {
+  const container = document.getElementById('entriesContainer');
+  if (!entries || entries.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:2em;color:#999" data-i18n="msg_no_entries">No hay asientos contables.</div>';
+    return;
+  }
+  container.innerHTML = entries.map(e => {
+    const lines = (e.lines || []).map(l =>
+      '<tr>' +
+        '<td>' + APP.esc(l.account_code) + '</td>' +
+        '<td>' + APP.esc(l.account_name) + '</td>' +
+        '<td>' + APP.esc(l.description || '') + '</td>' +
+        '<td class="text-right">' + (l.debit > 0 ? APP.formatMoney(l.debit) : '') + '</td>' +
+        '<td class="text-right">' + (l.credit > 0 ? APP.formatMoney(l.credit) : '') + '</td>' +
+      '</tr>'
+    ).join('');
+    const totals = e.lines.reduce((acc, l) => ({ debit: acc.debit + l.debit, credit: acc.credit + l.credit }), { debit: 0, credit: 0 });
+    return '<div class="entry-card">' +
+      '<div class="entry-header">' +
+        '<div><span class="entry-number">Asiento #' + e.entry_number + '</span> <span class="entry-date">' + APP.esc(e.date) + '</span></div>' +
+        '<div class="entry-actions">' +
+          '<button class="btn-secondary" style="min-width:auto;padding:.2em .6em;font-size:.85em" onclick="editEntry(\'' + e.id + '\')">✏️</button>' +
+          '<button class="btn-secondary" style="min-width:auto;padding:.2em .6em;font-size:.85em;color:#d93025" onclick="deleteEntry(\'' + e.id + '\')">🗑️</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="entry-body">' +
+        '<div style="color:#555;margin-bottom:.5em;font-size:.9em">' + APP.esc(e.description) + (e.created_by_name ? ' — <em>' + APP.esc(e.created_by_name) + '</em>' : '') + '</div>' +
+        '<table>' +
+          '<thead><tr><th data-i18n="th_code">Código</th><th data-i18n="th_account">Cuenta</th><th data-i18n="th_description">Descripción</th><th class="text-right" data-i18n="th_debit">Debe</th><th class="text-right" data-i18n="th_credit">Haber</th></tr></thead>' +
+          '<tbody>' + lines +
+            '<tr class="entry-total"><td colspan="3" class="text-right"><strong>Totales</strong></td><td class="text-right"><strong>' + APP.formatMoney(totals.debit) + '</strong></td><td class="text-right"><strong>' + APP.formatMoney(totals.credit) + '</strong></td></tr>' +
+          '</tbody>' +
+        '</table>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function openNewEntry() {
+  const nextNum = await API.get('/api/journal/next-number');
+  showEntryModal(null, nextNum.nextNumber);
+}
+
+async function editEntry(id) {
+  try {
+    const data = await API.get('/api/journal/' + id);
+    showEntryModal(data, data.entry_number);
+  } catch (e) { alert('Error al cargar asiento'); }
+}
+
+function showEntryModal(entry, entryNumber) {
+  const isEdit = !!entry;
+  const lines = entry && entry.lines || [{ account_id: '', description: '', debit: '', credit: '' }, { account_id: '', description: '', debit: '', credit: '' }];
+  let linesHtml = lines.map((l, i) => renderLineRow(l, i)).join('');
+  const html = '<div class="modal-content" style="max-width:700px">' +
+    '<span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span>' +
+    '<h2>' + (isEdit ? 'Editar Asiento #' + entryNumber : 'Nuevo Asiento #' + entryNumber) + '</h2>' +
+    '<div class="settings-grid">' +
+      '<div><label>Fecha</label><input type="date" id="entryDate" value="' + (entry ? entry.date : new Date().toISOString().slice(0,10)) + '"></div>' +
+      '<div><label>Descripción</label><input type="text" id="entryDesc" value="' + (entry ? APP.esc(entry.description) : '') + '"></div>' +
+    '</div>' +
+    '<div style="margin-top:1em">' +
+      '<table id="linesTable" style="width:100%">' +
+        '<thead><tr><th>Cuenta</th><th>Descripción</th><th style="width:8em">Debe</th><th style="width:8em">Haber</th><th style="width:2em"></th></tr></thead>' +
+        '<tbody>' + linesHtml + '</tbody>' +
+      '</table>' +
+      '<button class="btn-secondary" style="margin-top:.5em;min-width:auto" onclick="addLine()">+ Agregar línea</button>' +
+    '</div>' +
+    '<div style="margin-top:1em;padding:.5em;background:#f9f9f9;border:1px solid #e0e0e0">' +
+      '<div style="display:flex;justify-content:space-between"><strong>Total Debe:</strong> <span id="totalDebit">0.00</span></div>' +
+      '<div style="display:flex;justify-content:space-between"><strong>Total Haber:</strong> <span id="totalCredit">0.00</span></div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:1.1em;color:' +
+        "' + (isEdit ? '#444' : '') + '" +
+        ' id="diffRow"><strong>Diferencia:</strong> <span id="totalDiff">0.00</span></div>' +
+    '</div>' +
+    '<div class="modal-footer">' +
+      '<button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" data-i18n="btn_cancel">Cancelar</button>' +
+      '<button onclick="saveEntry(\'' + (isEdit ? entry.id : '') + '\')" data-i18n="btn_save">Guardar</button>' +
+    '</div>' +
+  '</div>';
+  APP.modal(html, '');
+  loadAccountSelects();
+  setTimeout(updateTotals, 100);
+}
+
+function renderLineRow(line, i) {
+  const sel = '<select class="line-account" data-index="' + i + '" style="width:100%"><option value="">Seleccionar cuenta...</option></select>';
+  return '<tr>' +
+    '<td>' + sel + '</td>' +
+    '<td><input type="text" class="line-desc" data-index="' + i + '" value="' + APP.esc(line.description || '') + '" style="width:100%"></td>' +
+    '<td><input type="number" step="0.01" min="0" class="line-debit" data-index="' + i + '" value="' + (line.debit || '') + '" style="width:100%" oninput="updateTotals()"></td>' +
+    '<td><input type="number" step="0.01" min="0" class="line-credit" data-index="' + i + '" value="' + (line.credit || '') + '" style="width:100%" oninput="updateTotals()"></td>' +
+    '<td><span style="cursor:pointer;color:#d93025" onclick="removeLine(this)">✕</span></td>' +
+  '</tr>';
+}
+
+async function loadAccountSelects() {
+  try {
+    const data = await API.get('/api/accounts?active=1');
+    const accounts = data.accounts || [];
+    document.querySelectorAll('.line-account').forEach(sel => {
+      const idx = sel.getAttribute('data-index');
+      const currentVal = document.querySelector('.line-account[data-index="' + idx + '"]');
+      accounts.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.id;
+        opt.textContent = a.code + ' - ' + a.name;
+        sel.appendChild(opt);
+      });
+    });
+  } catch (e) {}
+}
+
+function addLine() {
+  const tbody = document.querySelector('#linesTable tbody');
+  const idx = tbody.children.length;
+  const tr = document.createElement('tr');
+  tr.innerHTML = renderLineRow({ account_id: '', description: '', debit: '', credit: '' }, idx);
+  tbody.appendChild(tr);
+  loadAccountSelects();
+  updateTotals();
+}
+
+function removeLine(el) {
+  const tr = el.closest('tr');
+  if (document.querySelectorAll('#linesTable tbody tr').length <= 2) { alert('Debe haber al menos 2 líneas'); return; }
+  tr.remove();
+  updateTotals();
+}
+
+function updateTotals() {
+  let totalDebit = 0, totalCredit = 0;
+  document.querySelectorAll('.line-debit').forEach(inp => { totalDebit += parseFloat(inp.value) || 0; });
+  document.querySelectorAll('.line-credit').forEach(inp => { totalCredit += parseFloat(inp.value) || 0; });
+  document.getElementById('totalDebit').textContent = totalDebit.toFixed(2);
+  document.getElementById('totalCredit').textContent = totalCredit.toFixed(2);
+  const diff = totalDebit - totalCredit;
+  const diffEl = document.getElementById('totalDiff');
+  const diffRow = document.getElementById('diffRow');
+  diffEl.textContent = diff.toFixed(2);
+  diffRow.style.color = Math.abs(diff) > 0.01 ? '#d93025' : '#34a853';
+}
+
+async function saveEntry(id) {
+  const lines = [];
+  const tbody = document.querySelector('#linesTable tbody');
+  for (const tr of tbody.children) {
+    const accountId = tr.querySelector('.line-account').value;
+    const desc = tr.querySelector('.line-desc').value;
+    const debit = parseFloat(tr.querySelector('.line-debit').value) || 0;
+    const credit = parseFloat(tr.querySelector('.line-credit').value) || 0;
+    if (!accountId) { alert('Seleccione una cuenta para cada línea'); return; }
+    if (debit === 0 && credit === 0) { alert('Cada línea debe tener un importe'); return; }
+    lines.push({ account_id: accountId, description: desc, debit, credit });
+  }
+  const totalDebit = lines.reduce((s, l) => s + l.debit, 0);
+  const totalCredit = lines.reduce((s, l) => s + l.credit, 0);
+  if (Math.abs(totalDebit - totalCredit) > 0.01) { alert('El total del debe (' + totalDebit.toFixed(2) + ') debe igualar al haber (' + totalCredit.toFixed(2) + ')'); return; }
+  const data = {
+    date: document.getElementById('entryDate').value,
+    description: document.getElementById('entryDesc').value,
+    lines
+  };
+  if (!data.date || !data.description) { alert('Fecha y descripción son obligatorias'); return; }
+  try {
+    if (id) {
+      await API.put('/api/journal/' + id, data);
+    } else {
+      await API.post('/api/journal', data);
+    }
+    document.querySelector('.modal-overlay').remove();
+    loadEntries();
+  } catch (e) { alert('Error: ' + (e.message || 'Unknown')); }
+}
+
+async function deleteEntry(id) {
+  APP.confirm('Eliminar asiento', '¿Está seguro de eliminar este asiento contable?', async () => {
+    try {
+      await API.del('/api/journal/' + id);
+      loadEntries();
+    } catch (e) { alert('Error: ' + (e.message || 'Unknown')); }
+  });
+}
+</script>
+</body>
+</html>

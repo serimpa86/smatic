@@ -4,6 +4,7 @@ const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 router.use(authenticateToken);
+router.use(authenticateToken);
 
 router.get('/status', (req, res) => {
   const company = req.db.get('SELECT id, name, setup_completed, modules_active FROM companies WHERE id = ?', [req.companyId]);
@@ -75,6 +76,7 @@ router.post('/complete', (req, res) => {
     req.db.run('INSERT INTO invoice_templates (id, user_id, company_id, name, is_default) VALUES (?,?,?,?,?)',
       [uuidv4(), req.userId, req.companyId, 'Default', 1]);
   }
+  req.db.seedAccounts(req.companyId);
   res.json({ success: true });
 });
 

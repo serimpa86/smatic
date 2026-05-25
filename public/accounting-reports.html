@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="page_title_accounting_reports">Informes Contables | Smatic</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+.tab-bar { display: flex; gap: .5em; margin-bottom: 1em; border-bottom: 2px solid #e0e0e0; }
+.tab-bar button { background: none; border: none; padding: .5em 1em; cursor: pointer; color: #666; font-size: .9em; border-bottom: 2px solid transparent; margin-bottom: -2px; min-width: auto; }
+.tab-bar button.active { color: #444; border-bottom-color: #444; font-weight: bold; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.report-table { width: 100%; border-collapse: collapse; font-size: .9em; }
+.report-table th { background: #555; color: #fff; padding: .5em; text-align: left; font-weight: bold; }
+.report-table td { padding: .4em .5em; border-bottom: 1px solid #eee; }
+.report-table .text-right { text-align: right; }
+.report-table .total-row { font-weight: bold; border-top: 2px solid #444 !important; background: #f9f9f9; }
+.report-table .section-header { background: #eee; font-weight: bold; }
+.report-filters { display: flex; gap: .5em; align-items: center; flex-wrap: wrap; margin-bottom: 1em; }
+</style>
+</head>
+<body>
+<div class="navigation-wrapper" id="sidebar">
+  <nav class="navigation">
+    <div class="sidebar-brand">
+      <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+      <span>Smatic</span>
+    </div>
+    <ul>
+      <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+      <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+      <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+      <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+      <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+      <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+      <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+      <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+      <li><a href="chart-of-accounts.html"><span class="nav-icon">📋</span> <span data-i18n="nav_chart_of_accounts">Plan de Cuentas</span></a></li>
+      <li><a href="journal.html"><span class="nav-icon">📓</span> <span data-i18n="nav_journal">Libro Diario</span></a></li>
+      <li class="active"><a href="accounting-reports.html"><span class="nav-icon">📊</span> <span data-i18n="nav_accounting_reports">Informes Contables</span></a></li>
+      <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+      <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+      <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
+    </ul>
+    <div class="sidebar-bottom">
+      <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
+    </div>
+  </nav>
+</div>
+<div class="header-wrapper">
+  <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+  <div class="breadcrumbs">
+    <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+    <span data-i18n="breadcrumb_accounting_reports">Smatic - Informes Contables</span>
+  </div>
+</div>
+<div class="container" id="main-content">
+  <div class="page-header">
+    <h1 data-i18n="page_title_accounting_reports">Informes Contables</h1>
+  </div>
+  <div class="tab-bar">
+    <button class="active" onclick="switchTab('trial-balance', this)" data-i18n="tab_trial_balance">Balance de Comprobación</button>
+    <button onclick="switchTab('income-statement', this)" data-i18n="tab_income_statement">Resultados</button>
+    <button onclick="switchTab('balance-sheet', this)" data-i18n="tab_balance_sheet">Balance General</button>
+    <button onclick="switchTab('ledger', this)" data-i18n="tab_ledger">Libro Mayor</button>
+  </div>
+  <div class="tab-content active" id="tab-trial-balance">
+    <div class="report-filters">
+      <input type="date" id="tbFrom" onchange="loadTrialBalance()">
+      <input type="date" id="tbTo" onchange="loadTrialBalance()">
+      <button class="btn-secondary" onclick="document.getElementById('tbFrom').value='';document.getElementById('tbTo').value='';loadTrialBalance()" data-i18n="btn_clear">Limpiar</button>
+    </div>
+    <div class="card" id="tbContainer"><div class="loading">Cargando...</div></div>
+  </div>
+  <div class="tab-content" id="tab-income-statement">
+    <div class="report-filters">
+      <input type="date" id="isFrom" onchange="loadIncomeStatement()">
+      <input type="date" id="isTo" onchange="loadIncomeStatement()">
+      <button class="btn-secondary" onclick="document.getElementById('isFrom').value='';document.getElementById('isTo').value='';loadIncomeStatement()">Limpiar</button>
+    </div>
+    <div class="card" id="isContainer"><div class="loading">Cargando...</div></div>
+  </div>
+  <div class="tab-content" id="tab-balance-sheet">
+    <div class="report-filters">
+      <input type="date" id="bsAsOf" onchange="loadBalanceSheet()">
+      <button class="btn-secondary" onclick="document.getElementById('bsAsOf').value='';loadBalanceSheet()">Limpiar</button>
+    </div>
+    <div class="card" id="bsContainer"><div class="loading">Cargando...</div></div>
+  </div>
+  <div class="tab-content" id="tab-ledger">
+    <div class="report-filters">
+      <select id="ledgerAccount" style="min-width:20em"><option value="">Seleccionar cuenta...</option></select>
+      <input type="date" id="ledgerFrom">
+      <input type="date" id="ledgerTo">
+      <button onclick="loadLedger()" data-i18n="btn_filter">Filtrar</button>
+    </div>
+    <div class="card" id="ledgerContainer"><div style="color:#999;text-align:center;padding:2em">Seleccione una cuenta para ver el mayor.</div></div>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+  await APP.init();
+  if (APP.currentUser && APP.currentUser.role === 'superadmin') {
+    document.getElementById('admin-nav-link').classList.remove('hidden');
+  }
+  loadTrialBalance();
+  loadAccountSelect();
+});
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'trial-balance') loadTrialBalance();
+  if (tab === 'income-statement') loadIncomeStatement();
+  if (tab === 'balance-sheet') loadBalanceSheet();
+}
+
+async function loadTrialBalance() {
+  const from = document.getElementById('tbFrom').value;
+  const to = document.getElementById('tbTo').value;
+  let url = '/api/accounting-reports/trial-balance?';
+  if (from) url += 'from=' + from + '&';
+  if (to) url += 'to=' + to + '&';
+  try {
+    const data = await API.get(url);
+    renderTrialBalance(data);
+  } catch (e) { document.getElementById('tbContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+
+function renderTrialBalance(data) {
+  const rows = data.rows || [];
+  const totals = data.totals || { debit: 0, credit: 0 };
+  if (rows.length === 0) {
+    document.getElementById('tbContainer').innerHTML = '<div style="text-align:center;padding:2em;color:#999">Sin movimientos en el período.</div>';
+    return;
+  }
+  const typeOrder = { asset: 0, liability: 1, equity: 2, income: 3, expense: 4 };
+  const typeLabels = { asset: 'ACTIVO', liability: 'PASIVO', equity: 'PATRIMONIO NETO', income: 'INGRESOS', expense: 'GASTOS' };
+  rows.sort((a, b) => (typeOrder[a.type] || 99) - (typeOrder[b.type] || 99) || a.code.localeCompare(b.code));
+  let currentType = '';
+  let html = '<table class="report-table"><thead><tr><th>Código</th><th>Cuenta</th><th class="text-right">Debe</th><th class="text-right">Haber</th></tr></thead><tbody>';
+  for (const r of rows) {
+    if (r.type !== currentType) {
+      currentType = r.type;
+      html += '<tr class="section-header"><td colspan="4">' + (typeLabels[r.type] || r.type) + '</td></tr>';
+    }
+    html += '<tr><td>' + APP.esc(r.code) + '</td><td>' + APP.esc(r.name) + '</td><td class="text-right">' + (r.total_debit > 0 ? APP.formatMoney(r.total_debit) : '') + '</td><td class="text-right">' + (r.total_credit > 0 ? APP.formatMoney(r.total_credit) : '') + '</td></tr>';
+  }
+  html += '<tr class="total-row"><td colspan="2"><strong>TOTALES</strong></td><td class="text-right"><strong>' + APP.formatMoney(totals.debit) + '</strong></td><td class="text-right"><strong>' + APP.formatMoney(totals.credit) + '</strong></td></tr>';
+  html += '</tbody></table>';
+  document.getElementById('tbContainer').innerHTML = html;
+}
+
+async function loadIncomeStatement() {
+  const from = document.getElementById('isFrom').value;
+  const to = document.getElementById('isTo').value;
+  let url = '/api/accounting-reports/income-statement?';
+  if (from) url += 'from=' + from + '&';
+  if (to) url += 'to=' + to + '&';
+  try {
+    const data = await API.get(url);
+    renderIncomeStatement(data);
+  } catch (e) { document.getElementById('isContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+
+function renderIncomeStatement(data) {
+  if (!data) return;
+  const income = data.income || [];
+  const expense = data.expense || [];
+  let html = '<table class="report-table"><thead><tr><th>Código</th><th>Cuenta</th><th class="text-right">Importe</th></tr></thead><tbody>';
+  html += '<tr class="section-header"><td colspan="3">INGRESOS</td></tr>';
+  for (const r of income) {
+    html += '<tr><td>' + APP.esc(r.code) + '</td><td>' + APP.esc(r.name) + '</td><td class="text-right">' + APP.formatMoney(r.balance) + '</td></tr>';
+  }
+  html += '<tr class="total-row"><td colspan="2"><strong>Total Ingresos</strong></td><td class="text-right"><strong>' + APP.formatMoney(data.totalIncome) + '</strong></td></tr>';
+  html += '<tr class="section-header"><td colspan="3">GASTOS</td></tr>';
+  for (const r of expense) {
+    html += '<tr><td>' + APP.esc(r.code) + '</td><td>' + APP.esc(r.name) + '</td><td class="text-right">' + APP.formatMoney(r.balance) + '</td></tr>';
+  }
+  html += '<tr class="total-row"><td colspan="2"><strong>Total Gastos</strong></td><td class="text-right"><strong>' + APP.formatMoney(data.totalExpense) + '</strong></td></tr>';
+  const netColor = data.netIncome >= 0 ? '#155724' : '#721c24';
+  html += '<tr class="total-row" style="font-size:1.1em;color:' + netColor + '"><td colspan="2"><strong>Resultado Neto</strong></td><td class="text-right"><strong>' + APP.formatMoney(data.netIncome) + '</strong></td></tr>';
+  html += '</tbody></table>';
+  document.getElementById('isContainer').innerHTML = html;
+}
+
+async function loadBalanceSheet() {
+  const asOf = document.getElementById('bsAsOf').value;
+  let url = '/api/accounting-reports/balance-sheet?';
+  if (asOf) url += 'as_of=' + asOf + '&';
+  try {
+    const data = await API.get(url);
+    renderBalanceSheet(data);
+  } catch (e) { document.getElementById('bsContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+
+function renderBalanceSheet(data) {
+  if (!data) return;
+  const assets = data.assets || [];
+  const liabilities = data.liabilities || [];
+  const equity = data.equity || [];
+  let html = '<table class="report-table"><thead><tr><th>Código</th><th>Cuenta</th><th class="text-right">Saldo</th></tr></thead><tbody>';
+  html += '<tr class="section-header"><td colspan="3">ACTIVO</td></tr>';
+  for (const r of assets) {
+    html += '<tr><td>' + APP.esc(r.code) + '</td><td>' + APP.esc(r.name) + '</td><td class="text-right">' + APP.formatMoney(r.balance) + '</td></tr>';
+  }
+  html += '<tr class="total-row"><td colspan="2"><strong>Total Activo</strong></td><td class="text-right"><strong>' + APP.formatMoney(data.totalAssets) + '</strong></td></tr>';
+  html += '<tr class="section-header"><td colspan="3">PASIVO</td></tr>';
+  for (const r of liabilities) {
+    html += '<tr><td>' + APP.esc(r.code) + '</td><td>' + APP.esc(r.name) + '</td><td class="text-right">' + APP.formatMoney(r.balance) + '</td></tr>';
+  }
+  html += '<tr class="total-row"><td colspan="2"><strong>Total Pasivo</strong></td><td class="text-right"><strong>' + APP.formatMoney(data.totalLiabilities) + '</strong></td></tr>';
+  html += '<tr class="section-header"><td colspan="3">PATRIMONIO NETO</td></tr>';
+  for (const r of equity) {
+    html += '<tr><td>' + APP.esc(r.code) + '</td><td>' + APP.esc(r.name) + '</td><td class="text-right">' + APP.formatMoney(r.balance) + '</td></tr>';
+  }
+  html += '<tr class="total-row"><td colspan="2"><strong>Total Patrimonio Neto</strong></td><td class="text-right"><strong>' + APP.formatMoney(data.totalEquity) + '</strong></td></tr>';
+  const eqTotal = data.totalLiabilities + data.totalEquity;
+  html += '<tr class="total-row" style="font-size:1em"><td colspan="2"><strong>Pasivo + PN</strong></td><td class="text-right"><strong>' + APP.formatMoney(eqTotal) + '</strong></td></tr>';
+  html += '</tbody></table>';
+  document.getElementById('bsContainer').innerHTML = html;
+}
+
+async function loadAccountSelect() {
+  try {
+    const data = await API.get('/api/accounts?active=1');
+    const sel = document.getElementById('ledgerAccount');
+    (data.accounts || []).forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a.id;
+      opt.textContent = a.code + ' - ' + a.name;
+      sel.appendChild(opt);
+    });
+  } catch (e) {}
+}
+
+async function loadLedger() {
+  const accountId = document.getElementById('ledgerAccount').value;
+  if (!accountId) { document.getElementById('ledgerContainer').innerHTML = '<div style="color:#999;text-align:center;padding:2em">Seleccione una cuenta.</div>'; return; }
+  const from = document.getElementById('ledgerFrom').value;
+  const to = document.getElementById('ledgerTo').value;
+  let url = '/api/accounting-reports/ledger?account_id=' + accountId;
+  if (from) url += '&from=' + from;
+  if (to) url += '&to=' + to;
+  try {
+    const data = await API.get(url);
+    renderLedger(data);
+  } catch (e) { document.getElementById('ledgerContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+
+function renderLedger(data) {
+  if (!data || !data.account) return;
+  const account = data.account;
+  const lines = data.lines || [];
+  let balance = data.openingBalance || 0;
+  const isDebitType = account.type === 'asset' || account.type === 'expense';
+  let html = '<div style="margin-bottom:.5em"><strong>' + APP.esc(account.code) + ' - ' + APP.esc(account.name) + '</strong> <span style="color:#888;font-size:.85em">(' + account.type + ')</span></div>';
+  html += '<table class="report-table"><thead><tr><th>Fecha</th><th>N°</th><th>Descripción</th><th class="text-right">Debe</th><th class="text-right">Haber</th><th class="text-right">Saldo</th></tr></thead><tbody>';
+  if (data.openingBalance || 0 !== 0) {
+    html += '<tr style="color:#888"><td colspan="3"><em>Saldo inicial</em></td><td></td><td></td><td class="text-right"><strong>' + APP.formatMoney(data.openingBalance) + '</strong></td></tr>';
+    balance = data.openingBalance;
+  }
+  for (const l of lines) {
+    const lineBalance = l.running_balance || 0;
+    html += '<tr><td>' + APP.esc(l.date) + '</td><td>' + l.entry_number + '</td><td>' + APP.esc(l.line_description || l.entry_description) + '</td><td class="text-right">' + (l.debit > 0 ? APP.formatMoney(l.debit) : '') + '</td><td class="text-right">' + (l.credit > 0 ? APP.formatMoney(l.credit) : '') + '</td><td class="text-right"><strong>' + APP.formatMoney(lineBalance) + '</strong></td></tr>';
+  }
+  if (lines.length > 0) {
+    const lastLine = lines[lines.length - 1];
+    html += '<tr class="total-row"><td colspan="5"><strong>Saldo final</strong></td><td class="text-right"><strong>' + APP.formatMoney(lastLine.running_balance) + '</strong></td></tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('ledgerContainer').innerHTML = html;
+}
+</script>
+</body>
+</html>

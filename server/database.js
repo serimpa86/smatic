@@ -52,7 +52,7 @@ function exec(sql) {
 }
 
 function getDb() {
-  return { all, get, run, transaction, save, exec, _raw: () => _db };
+  return { all, get, run, transaction, save, exec, seedAccounts: (companyId) => seedChartOfAccounts(companyId), _raw: () => _db };
 }
 
 async function initDb() {
@@ -327,6 +327,34 @@ async function initDb() {
   try { exec("ALTER TABLE quote_items ADD COLUMN company_id TEXT"); } catch (e) {}
   try { exec("ALTER TABLE credit_note_items ADD COLUMN company_id TEXT"); } catch (e) {}
   try { exec("ALTER TABLE sessions ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE chart_of_accounts ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE journal_entries ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE journal_entry_lines ADD COLUMN company_id TEXT"); } catch (e) {}
+
+  exec(`CREATE TABLE IF NOT EXISTS chart_of_accounts (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    code TEXT NOT NULL, name TEXT NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('asset','liability','equity','income','expense')),
+    parent_id TEXT, is_active INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS journal_entries (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    entry_number INTEGER NOT NULL, date TEXT NOT NULL DEFAULT (date('now')),
+    description TEXT NOT NULL, reference_type TEXT DEFAULT '',
+    reference_id TEXT DEFAULT '', created_by TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS journal_entry_lines (
+    id TEXT PRIMARY KEY, journal_entry_id TEXT NOT NULL,
+    account_id TEXT NOT NULL, description TEXT DEFAULT '',
+    debit REAL DEFAULT 0, credit REAL DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
 
   migrateToMultiCompany();
   seed();
@@ -360,6 +388,9 @@ function migrateToMultiCompany() {
       run('UPDATE refunds SET company_id = ? WHERE user_id = ?', [newId, u.id]);
       run('UPDATE credit_notes SET company_id = ? WHERE user_id = ?', [newId, u.id]);
       run('UPDATE invoice_templates SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE chart_of_accounts SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE journal_entries SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE journal_entry_lines SET company_id = ? WHERE journal_entry_id IN (SELECT id FROM journal_entries WHERE user_id = ?)', [newId, u.id]);
     }
     log('Fixed ' + orphaned.length + ' orphaned references.');
   }
@@ -388,6 +419,9 @@ function migrateToMultiCompany() {
       run('UPDATE invoice_items SET company_id = ? WHERE invoice_id IN (SELECT id FROM invoices WHERE user_id = ?)', [companyId, user.id]);
       run('UPDATE quote_items SET company_id = ? WHERE quote_id IN (SELECT id FROM quotes WHERE user_id = ?)', [companyId, user.id]);
       run('UPDATE credit_note_items SET company_id = ? WHERE credit_note_id IN (SELECT id FROM credit_notes WHERE user_id = ?)', [companyId, user.id]);
+      run('UPDATE chart_of_accounts SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE journal_entries SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE journal_entry_lines SET company_id = ? WHERE journal_entry_id IN (SELECT id FROM journal_entries WHERE user_id = ?)', [companyId, user.id]);
     } catch (e) { log('Migration error for user ' + user.email + ': ' + e.message); }
   }
   log('Migration to multi-company completed.');
@@ -423,6 +457,67 @@ function seed() {
     [uuidv4(), adminId, adminCompanyId, 'IVA 10%', 10]);
   run('INSERT INTO invoice_templates (id, user_id, company_id, name, is_default) VALUES (?, ?, ?, ?, ?)',
     [uuidv4(), adminId, adminCompanyId, 'Default', 1]);
+  seedChartOfAccounts(adminCompanyId);
+  seedChartOfAccounts(saCompanyId);
 }
 
-module.exports = { getDb, initDb };
+function seedChartOfAccounts(companyId) {
+  const existing = get('SELECT COUNT(*) as c FROM chart_of_accounts WHERE company_id = ?', [companyId]);
+  if (existing && existing.c > 0) return;
+  const accounts = [
+    ['1', 'Activo', 'asset', null],
+    ['1.01', 'Activo Corriente', 'asset', '1'],
+    ['1.01.01', 'Caja', 'asset', '1.01'],
+    ['1.01.02', 'Bancos', 'asset', '1.01'],
+    ['1.01.03', 'Clientes', 'asset', '1.01'],
+    ['1.01.04', 'Deudores por Ventas', 'asset', '1.01'],
+    ['1.01.05', 'Crédito Fiscal IVA', 'asset', '1.01'],
+    ['1.01.06', 'Mercaderías', 'asset', '1.01'],
+    ['1.02', 'Activo No Corriente', 'asset', '1'],
+    ['1.02.01', 'Bienes de Uso', 'asset', '1.02'],
+    ['1.02.02', 'Amortizaciones Acumuladas', 'asset', '1.02'],
+    ['1.02.03', 'Intangibles', 'asset', '1.02'],
+    ['2', 'Pasivo', 'liability', null],
+    ['2.01', 'Pasivo Corriente', 'liability', '2'],
+    ['2.01.01', 'Proveedores', 'liability', '2.01'],
+    ['2.01.02', 'Acreedores Varios', 'liability', '2.01'],
+    ['2.01.03', 'Sueldos a Pagar', 'liability', '2.01'],
+    ['2.01.04', 'Cargas Sociales a Pagar', 'liability', '2.01'],
+    ['2.01.05', 'IVA Débito Fiscal', 'liability', '2.01'],
+    ['2.01.06', 'IVA a Pagar', 'liability', '2.01'],
+    ['2.01.07', 'IIBB a Pagar', 'liability', '2.01'],
+    ['2.01.08', 'Ganancias a Pagar', 'liability', '2.01'],
+    ['2.02', 'Pasivo No Corriente', 'liability', '2'],
+    ['2.02.01', 'Préstamos Bancarios', 'liability', '2.02'],
+    ['3', 'Patrimonio Neto', 'equity', null],
+    ['3.01', 'Capital Social', 'equity', '3'],
+    ['3.02', 'Resultados Acumulados', 'equity', '3'],
+    ['3.03', 'Resultado del Ejercicio', 'equity', '3'],
+    ['4', 'Ingresos', 'income', null],
+    ['4.01', 'Ventas', 'income', '4'],
+    ['4.01.01', 'Ventas Gravadas', 'income', '4.01'],
+    ['4.01.02', 'Ventas No Gravadas', 'income', '4.01'],
+    ['4.02', 'Otros Ingresos', 'income', '4'],
+    ['5', 'Gastos', 'expense', null],
+    ['5.01', 'Costos', 'expense', '5'],
+    ['5.01.01', 'Costo de Mercaderías Vendidas', 'expense', '5.01'],
+    ['5.02', 'Gastos Operativos', 'expense', '5'],
+    ['5.02.01', 'Sueldos y Salarios', 'expense', '5.02'],
+    ['5.02.02', 'Cargas Sociales', 'expense', '5.02'],
+    ['5.02.03', 'Alquileres', 'expense', '5.02'],
+    ['5.02.04', 'Servicios', 'expense', '5.02'],
+    ['5.02.05', 'Honorarios', 'expense', '5.02'],
+    ['5.02.06', 'Gastos Bancarios', 'expense', '5.02'],
+    ['5.02.07', 'Amortizaciones', 'expense', '5.02'],
+    ['5.02.08', 'Impuestos', 'expense', '5.02'],
+    ['5.02.09', 'Fletes y Envíos', 'expense', '5.02'],
+    ['5.02.10', 'Gastos de Oficina', 'expense', '5.02'],
+  ];
+  for (const [code, name, type, parentCode] of accounts) {
+    const parent = parentCode ? get('SELECT id FROM chart_of_accounts WHERE code = ? AND company_id = ?', [parentCode, companyId]) : null;
+    run('INSERT INTO chart_of_accounts (id, company_id, code, name, type, parent_id) VALUES (?,?,?,?,?,?)',
+      [uuidv4(), companyId, code, name, type, parent ? parent.id : null]);
+  }
+}
+
+module.exports = { getDb, initDb, seedChartOfAccounts };

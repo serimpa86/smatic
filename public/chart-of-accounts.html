@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="page_title_chart_of_accounts">Plan de Cuentas | Smatic</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+.accounts-tree { margin-top: 1em; }
+.accounts-tree ul { list-style: none; padding-left: 1.5em; }
+.accounts-tree .tree-node { padding: .3em .5em; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: .5em; }
+.accounts-tree .tree-node:hover { background: #eee; }
+.accounts-tree .tree-node .code { color: #888; font-size: .85em; min-width: 5em; }
+.accounts-tree .tree-node .name { flex: 1; }
+.accounts-tree .tree-node .type-badge { font-size: .75em; padding: .1em .4em; border-radius: 3px; }
+.accounts-tree .tree-node .balance { font-size: .85em; color: #555; min-width: 8em; text-align: right; }
+.type-asset { background: #cce5ff; color: #004085; }
+.type-liability { background: #d4edda; color: #155724; }
+.type-equity { background: #fff3cd; color: #856404; }
+.type-income { background: #d1ecf1; color: #0c5460; }
+.type-expense { background: #f8d7da; color: #721c24; }
+</style>
+</head>
+<body>
+<div class="navigation-wrapper" id="sidebar">
+  <nav class="navigation">
+    <div class="sidebar-brand">
+      <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+      <span>Smatic</span>
+    </div>
+    <ul>
+      <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
+      <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
+      <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
+      <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
+      <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
+      <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
+      <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
+      <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
+      <li class="active"><a href="chart-of-accounts.html"><span class="nav-icon">📋</span> <span data-i18n="nav_chart_of_accounts">Plan de Cuentas</span></a></li>
+      <li><a href="journal.html"><span class="nav-icon">📓</span> <span data-i18n="nav_journal">Libro Diario</span></a></li>
+      <li><a href="accounting-reports.html"><span class="nav-icon">📊</span> <span data-i18n="nav_accounting_reports">Informes Contables</span></a></li>
+      <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
+      <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
+      <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
+    </ul>
+    <div class="sidebar-bottom">
+      <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
+    </div>
+  </nav>
+</div>
+<div class="header-wrapper">
+  <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+  <div class="breadcrumbs">
+    <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
+    <span data-i18n="breadcrumb_chart_of_accounts">Smatic - Plan de Cuentas</span>
+  </div>
+</div>
+<div class="container" id="main-content">
+  <div class="page-header">
+    <h1 data-i18n="page_title_chart_of_accounts">Plan de Cuentas</h1>
+    <div class="actions">
+      <button onclick="openAddAccount()">+ <span data-i18n="btn_add_account">Agregar Cuenta</span></button>
+    </div>
+  </div>
+  <div class="filters">
+    <select id="typeFilter" onchange="loadAccounts()">
+      <option value="" data-i18n="filter_all_types">Todos los tipos</option>
+      <option value="asset">Activo</option>
+      <option value="liability">Pasivo</option>
+      <option value="equity">Patrimonio Neto</option>
+      <option value="income">Ingresos</option>
+      <option value="expense">Gastos</option>
+    </select>
+    <input type="text" id="searchInput" data-i18n-placeholder="placeholder_search_account" placeholder="Buscar cuenta..." oninput="loadAccounts()">
+  </div>
+  <div class="card">
+    <div class="accounts-tree" id="treeContainer">
+      <div class="loading" data-i18n="loading">Cargando...</div>
+    </div>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+  await APP.init();
+  if (APP.currentUser && APP.currentUser.role === 'superadmin') {
+    document.getElementById('admin-nav-link').classList.remove('hidden');
+  }
+  loadAccounts();
+});
+
+async function loadAccounts() {
+  const type = document.getElementById('typeFilter').value;
+  const search = document.getElementById('searchInput').value;
+  let url = '/api/accounts?';
+  if (type) url += 'type=' + encodeURIComponent(type) + '&';
+  if (search) url += 'search=' + encodeURIComponent(search) + '&';
+  try {
+    const data = await API.get(url);
+    renderTree(data.tree || []);
+  } catch (e) {
+    document.getElementById('treeContainer').innerHTML = '<div style="color:#d93025">Error al cargar cuentas</div>';
+  }
+}
+
+function renderTree(nodes, depth) {
+  depth = depth || 0;
+  if (depth === 0 && (!nodes || nodes.length === 0)) {
+    document.getElementById('treeContainer').innerHTML = '<div style="color:#999;text-align:center;padding:2em" data-i18n="msg_no_accounts">No hay cuentas. Agregue la primera.</div>';
+    return;
+  }
+  if (depth === 0) {
+    document.getElementById('treeContainer').innerHTML = '<ul>' + renderNodes(nodes, 0) + '</ul>';
+  }
+  return '<ul>' + renderNodes(nodes, depth) + '</ul>';
+}
+
+function renderNodes(nodes, depth) {
+  if (!nodes || nodes.length === 0) return '';
+  return nodes.map(n => {
+    const hasChildren = n.children && n.children.length > 0;
+    const label = document.createElement('span');
+    const typeLabel = { asset: 'Activo', liability: 'Pasivo', equity: 'PN', income: 'Ingreso', expense: 'Gasto' }[n.type] || n.type;
+    let childHtml = '';
+    if (hasChildren) {
+      childHtml = '<ul style="display:none" class="child-ul">' + renderNodes(n.children, depth + 1) + '</ul>';
+    }
+    return '<li>' +
+      '<div class="tree-node" onclick="toggleNode(this)">' +
+        '<span class="code">' + APP.esc(n.code) + '</span>' +
+        '<span class="name">' + APP.esc(n.name) + '</span>' +
+        '<span class="type-badge type-' + n.type + '">' + typeLabel + '</span>' +
+        '<span class="balance">' + APP.formatMoney(n.balance) + '</span>' +
+        '<span style="font-size:.8em;color:#aaa;cursor:pointer" onclick="event.stopPropagation();editAccount(\'' + n.id + '\')">✏️</span>' +
+      '</div>' +
+      childHtml +
+    '</li>';
+  }).join('');
+}
+
+function toggleNode(el) {
+  const ul = el.parentElement.querySelector('.child-ul');
+  if (ul) ul.style.display = ul.style.display === 'none' ? 'block' : 'none';
+}
+
+function openAddAccount() {
+  showAccountModal(null);
+}
+
+async function editAccount(id) {
+  try {
+    const data = await API.get('/api/accounts/' + id);
+    showAccountModal(data);
+  } catch (e) { alert('Error al cargar cuenta'); }
+}
+
+function showAccountModal(account) {
+  const isEdit = !!account;
+  const html = '<div class="modal-content">' +
+    '<span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span>' +
+    '<h2>' + (isEdit ? 'Editar Cuenta' : 'Nueva Cuenta') + '</h2>' +
+    '<div class="settings-grid">' +
+      '<div><label>Código</label><input type="text" id="accCode" value="' + (account ? APP.esc(account.code) : '') + '"></div>' +
+      '<div><label>Nombre</label><input type="text" id="accName" value="' + (account ? APP.esc(account.name) : '') + '"></div>' +
+      '<div><label>Tipo</label><select id="accType">' +
+        '<option value="asset"' + (account && account.type === 'asset' ? ' selected' : '') + '>Activo</option>' +
+        '<option value="liability"' + (account && account.type === 'liability' ? ' selected' : '') + '>Pasivo</option>' +
+        '<option value="equity"' + (account && account.type === 'equity' ? ' selected' : '') + '>Patrimonio Neto</option>' +
+        '<option value="income"' + (account && account.type === 'income' ? ' selected' : '') + '>Ingresos</option>' +
+        '<option value="expense"' + (account && account.type === 'expense' ? ' selected' : '') + '>Gastos</option>' +
+      '</select></div>' +
+      '<div><label>Cuenta padre (opcional)</label><input type="text" id="accParent" placeholder="Código de cuenta padre" value="' + (account && account.parent_code || '') + '"></div>' +
+    '</div>' +
+    '<div class="modal-footer">' +
+      '<button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" data-i18n="btn_cancel">Cancelar</button>' +
+      '<button onclick="saveAccount(\'' + (isEdit ? account.id : '') + '\')" data-i18n="btn_save">Guardar</button>' +
+    '</div>' +
+  '</div>';
+  APP.modal(html, '');
+}
+
+async function saveAccount(id) {
+  const data = {
+    code: document.getElementById('accCode').value.trim(),
+    name: document.getElementById('accName').value.trim(),
+    type: document.getElementById('accType').value,
+  };
+  if (!data.code || !data.name) { alert('Código y nombre son obligatorios'); return; }
+  try {
+    if (id) {
+      await API.put('/api/accounts/' + id, data);
+    } else {
+      await API.post('/api/accounts', data);
+    }
+    document.querySelector('.modal-overlay').remove();
+    loadAccounts();
+  } catch (e) { alert('Error: ' + (e.message || 'Unknown')); }
+}
+</script>
+</body>
+</html>

@@ -22,6 +22,7 @@ const APP = {
     } catch (e) {}
     await this.loadLang();
     this.initNavigation();
+    this.injectAccountingNav();
     this.renderCompanyInfo();
   },
 
@@ -37,6 +38,34 @@ const APP = {
       brand.appendChild(el);
     }
     el.textContent = this.currentUser.company.name;
+  },
+
+  injectAccountingNav() {
+    const navList = document.querySelector('.navigation ul');
+    if (!navList) return;
+    if (document.querySelector('.nav-accounting-injected')) return;
+    const items = [
+      ['chart-of-accounts.html', '📋', 'nav_chart_of_accounts', 'Plan de Cuentas'],
+      ['journal.html', '📓', 'nav_journal', 'Libro Diario'],
+      ['accounting-reports.html', '📊', 'nav_accounting_reports', 'Informes Contables'],
+    ];
+    const reportsLi = navList.querySelector('li a[href="reports.html"]');
+    const refNode = reportsLi ? reportsLi.closest('li') : null;
+    for (const [href, icon, i18n, text] of items) {
+      const li = document.createElement('li');
+      li.className = 'nav-accounting-injected nav-item';
+      li.setAttribute('data-module', 'accounting');
+      const isActive = window.location.pathname.includes('/' + href.split('/').pop().split('.')[0]) ||
+                       window.location.pathname.endsWith('/' + href);
+      if (isActive) li.classList.add('active');
+      li.innerHTML = '<a href="' + href + '"><span class="nav-icon">' + icon + '</span> <span data-i18n="' + i18n + '">' + text + '</span></a>';
+      if (refNode && refNode.parentNode) {
+        refNode.parentNode.insertBefore(li, refNode);
+      } else {
+        navList.appendChild(li);
+      }
+    }
+    if (this.lang && Object.keys(this.lang).length > 0) this.applyLanguage();
   },
 
   async loadLang() {
