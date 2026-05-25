@@ -46,7 +46,7 @@ router.put('/system', (req, res) => {
 
 router.get('/users', (req, res) => {
   const { search, role, page = 1, limit = 50 } = req.query;
-  let sql = 'SELECT id, email, name, role, is_active, created_at, updated_at FROM users';
+  let sql = 'SELECT u.id, u.email, u.name, u.role, u.is_active, u.company_id, u.created_at, u.updated_at, c.name as company_name FROM users u LEFT JOIN companies c ON u.company_id = c.id';
   let params = [];
   const where = [];
   if (search) { where.push('(email LIKE ? OR name LIKE ?)'); params.push(`%${search}%`, `%${search}%`); }
@@ -66,15 +66,16 @@ router.get('/users', (req, res) => {
 });
 
 router.get('/users/:id', (req, res) => {
-  const user = req.db.get('SELECT id, email, name, role, is_active, created_at, updated_at FROM users WHERE id = ?', [req.params.id]);
+  const user = req.db.get('SELECT id, email, name, role, is_active, company_id, created_at, updated_at FROM users WHERE id = ?', [req.params.id]);
   if (!user) return res.json({ errorcode: 404, errormsg: 'User not found' });
+  const company = req.db.get('SELECT id, name, business_name, cuit, currency FROM companies WHERE id = ?', [user.company_id]);
   const stats = req.db.get(`SELECT
     (SELECT COUNT(*) FROM invoices WHERE user_id=?) as total_invoices,
     (SELECT COUNT(*) FROM customers WHERE user_id=?) as total_customers,
     (SELECT COUNT(*) FROM items WHERE user_id=?) as total_items,
     (SELECT COALESCE(SUM(total),0) FROM invoices WHERE user_id=? AND status!='draft') as total_invoiced
   `, [user.id, user.id, user.id, user.id]);
-  res.json({ ...user, stats });
+  res.json({ ...user, company: company || null, stats });
 });
 
 router.post('/users', (req, res) => {
@@ -83,12 +84,19 @@ router.post('/users', (req, res) => {
   const existing = req.db.get('SELECT id FROM users WHERE email = ?', [email]);
   if (existing) return res.json({ errorcode: 409, errormsg: 'Email already registered' });
   const id = uuidv4();
+  const companyId = uuidv4();
   const hash = bcrypt.hashSync(password, 10);
   const userRole = role || 'user';
-  req.db.run('INSERT INTO users (id, email, password_hash, name, role) VALUES (?,?,?,?,?)',
-    [id, email, hash, name||'', userRole]);
-  req.db.run('INSERT INTO business_settings (id, user_id, business_name) VALUES (?, ?, ?)',
-    [uuidv4(), id, name||'Mi Empresa']);
+  req.db.run('INSERT INTO companies (id, name, currency, currency_symbol) VALUES (?, ?, ?, ?)',
+    [companyId, name || 'Mi Empresa', 'ARS', '$']);
+  req.db.run('INSERT INTO users (id, email, password_hash, name, role, company_id) VALUES (?,?,?,?,?,?)',
+    [id, email, hash, name||'', userRole, companyId]);
+  req.db.run('INSERT INTO business_settings (id, user_id, company_id, business_name) VALUES (?, ?, ?, ?)',
+    [uuidv4(), id, companyId, name||'Mi Empresa']);
+  req.db.run('INSERT INTO taxes (id, user_id, company_id, name, rate, is_default) VALUES (?, ?, ?, ?, ?, ?)',
+    [uuidv4(), id, companyId, 'IVA 21%', 21, 1]);
+  req.db.run('INSERT INTO invoice_templates (id, user_id, company_id, name, is_default) VALUES (?, ?, ?, ?, ?)',
+    [uuidv4(), id, companyId, 'Default', 1]);
   req.db.run('INSERT INTO audit_log (id, user_id, action, details) VALUES (?,?,?,?)',
     [uuidv4(), req.userId, 'USER_CREATE', 'Created user: ' + email + ' role: ' + userRole]);
   res.json({ id, email, name: name||'', role: userRole });
@@ -113,7 +121,7 @@ router.put('/users/:id', (req, res) => {
 });
 
 router.delete('/users/:id', (req, res) => {
-  const user = req.db.get('SELECT id, role FROM users WHERE id = ?', [req.params.id]);
+  const user = req.db.get('SELECT id, role, company_id FROM users WHERE id = ?', [req.params.id]);
   if (!user) return res.json({ errorcode: 404, errormsg: 'User not found' });
   if (req.params.id === req.userId) return res.json({ errorcode: 403, errormsg: 'Cannot delete yourself' });
   const uid = req.params.id;
@@ -133,6 +141,10 @@ router.delete('/users/:id', (req, res) => {
     req.db.run('DELETE FROM business_settings WHERE user_id=?', [uid]);
     req.db.run('DELETE FROM sessions WHERE user_id=?', [uid]);
     req.db.run('DELETE FROM users WHERE id=?', [uid]);
+    const remaining = req.db.get('SELECT COUNT(*) as c FROM users WHERE company_id = ?', [user.company_id]);
+    if (remaining && remaining.c === 0 && user.company_id) {
+      req.db.run('DELETE FROM companies WHERE id = ?', [user.company_id]);
+    }
   });
   req.db.run('INSERT INTO audit_log (id, user_id, action, details) VALUES (?,?,?,?)',
     [uuidv4(), req.userId, 'USER_DELETE', 'Deleted user: ' + uid]);
@@ -175,7 +187,7 @@ router.get('/db/backup', (req, res) => {
 
 router.get('/all-customers', (req, res) => {
   const { search } = req.query;
-  let sql = 'SELECT c.*, u.email as user_email, u.name as user_name FROM customers c JOIN users u ON c.user_id = u.id';
+  let sql = 'SELECT c.*, u.email as user_email, u.name as user_name, co.name as company_name FROM customers c JOIN users u ON c.user_id = u.id LEFT JOIN companies co ON c.company_id = co.id';
   let params = [];
   if (search) { sql += ' WHERE (c.name LIKE ? OR c.email LIKE ? OR u.email LIKE ?)'; params.push(`%${search}%`, `%${search}%`, `%${search}%`); }
   sql += ' ORDER BY u.email, c.name';
@@ -184,7 +196,7 @@ router.get('/all-customers', (req, res) => {
 
 router.get('/all-invoices', (req, res) => {
   const { status, start, end } = req.query;
-  let sql = 'SELECT i.*, u.email as user_email FROM invoices i JOIN users u ON i.user_id = u.id WHERE 1=1';
+  let sql = 'SELECT i.*, u.email as user_email, co.name as company_name FROM invoices i JOIN users u ON i.user_id = u.id LEFT JOIN companies co ON i.company_id = co.id WHERE 1=1';
   let params = [];
   if (status) { sql += ' AND i.status=?'; params.push(status); }
   if (start) { sql += ' AND i.date>=?'; params.push(start); }

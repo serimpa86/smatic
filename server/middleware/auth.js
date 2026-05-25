@@ -17,6 +17,7 @@ function authenticateToken(req, res, next) {
     req.userId = decoded.userId;
     req.userRole = decoded.role || 'user';
     req.isSuperadmin = req.userRole === 'superadmin';
+    try { const u = getDb().get('SELECT company_id FROM users WHERE id = ?', [req.userId]); req.companyId = u ? u.company_id : null; } catch(e) { req.companyId = null; }
     next();
   });
 }
@@ -37,6 +38,7 @@ function optionalAuth(req, res, next) {
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     req.userId = err ? null : decoded.userId;
     req.userRole = err ? null : (decoded.role || 'user');
+    if (req.userId) { try { const u = getDb().get('SELECT company_id FROM users WHERE id = ?', [req.userId]); req.companyId = u ? u.company_id : null; } catch(e) { req.companyId = null; } }
     next();
   });
 }

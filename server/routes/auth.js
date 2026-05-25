@@ -26,7 +26,8 @@ router.post('/login', (req, res) => {
   const token = generateToken(user.id, role);
   req.db.run('INSERT INTO audit_log (id, user_id, action, details) VALUES (?,?,?,?)',
     [uuidv4(), user.id, 'LOGIN', 'Login desde IP: ' + (req.ip || 'unknown')]);
-  res.json({ token, user: { id: user.id, email: user.email, name: user.name, role } });
+  const company = req.db.get('SELECT id, name FROM companies WHERE id = ?', [user.company_id]);
+  res.json({ token, user: { id: user.id, email: user.email, name: user.name, role, company_id: user.company_id, company_name: company ? company.name : '' } });
 });
 
 router.post('/signup', (req, res) => {
@@ -38,25 +39,29 @@ router.post('/signup', (req, res) => {
   const existing = req.db.get('SELECT id FROM users WHERE email = ?', [email]);
   if (existing) return res.json({ errorcode: 409, errormsg: 'Email already registered' });
   const id = uuidv4();
+  const companyId = uuidv4();
   const hash = bcrypt.hashSync(password, 10);
-  req.db.run('INSERT INTO users (id, email, password_hash, name, role) VALUES (?, ?, ?, ?, ?)',
-    [id, email, hash, name || '', 'user']);
-  req.db.run('INSERT INTO business_settings (id, user_id, business_name) VALUES (?, ?, ?)',
-    [uuidv4(), id, name || 'Mi Empresa']);
-  req.db.run('INSERT INTO taxes (id, user_id, name, rate, is_default) VALUES (?, ?, ?, ?, ?)',
-    [uuidv4(), id, 'IVA 21%', 21, 1]);
-  req.db.run('INSERT INTO taxes (id, user_id, name, rate) VALUES (?, ?, ?, ?)',
-    [uuidv4(), id, 'IVA 10%', 10]);
-  req.db.run('INSERT INTO invoice_templates (id, user_id, name, is_default) VALUES (?, ?, ?, ?)',
-    [uuidv4(), id, 'Default', 1]);
+  req.db.run('INSERT INTO companies (id, name, currency, currency_symbol) VALUES (?, ?, ?, ?)',
+    [companyId, name || 'Mi Empresa', 'ARS', '$']);
+  req.db.run('INSERT INTO users (id, email, password_hash, name, role, company_id) VALUES (?, ?, ?, ?, ?, ?)',
+    [id, email, hash, name || '', 'user', companyId]);
+  req.db.run('INSERT INTO business_settings (id, user_id, company_id, business_name) VALUES (?, ?, ?, ?)',
+    [uuidv4(), id, companyId, name || 'Mi Empresa']);
+  req.db.run('INSERT INTO taxes (id, user_id, company_id, name, rate, is_default) VALUES (?, ?, ?, ?, ?, ?)',
+    [uuidv4(), id, companyId, 'IVA 21%', 21, 1]);
+  req.db.run('INSERT INTO taxes (id, user_id, company_id, name, rate) VALUES (?, ?, ?, ?, ?)',
+    [uuidv4(), id, companyId, 'IVA 10%', 10]);
+  req.db.run('INSERT INTO invoice_templates (id, user_id, company_id, name, is_default) VALUES (?, ?, ?, ?, ?)',
+    [uuidv4(), id, companyId, 'Default', 1]);
   const token = generateToken(id, 'user');
-  res.json({ token, user: { id, email, name: name || '', role: 'user' } });
+  res.json({ token, user: { id, email, name: name || '', role: 'user', company_id: companyId } });
 });
 
 router.get('/api/user', authenticateToken, (req, res) => {
-  const user = req.db.get('SELECT id, email, name, role, language FROM users WHERE id = ?', [req.userId]);
+  const user = req.db.get('SELECT id, email, name, role, language, company_id FROM users WHERE id = ?', [req.userId]);
   if (!user) return res.json({ errorcode: 404, errormsg: 'User not found' });
-  res.json(user);
+  const company = req.db.get('SELECT id as company_id, name as company_name, currency, currency_symbol, logo_url, business_name, cuit, address, phone, email as company_email, website FROM companies WHERE id = ?', [user.company_id]);
+  res.json({ ...user, company: company || null });
 });
 
 router.put('/api/user/preferences', authenticateToken, (req, res) => {

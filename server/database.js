@@ -284,6 +284,51 @@ async function initDb() {
     created_at TEXT DEFAULT (datetime('now'))
   )`);
 
+  exec(`CREATE TABLE IF NOT EXISTS companies (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL DEFAULT 'Mi Empresa',
+    business_name TEXT DEFAULT '',
+    cuit TEXT DEFAULT '',
+    tax_category TEXT DEFAULT 'responsable_inscripto',
+    industry TEXT DEFAULT '',
+    address TEXT DEFAULT '', phone TEXT DEFAULT '',
+    email TEXT DEFAULT '', website TEXT DEFAULT '',
+    logo_url TEXT DEFAULT '',
+    currency TEXT DEFAULT 'ARS',
+    currency_symbol TEXT DEFAULT '$',
+    timezone TEXT DEFAULT 'America/Argentina/Buenos_Aires',
+    fiscal_year_start TEXT DEFAULT '01-01',
+    afip_env TEXT DEFAULT 'testing',
+    afip_cert TEXT DEFAULT '', afip_key TEXT DEFAULT '',
+    afip_point_of_sale TEXT DEFAULT '0001',
+    fiscal_printer_type TEXT DEFAULT 'none',
+    printer_connection TEXT DEFAULT '',
+    printer_port TEXT DEFAULT '',
+    modules_active TEXT DEFAULT '[]',
+    setup_completed INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // --- Add company_id to existing tables ---
+  try { exec("ALTER TABLE users ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE business_settings ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE customers ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE customer_groups ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE items ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE taxes ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE invoices ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE quotes ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE payments ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE refunds ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE credit_notes ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE invoice_templates ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE invoice_items ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE quote_items ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE credit_note_items ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE sessions ADD COLUMN company_id TEXT"); } catch (e) {}
+
+  migrateToMultiCompany();
   seed();
   save();
   log('initDb completed in ' + (Date.now() - ts) + 'ms');
@@ -293,30 +338,68 @@ async function initDb() {
   }
 }
 
+function migrateToMultiCompany() {
+  // Only run once: check if any user already has company_id
+  const already = get("SELECT COUNT(*) as c FROM users WHERE company_id IS NOT NULL AND company_id != ''");
+  if (already && already.c > 0) return;
+  const users = all('SELECT u.*, bs.business_name, bs.currency, bs.currency_symbol, bs.timezone, bs.fiscal_year_start FROM users u LEFT JOIN business_settings bs ON bs.user_id = u.id');
+  if (!users || users.length === 0) return;
+  log('Migrating ' + users.length + ' users to multi-company...');
+  transaction(() => {
+    for (const user of users) {
+      const companyId = uuidv4();
+      run('INSERT INTO companies (id, name, business_name, currency, currency_symbol, timezone, fiscal_year_start) VALUES (?,?,?,?,?,?,?)',
+        [companyId, user.business_name || user.name || 'Mi Empresa', user.business_name || '', user.currency || 'ARS', user.currency_symbol || '$', user.timezone || 'America/Argentina/Buenos_Aires', user.fiscal_year_start || '01-01']);
+      run('UPDATE users SET company_id = ? WHERE id = ?', [companyId, user.id]);
+      run('UPDATE business_settings SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE customers SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE customer_groups SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE items SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE taxes SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE invoices SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE quotes SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE payments SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE refunds SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE credit_notes SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE invoice_templates SET company_id = ? WHERE user_id = ?', [companyId, user.id]);
+      run('UPDATE invoice_items SET company_id = ? WHERE invoice_id IN (SELECT id FROM invoices WHERE user_id = ?)', [companyId, user.id]);
+      run('UPDATE quote_items SET company_id = ? WHERE quote_id IN (SELECT id FROM quotes WHERE user_id = ?)', [companyId, user.id]);
+      run('UPDATE credit_note_items SET company_id = ? WHERE credit_note_id IN (SELECT id FROM credit_notes WHERE user_id = ?)', [companyId, user.id]);
+    }
+  });
+  log('Migration to multi-company completed.');
+}
+
 function seed() {
   const result = get('SELECT COUNT(*) as c FROM users');
   if (result && result.c > 0) return;
 
+  const saCompanyId = uuidv4();
+  run('INSERT INTO companies (id, name, currency, currency_symbol) VALUES (?,?,?,?)',
+    [saCompanyId, 'Smatic Admin', 'USD', '$']);
   const saId = uuidv4();
   const saHash = bcrypt.hashSync('SuperAdmin2026!', 10);
-  run('INSERT INTO users (id, email, password_hash, name, role, is_active) VALUES (?,?,?,?,?,?)',
-    [saId, 'superadmin@smatic.com', saHash, 'Super Admin', 'superadmin', 1]);
-  run('INSERT INTO business_settings (id, user_id, business_name) VALUES (?, ?, ?)',
-    [uuidv4(), saId, 'Smatic Admin']);
+  run('INSERT INTO users (id, email, password_hash, name, role, is_active, company_id) VALUES (?,?,?,?,?,?,?)',
+    [saId, 'superadmin@smatic.com', saHash, 'Super Admin', 'superadmin', 1, saCompanyId]);
+  run('INSERT INTO business_settings (id, user_id, company_id, business_name) VALUES (?, ?, ?, ?)',
+    [uuidv4(), saId, saCompanyId, 'Smatic Admin']);
   run('INSERT INTO system_config (id) VALUES (\'global\')');
 
+  const adminCompanyId = uuidv4();
+  run('INSERT INTO companies (id, name, currency, currency_symbol) VALUES (?,?,?,?)',
+    [adminCompanyId, 'Mi Empresa Demo', 'ARS', '$']);
   const adminId = uuidv4();
   const adminHash = bcrypt.hashSync('admin123', 10);
-  run('INSERT INTO users (id, email, password_hash, name, role, is_active) VALUES (?,?,?,?,?,?)',
-    [adminId, 'admin@demo.com', adminHash, 'Admin Demo', 'admin', 1]);
-  run('INSERT INTO business_settings (id, user_id, business_name) VALUES (?, ?, ?)',
-    [uuidv4(), adminId, 'Mi Empresa Demo']);
-  run('INSERT INTO taxes (id, user_id, name, rate, is_default) VALUES (?, ?, ?, ?, ?)',
-    [uuidv4(), adminId, 'IVA 21%', 21, 1]);
-  run('INSERT INTO taxes (id, user_id, name, rate) VALUES (?, ?, ?, ?)',
-    [uuidv4(), adminId, 'IVA 10%', 10]);
-  run('INSERT INTO invoice_templates (id, user_id, name, is_default) VALUES (?, ?, ?, ?)',
-    [uuidv4(), adminId, 'Default', 1]);
+  run('INSERT INTO users (id, email, password_hash, name, role, is_active, company_id) VALUES (?,?,?,?,?,?,?)',
+    [adminId, 'admin@demo.com', adminHash, 'Admin Demo', 'admin', 1, adminCompanyId]);
+  run('INSERT INTO business_settings (id, user_id, company_id, business_name) VALUES (?, ?, ?, ?)',
+    [uuidv4(), adminId, adminCompanyId, 'Mi Empresa Demo']);
+  run('INSERT INTO taxes (id, user_id, company_id, name, rate, is_default) VALUES (?, ?, ?, ?, ?, ?)',
+    [uuidv4(), adminId, adminCompanyId, 'IVA 21%', 21, 1]);
+  run('INSERT INTO taxes (id, user_id, company_id, name, rate) VALUES (?, ?, ?, ?, ?)',
+    [uuidv4(), adminId, adminCompanyId, 'IVA 10%', 10]);
+  run('INSERT INTO invoice_templates (id, user_id, company_id, name, is_default) VALUES (?, ?, ?, ?, ?)',
+    [uuidv4(), adminId, adminCompanyId, 'Default', 1]);
 }
 
 module.exports = { getDb, initDb };
