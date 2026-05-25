@@ -32,6 +32,11 @@
 <button onclick="switchModule('servicios',this)">🔧 Servicios</button>
 <button onclick="switchModule('fields',this)">📋 Campos Personalizados</button>
 </div>
+<div style="font-size:.85em;color:#666;margin-bottom:1em;padding:.5em .8em;background:#f8f9fa;border-radius:4px" id="module-desc">
+  <strong>🏗 Construcción:</strong> Gestión de obras, partes diarios y subcontratistas.
+  <strong>🔧 Servicios:</strong> Contratos de servicio recurrentes y visitas técnicas.
+  <strong>📋 Campos Personalizados:</strong> Campos adicionales para obras, contratos, visitas, proyectos y clientes.
+</div>
 
 <!-- Construcción -->
 <div id="mod-construccion" class="module-content active"></div>
@@ -65,7 +70,7 @@ async function loadConstruccion(){
   try{
     const d=await API.get('/api/modules/construction/works');
     renderWorks(d.works||[]);
-  }catch(e){document.getElementById('mod-construccion').innerHTML='<div style="color:#d93025">Error</div>';}
+  }catch(e){document.getElementById('mod-construccion').innerHTML='<div style="text-align:center;padding:2em;color:#d93025">Error al cargar obras. Verifique la conexión con el servidor.</div>';}
 }
 function renderWorks(works){
   const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Obras</h2><div class="actions"><button onclick="openWorkModal(null)">+ Nueva Obra</button></div></div>'+
@@ -187,7 +192,7 @@ async function loadServicios(){
   try{
     const d=await API.get('/api/modules/services/contracts');
     renderContracts(d.contracts||[]);
-  }catch(e){document.getElementById('mod-servicios').innerHTML='<div style="color:#d93025">Error</div>';}
+  }catch(e){document.getElementById('mod-servicios').innerHTML='<div style="text-align:center;padding:2em;color:#d93025">Error al cargar contratos. Verifique la conexión con el servidor.</div>';}
 }
 function renderContracts(contracts){
   const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Contratos de Servicio</h2><div class="actions"><button onclick="openContractModal(null)">+ Nuevo Contrato</button>&nbsp;<button onclick="openVisitModal(null)">+ Visita</button></div></div>'+
@@ -274,7 +279,7 @@ async function loadCustomFields(){
   try{
     const d=await API.get('/api/modules/custom-fields');
     renderCustomFields(d.fields||[]);
-  }catch(e){document.getElementById('mod-fields').innerHTML='<div style="color:#d93025">Error</div>';}
+  }catch(e){document.getElementById('mod-fields').innerHTML='<div style="text-align:center;padding:2em;color:#d93025">Error al cargar campos personalizados. Verifique la conexión con el servidor.</div>';}
 }
 function renderCustomFields(fields){
   const entities={construction_works:{label:'Obras',color:'#e8e8e8'},service_contracts:{label:'Contratos Servicio',color:'#fff3cd'},service_visits:{label:'Visitas',color:'#d4edda'},projects:{label:'Proyectos',color:'#cce5ff'},customers:{label:'Clientes',color:'#f8d7da'}};
