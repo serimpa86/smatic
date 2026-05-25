@@ -34,23 +34,9 @@
 </style>
 </head>
 <body>
-<div class="navigation-wrapper"><nav class="navigation">
-<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
-<ul>
-<li class="active"><a href="dashboard.html">📊 <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
-<li><a href="customers.html">👥 <span data-i18n="nav_customers">Clientes</span></a></li>
-<li><a href="invoices.html">📄 <span data-i18n="nav_invoices">Facturas</span></a></li>
-<li><a href="quotes.html">📝 <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
-<li><a href="credit-notes.html">📒 <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
-<li><a href="payments.html">💳 <span data-i18n="nav_payments">Pagos</span></a></li>
-<li><a href="refunds.html">💸 <span data-i18n="nav_refunds">Reembolsos</span></a></li>
-<li><a href="items.html">📦 <span data-i18n="nav_items">Productos</span></a></li>
-<li><a href="reports.html">📈 <span data-i18n="nav_reports">Reportes</span></a></li>
-<li><a href="settings.html">⚙️ <span data-i18n="nav_settings">Configuración</span></a></li>
-<li id="admin-nav-link" class="hidden"><a href="admin.html">⚡ <span data-i18n="nav_admin">Administración</span></a></li>
-</ul>
-<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a></div>
-</nav></div>
+<div class="navigation-wrapper" id="sidebar">
+  <nav id="app-nav" class="navigation"></nav>
+</div>
 <div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span data-i18n="breadcrumb_dashboard">Smatic - Panel Principal</span></div></div>
 <div class="container">
 <div class="page-header"><h1 data-i18n="page_title_dashboard">Panel Principal</h1><div class="actions"><span id="greeting" style="font-size:.9em;color:#666;margin-right:1em"></span></div></div>

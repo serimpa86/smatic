@@ -1,4 +1,4 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -37,32 +37,11 @@
 </head>
 <body>
   <div class="navigation-wrapper" id="sidebar">
-    <nav class="navigation">
-      <div class="sidebar-brand">
-        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-        <span>Smatic</span>
-      </div>
-      <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">üìä</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
-        <li><a href="customers.html"><span class="nav-icon">üë•</span> <span data-i18n="nav_customers">Clientes</span></a></li>
-        <li><a href="invoices.html"><span class="nav-icon">üìÑ</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
-        <li class="active"><a href="quotes.html"><span class="nav-icon">üìù</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">üìí</span> <span data-i18n="nav_credit_notes">Notas de Cr√©dito</span></a></li>
-        <li><a href="payments.html"><span class="nav-icon">üí≥</span> <span data-i18n="nav_payments">Pagos</span></a></li>
-        <li><a href="refunds.html"><span class="nav-icon">üí∏</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
-        <li><a href="items.html"><span class="nav-icon">üì¶</span> <span data-i18n="nav_items">Productos</span></a></li>
-        <li><a href="reports.html"><span class="nav-icon">üìà</span> <span data-i18n="nav_reports">Reportes</span></a></li>
-        <li><a href="settings.html"><span class="nav-icon">‚öôÔ∏è</span> <span data-i18n="nav_settings">Configuraci√≥n</span></a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">‚ö°</span> <span data-i18n="nav_admin">Administraci√≥n</span></a></li>
-      </ul>
-      <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">üö™ <span data-i18n="nav_logout">Cerrar Sesi√≥n</span></a>
-      </div>
-    </nav>
-  </div>
+  <nav id="app-nav" class="navigation"></nav>
+</div>
 
   <div class="header-wrapper">
-    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">‚ò∞</div>
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">?</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
       <span data-i18n="breadcrumb_quotes">Smatic - Cotizaciones</span>
@@ -73,7 +52,7 @@
     <div class="page-header">
       <h1 data-i18n="page_title_quotes">Cotizaciones</h1>
       <div class="actions">
-        <button onclick="openCreateModal()">+ <span data-i18n="btn_new_quote">Nueva Cotizaci√≥n</span></button>
+        <button onclick="openCreateModal()">+ <span data-i18n="btn_new_quote">Nueva CotizaciÛn</span></button>
       </div>
     </div>
 
@@ -87,7 +66,7 @@
         <option value="converted" data-i18n="status_converted">Convertida</option>
       </select>
       <div class="search-box">
-        <input type="text" id="filter-search" data-i18n-placeholder="placeholder_search_quotes" placeholder="Buscar cotizaci√≥n o cliente...">
+        <input type="text" id="filter-search" data-i18n-placeholder="placeholder_search_quotes" placeholder="Buscar cotizaciÛn o cliente...">
         <button onclick="applyFilters()" data-i18n="btn_search">Buscar</button>
       </div>
     </div>
@@ -97,7 +76,7 @@
         <table class="record-list" id="quotes-table">
           <thead>
             <tr>
-              <th data-i18n="th_quote_number">N¬∞ Cotizaci√≥n</th>
+              <th data-i18n="th_quote_number">N∞ CotizaciÛn</th>
               <th data-i18n="th_customer">Cliente</th>
               <th data-i18n="th_date">Fecha</th>
               <th data-i18n="th_due_date">Vencimiento</th>
@@ -205,7 +184,7 @@ await Promise.all([loadCustomers(), loadItems(), loadTaxes()]);
     function renderQuotes() {
       const tbody = document.getElementById('quotes-body');
       if (!quotesData || quotesData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="color:#999">No hay cotizaciones. Crea una nueva cotizaci√≥n.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="color:#999">No hay cotizaciones. Crea una nueva cotizaciÛn.</td></tr>';
         return;
       }
       tbody.innerHTML = quotesData.map(q => {
@@ -270,7 +249,7 @@ await Promise.all([loadCustomers(), loadItems(), loadTaxes()]);
     function getQuoteFormHtml() {
       return '<div class="modal-content">' +
         '<button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</button>' +
-        '<h2 style="margin:0 0 1em;color:#555">' + (editingQuoteId ? APP.t('modal_title_edit_quote', 'Editar Cotizaci√≥n') : APP.t('modal_title_new_quote', 'Nueva Cotizaci√≥n')) + '</h2>' +
+        '<h2 style="margin:0 0 1em;color:#555">' + (editingQuoteId ? APP.t('modal_title_edit_quote', 'Editar CotizaciÛn') : APP.t('modal_title_new_quote', 'Nueva CotizaciÛn')) + '</h2>' +
         '<form class="invoice-form" id="quote-form" onsubmit="saveQuote(event)" autocomplete="off">' +
           '<div class="form-row">' +
             '<div><label for="quote-customer" data-i18n="lbl_customer">Cliente *</label><select id="quote-customer" required><option value="" data-i18n="option_select_customer">Seleccionar Cliente...</option></select></div>' +
@@ -278,12 +257,12 @@ await Promise.all([loadCustomers(), loadItems(), loadTaxes()]);
             '<div><label for="quote-expiry" data-i18n="lbl_due_date">Vencimiento</label><input type="date" id="quote-expiry"></div>' +
           '</div>' +
           '<div class="form-row">' +
-            '<div><label for="quote-number" data-i18n="lbl_quote_number">N¬∞ Cotizaci√≥n</label><input type="text" id="quote-number" readonly></div>' +
-            '<div><label for="quote-currency" data-i18n="lbl_currency">Moneda</label><select id="quote-currency"><option value="USD">USD - D√≥lar</option><option value="EUR">EUR - Euro</option><option value="MXN">MXN - Peso Mexicano</option><option value="COP">COP - Peso Colombiano</option><option value="ARS">ARS - Peso Argentino</option><option value="CLP">CLP - Peso Chileno</option></select></div>' +
+            '<div><label for="quote-number" data-i18n="lbl_quote_number">N∞ CotizaciÛn</label><input type="text" id="quote-number" readonly></div>' +
+            '<div><label for="quote-currency" data-i18n="lbl_currency">Moneda</label><select id="quote-currency"><option value="USD">USD - DÛlar</option><option value="EUR">EUR - Euro</option><option value="MXN">MXN - Peso Mexicano</option><option value="COP">COP - Peso Colombiano</option><option value="ARS">ARS - Peso Argentino</option><option value="CLP">CLP - Peso Chileno</option></select></div>' +
           '</div>' +
-          '<div style="margin:1em 0"><div style="font-weight:bold;color:#555;font-size:1.05em;margin-bottom:.75em;padding-bottom:.4em;border-bottom:2px solid #ccc" data-i18n="section_items">Art√≠culos</div>' +
-            '<div class="scroll-table"><table class="items-table" id="quote-items-table"><thead><tr><th style="width:5em" data-i18n="th_qty">Cantidad</th><th style="width:8em" data-i18n="th_code">C√≥digo</th><th style="min-width:12em" data-i18n="th_description">Descripci√≥n</th><th style="width:9em" data-i18n="th_unit_price">Precio Unitario</th><th style="width:7em" data-i18n="th_discount_pct">Descuento %</th><th style="width:9em" data-i18n="th_tax">Impuesto</th><th style="width:9em" data-i18n="th_total">Total</th><th style="width:2em"></th></tr></thead><tbody id="quote-items-body"></tbody></table></div>' +
-            '<button type="button" class="btn btn-secondary" onclick="addQuoteItem()" style="margin-top:.5em;min-width:auto" data-i18n="btn_add_item">+ Agregar Art√≠culo</button>' +
+          '<div style="margin:1em 0"><div style="font-weight:bold;color:#555;font-size:1.05em;margin-bottom:.75em;padding-bottom:.4em;border-bottom:2px solid #ccc" data-i18n="section_items">ArtÌculos</div>' +
+            '<div class="scroll-table"><table class="items-table" id="quote-items-table"><thead><tr><th style="width:5em" data-i18n="th_qty">Cantidad</th><th style="width:8em" data-i18n="th_code">CÛdigo</th><th style="min-width:12em" data-i18n="th_description">DescripciÛn</th><th style="width:9em" data-i18n="th_unit_price">Precio Unitario</th><th style="width:7em" data-i18n="th_discount_pct">Descuento %</th><th style="width:9em" data-i18n="th_tax">Impuesto</th><th style="width:9em" data-i18n="th_total">Total</th><th style="width:2em"></th></tr></thead><tbody id="quote-items-body"></tbody></table></div>' +
+            '<button type="button" class="btn btn-secondary" onclick="addQuoteItem()" style="margin-top:.5em;min-width:auto" data-i18n="btn_add_item">+ Agregar ArtÌculo</button>' +
           '</div>' +
           '<div class="totals" id="quote-totals-section">' +
             '<div class="total-row"><span class="label" data-i18n="lbl_subtotal">Subtotal</span><span class="value" id="qt-subtotal">$ 0.00</span></div>' +
@@ -292,7 +271,7 @@ await Promise.all([loadCustomers(), loadItems(), loadTaxes()]);
             '<div class="total-row grand"><span class="label" data-i18n="lbl_grand_total">Total General</span><span class="value" id="qt-grand">$ 0.00</span></div>' +
           '</div>' +
           '<div class="form-row">' +
-            '<div><label for="quote-notes" data-i18n="lbl_public_note">Notas</label><textarea id="quote-notes" rows="3" data-i18n-placeholder="placeholder_quote_notes" placeholder="Notas visibles en la cotizaci√≥n"></textarea></div>' +
+            '<div><label for="quote-notes" data-i18n="lbl_public_note">Notas</label><textarea id="quote-notes" rows="3" data-i18n-placeholder="placeholder_quote_notes" placeholder="Notas visibles en la cotizaciÛn"></textarea></div>' +
             '<div><label for="quote-private-notes" data-i18n="lbl_private_note">Notas Privadas</label><textarea id="quote-private-notes" rows="3" data-i18n-placeholder="placeholder_private_note" placeholder="Notas internas"></textarea></div>' +
           '</div>' +
           '<div class="modal-footer">' +
@@ -320,8 +299,8 @@ await Promise.all([loadCustomers(), loadItems(), loadTaxes()]);
       tr.id = rowId;
       tr.innerHTML =
         '<td><input type="number" class="item-qty" value="' + (data.quantity || 1) + '" min="0.01" step="0.01" oninput="calculateQuoteRow(\'' + rowId + '\')"></td>' +
-        '<td><input type="text" class="item-code" value="' + APP.esc(data.item_code || data.code || '') + '" list="item-codes" onchange="onQuoteItemCodeChange(\'' + rowId + '\')" data-i18n-placeholder="placeholder_code" placeholder="C√≥digo"></td>' +
-        '<td><input type="text" class="item-desc" value="' + APP.esc(data.description || data.name || '') + '" data-i18n-placeholder="placeholder_description" placeholder="Descripci√≥n"></td>' +
+        '<td><input type="text" class="item-code" value="' + APP.esc(data.item_code || data.code || '') + '" list="item-codes" onchange="onQuoteItemCodeChange(\'' + rowId + '\')" data-i18n-placeholder="placeholder_code" placeholder="CÛdigo"></td>' +
+        '<td><input type="text" class="item-desc" value="' + APP.esc(data.description || data.name || '') + '" data-i18n-placeholder="placeholder_description" placeholder="DescripciÛn"></td>' +
         '<td><input type="number" class="item-price" value="' + (data.unit_price || data.price || 0) + '" step="0.01" min="0" oninput="calculateQuoteRow(\'' + rowId + '\')"></td>' +
         '<td><input type="number" class="item-discount" value="' + (data.discount || 0) + '" step="0.01" min="0" max="100" oninput="calculateQuoteRow(\'' + rowId + '\')"></td>' +
         '<td><select class="item-tax" onchange="calculateQuoteRow(\'' + rowId + '\')">' + taxOpts + '</select></td>' +
@@ -410,7 +389,7 @@ await Promise.all([loadCustomers(), loadItems(), loadTaxes()]);
 
     async function saveQuote(e) {
       e.preventDefault();
-      await submitQuote('sent', 'Cotizaci√≥n enviada exitosamente');
+      await submitQuote('sent', 'CotizaciÛn enviada exitosamente');
     }
 
     async function saveQuoteDraft() {
@@ -425,7 +404,7 @@ await Promise.all([loadCustomers(), loadItems(), loadTaxes()]);
       }
       const rows = document.querySelectorAll('#quote-items-body tr');
       if (rows.length === 0) {
-        APP.showMessage('Debes agregar al menos un art√≠culo', 'error');
+        APP.showMessage('Debes agregar al menos un artÌculo', 'error');
         return;
       }
       const itemsData = [];
@@ -481,7 +460,7 @@ await Promise.all([loadCustomers(), loadItems(), loadTaxes()]);
         document.querySelector('.modal-overlay').remove();
         loadQuotes(currentPage);
       } catch (e) {
-        APP.showMessage('Error al guardar la cotizaci√≥n', 'error');
+        APP.showMessage('Error al guardar la cotizaciÛn', 'error');
         if (btn) { btn.disabled = false; btn.textContent = editingQuoteId ? 'Guardar Cambios' : (status === 'sent' ? 'Guardar y Enviar' : 'Guardar Borrador'); }
       }
     }
@@ -504,14 +483,14 @@ await Promise.all([loadCustomers(), loadItems(), loadTaxes()]);
         const items = data.items || [];
         let itemsHtml = '';
         if (items.length > 0) {
-          itemsHtml = '<table class="items-table" style="margin:.5em 0"><thead><tr><th data-i18n="th_description">Descripci√≥n</th><th data-i18n="th_qty">Cant</th><th data-i18n="th_price">Precio</th><th data-i18n="th_total">Total</th></tr></thead><tbody>' +
+          itemsHtml = '<table class="items-table" style="margin:.5em 0"><thead><tr><th data-i18n="th_description">DescripciÛn</th><th data-i18n="th_qty">Cant</th><th data-i18n="th_price">Precio</th><th data-i18n="th_total">Total</th></tr></thead><tbody>' +
             items.map(item => '<tr><td>' + APP.esc(item.description || item.name || '') + '</td><td>' + APP.esc(item.quantity || 1) + '</td><td>' + APP.formatMoney(item.price || 0) + '</td><td>' + APP.formatMoney((item.price || 0) * (item.quantity || 1)) + '</td></tr>').join('') +
           '</tbody></table>';
         }
         const html =
           '<div class="modal-content">' +
             '<button class="modal-close" onclick="this.closest(\'div[style]\').remove()">&times;</button>' +
-            '<h2>' + APP.t('lbl_quote', 'Cotizaci√≥n') + ' ' + APP.esc(data.quote_number || data.number || id) + '</h2>' +
+            '<h2>' + APP.t('lbl_quote', 'CotizaciÛn') + ' ' + APP.esc(data.quote_number || data.number || id) + '</h2>' +
             '<div style="margin-bottom:1em">' +
               '<p><strong data-i18n="th_customer">Cliente:</strong> ' + APP.esc(data.customer_name || data.customer || '-') + '</p>' +
               '<p><strong data-i18n="th_date">Fecha:</strong> ' + (data.date || data.issue_date || '-') + '</p>' +
@@ -533,38 +512,38 @@ await Promise.all([loadCustomers(), loadItems(), loadTaxes()]);
         document.body.appendChild(overlay);
       } catch (e) {
         console.error('Error loading quote detail', e);
-        APP.showMessage('Error al cargar detalle de la cotizaci√≥n', 'error');
+        APP.showMessage('Error al cargar detalle de la cotizaciÛn', 'error');
       }
     }
 
     async function convertToInvoice(id) {
-      APP.confirm(APP.t('confirm_convert_title', 'Convertir a Factura'), APP.t('confirm_convert_text', '¬øEst√°s seguro de convertir esta cotizaci√≥n en factura? Se crear√° una nueva factura basada en esta cotizaci√≥n.'), async () => {
+      APP.confirm(APP.t('confirm_convert_title', 'Convertir a Factura'), APP.t('confirm_convert_text', 'øEst·s seguro de convertir esta cotizaciÛn en factura? Se crear· una nueva factura basada en esta cotizaciÛn.'), async () => {
         try {
           const resp = await API.post('/api/quotes/' + id + '/convert');
           if (resp.error) {
             APP.showMessage(resp.error, 'error');
           } else {
-            APP.showMessage('Cotizaci√≥n convertida a factura exitosamente', 'success');
+            APP.showMessage('CotizaciÛn convertida a factura exitosamente', 'success');
             loadQuotes(currentPage);
           }
         } catch (e) {
-          APP.showMessage('Error al convertir la cotizaci√≥n', 'error');
+          APP.showMessage('Error al convertir la cotizaciÛn', 'error');
         }
       });
     }
 
     function deleteQuote(id) {
-      APP.confirm(APP.t('confirm_delete_title', 'Eliminar Cotizaci√≥n'), APP.t('confirm_delete_text', '¬øEst√°s seguro de eliminar esta cotizaci√≥n? Esta acci√≥n no se puede deshacer.'), async () => {
+      APP.confirm(APP.t('confirm_delete_title', 'Eliminar CotizaciÛn'), APP.t('confirm_delete_text', 'øEst·s seguro de eliminar esta cotizaciÛn? Esta acciÛn no se puede deshacer.'), async () => {
         try {
           const resp = await API.del('/api/quotes/' + id);
           if (resp.error) {
             APP.showMessage(resp.error, 'error');
           } else {
-            APP.showMessage('Cotizaci√≥n eliminada correctamente', 'success');
+            APP.showMessage('CotizaciÛn eliminada correctamente', 'success');
             loadQuotes(currentPage);
           }
         } catch (e) {
-          APP.showMessage('Error al eliminar la cotizaci√≥n', 'error');
+          APP.showMessage('Error al eliminar la cotizaciÛn', 'error');
         }
       });
     }

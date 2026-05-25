@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -25,33 +25,11 @@
 </head>
 <body>
   <div class="navigation-wrapper" id="sidebar">
-    <nav class="navigation">
-      <div class="sidebar-brand">
-        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-        <span>Smatic</span>
-      </div>
-      <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
-        <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
-        <li class="active"><a href="tools.html"><span class="nav-icon">🔧</span> <span data-i18n="nav_tools">Herramientas</span></a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
-      </ul>
-      <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
-      </div>
-    </nav>
-  </div>
+  <nav id="app-nav" class="navigation"></nav>
+</div>
 
   <div class="header-wrapper">
-    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">?</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
       <span data-i18n="breadcrumb_tools">Smatic - Herramientas</span>
@@ -72,7 +50,7 @@
           <input type="file" id="import-customers-file" accept=".csv,.txt">
           <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-customers-file').click()" data-i18n="btn_select_csv">Seleccionar CSV</button>
         </div>
-        <div class="or-divider" data-i18n="or_paste_json">— o pega JSON —</div>
+        <div class="or-divider" data-i18n="or_paste_json">� o pega JSON �</div>
         <textarea id="import-customers-json" data-i18n-placeholder="placeholder_json_customers" placeholder='[{"name":"Cliente Ejemplo","email":"cliente@ejemplo.com","phone":"123456789"}]'></textarea>
         <div class="import-actions">
           <button onclick="importFromFile('customers')" data-i18n="btn_import_csv">Importar CSV</button>
@@ -88,8 +66,8 @@
           <input type="file" id="import-items-file" accept=".csv,.txt">
           <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-items-file').click()" data-i18n="btn_select_csv">Seleccionar CSV</button>
         </div>
-        <div class="or-divider" data-i18n="or_paste_json">— o pega JSON —</div>
-        <textarea id="import-items-json" data-i18n-placeholder="placeholder_json_items" placeholder='[{"name":"Producto Ej.","price":100,"description":"Descripción"}]'></textarea>
+        <div class="or-divider" data-i18n="or_paste_json">� o pega JSON �</div>
+        <textarea id="import-items-json" data-i18n-placeholder="placeholder_json_items" placeholder='[{"name":"Producto Ej.","price":100,"description":"Descripci�n"}]'></textarea>
         <div class="import-actions">
           <button onclick="importFromFile('items')" data-i18n="btn_import_csv">Importar CSV</button>
           <button class="btn-secondary" onclick="importFromJson('items')" data-i18n="btn_import_json">Importar JSON</button>
@@ -104,7 +82,7 @@
           <input type="file" id="import-invoices-file" accept=".csv,.txt">
           <button class="btn-secondary" style="min-width:auto" onclick="document.getElementById('import-invoices-file').click()" data-i18n="btn_select_csv">Seleccionar CSV</button>
         </div>
-        <div class="or-divider" data-i18n="or_paste_json">— o pega JSON —</div>
+        <div class="or-divider" data-i18n="or_paste_json">� o pega JSON �</div>
         <textarea id="import-invoices-json" data-i18n-placeholder="placeholder_json_invoices" placeholder='[{"customer_name":"Cliente","total":150,"status":"sent","date":"2026-01-15"}]'></textarea>
         <div class="import-actions">
           <button onclick="importFromFile('invoices')" data-i18n="btn_import_csv">Importar CSV</button>
@@ -117,8 +95,8 @@
     <h2 style="color:#555;font-size:1.2em;margin-bottom:.5em" data-i18n="section_export_data">Exportar Datos</h2>
     <div class="card">
       <div class="export-buttons">
-        <button onclick="exportCSV('customers')" data-i18n="btn_export_customers_csv">📥 Exportar Clientes CSV</button>
-        <button onclick="exportCSV('invoices')" data-i18n="btn_export_invoices_csv">📥 Exportar Facturas CSV</button>
+        <button onclick="exportCSV('customers')" data-i18n="btn_export_customers_csv">?? Exportar Clientes CSV</button>
+        <button onclick="exportCSV('invoices')" data-i18n="btn_export_invoices_csv">?? Exportar Facturas CSV</button>
       </div>
     </div>
   </div>
@@ -204,7 +182,7 @@
       const text = await file.text();
       const data = parseCSV(text);
       if (!data.length) {
-        showResult('import-' + type + '-result', false, 'El archivo CSV está vacío o tiene un formato inválido.');
+        showResult('import-' + type + '-result', false, 'El archivo CSV est� vac�o o tiene un formato inv�lido.');
         return;
       }
       await doImport(type, data);
@@ -225,7 +203,7 @@
         }
         await doImport(type, data);
       } catch (e) {
-        showResult('import-' + type + '-result', false, 'JSON inválido: ' + e.message);
+        showResult('import-' + type + '-result', false, 'JSON inv�lido: ' + e.message);
       }
     }
 
@@ -244,7 +222,7 @@
           document.getElementById('import-' + type + '-file').value = '';
         }
       } catch (e) {
-        showResult('import-' + type + '-result', false, 'Error al importar: ' + (e.message || 'Error de conexión'));
+        showResult('import-' + type + '-result', false, 'Error al importar: ' + (e.message || 'Error de conexi�n'));
       }
       if (btn) btn.disabled = false;
     }
@@ -274,9 +252,9 @@
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(link.href);
-        APP.showMessage('Exportación completada.', 'success');
+        APP.showMessage('Exportaci�n completada.', 'success');
       } catch (e) {
-        APP.showMessage('Error al exportar: ' + (e.message || 'Error de conexión'), 'error');
+        APP.showMessage('Error al exportar: ' + (e.message || 'Error de conexi�n'), 'error');
       }
     }
 </script>

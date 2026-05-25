@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -8,32 +8,11 @@
 </head>
 <body>
   <div class="navigation-wrapper" id="sidebar">
-    <nav class="navigation">
-      <div class="sidebar-brand">
-        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-        <span>Smatic</span>
-      </div>
-      <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
-        <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
-        <li class="active"><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
-      </ul>
-      <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
-      </div>
-    </nav>
-  </div>
+  <nav id="app-nav" class="navigation"></nav>
+</div>
 
   <div class="header-wrapper">
-    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">?</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
       <span data-i18n="breadcrumb_items">Smatic - Productos</span>
@@ -60,7 +39,7 @@
           <thead>
             <tr>
               <th data-i18n="th_photo">Foto</th>
-              <th data-i18n="th_code">Código</th>
+              <th data-i18n="th_code">C�digo</th>
               <th data-i18n="th_name">Nombre</th>
               <th data-i18n="th_price">Precio</th>
               <th data-i18n="th_tax">Impuesto</th>
@@ -86,7 +65,7 @@
         <div class="invoice-form">
           <div class="form-row">
             <div>
-              <label data-i18n="lbl_code_required">Código *</label>
+              <label data-i18n="lbl_code_required">C�digo *</label>
               <input type="text" id="fieldCode" required>
             </div>
             <div>
@@ -96,7 +75,7 @@
           </div>
           <div class="form-row">
             <div>
-              <label data-i18n="lbl_description">Descripción</label>
+              <label data-i18n="lbl_description">Descripci�n</label>
               <textarea id="fieldDescription" rows="2"></textarea>
             </div>
           </div>
@@ -153,9 +132,9 @@
               <div id="imagePreview" style="margin-top:5px;max-width:150px"></div>
             </div>
             <div>
-              <label data-i18n="lbl_qr_code">Código QR</label>
+              <label data-i18n="lbl_qr_code">C�digo QR</label>
               <div id="qrPreview" style="margin-top:5px;min-height:80px">
-                <span style="color:#999;font-size:.85em" data-i18n="msg_qr_auto_generated">Se genera automáticamente con el código</span>
+                <span style="color:#999;font-size:.85em" data-i18n="msg_qr_auto_generated">Se genera autom�ticamente con el c�digo</span>
               </div>
               <button type="button" class="btn-secondary" style="font-size:.8em;margin-top:3px" onclick="regenerateQr()" data-i18n="btn_regenerate_qr">Regenerar QR</button>
             </div>
@@ -237,7 +216,7 @@ await loadTaxes();
       tbody.innerHTML = list.map(item => {
         const taxName = item.tax_name || item.tax_rate_name || '';
         const imgHtml = item.image_url ? '<img src="' + item.image_url + '" style="width:40px;height:40px;object-fit:cover;border-radius:4px;border:1px solid #eee" alt="foto" onerror="this.style.display=\'none\'">' : '<span style="color:#ccc">-</span>';
-        const qrHtml = item.qr_code ? '<img src="' + item.qr_code + '" style="width:30px;height:30px;cursor:pointer" alt="QR" title="Código QR" onclick="window.open(this.src)" onerror="this.style.display=\'none\'">' : '<span style="color:#ccc">-</span>';
+        const qrHtml = item.qr_code ? '<img src="' + item.qr_code + '" style="width:30px;height:30px;cursor:pointer" alt="QR" title="C�digo QR" onclick="window.open(this.src)" onerror="this.style.display=\'none\'">' : '<span style="color:#ccc">-</span>';
         return '<tr>' +
           '<td style="text-align:center;vertical-align:middle">' + imgHtml + '</td>' +
           '<td>' + APP.esc(item.code || '-') + '</td>' +
@@ -245,7 +224,7 @@ await loadTaxes();
           '<td>' + APP.formatMoney(item.price) + '</td>' +
           '<td>' + APP.esc(taxName) + '</td>' +
           '<td>' + (item.track_inventory ? (item.stock_quantity != null ? item.stock_quantity : '-') : '-') + '</td>' +
-          '<td>' + (item.active !== false ? 'Sí' : 'No') + '</td>' +
+          '<td>' + (item.active !== false ? 'S�' : 'No') + '</td>' +
           '<td>' +
             '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="openEditModal(\'' + item.id + '\')" data-i18n="btn_edit">Editar</button> ' +
             '<button class="btn-danger" style="min-width:auto;font-size:.85em" onclick="deleteItem(\'' + item.id + '\',\'' + APP.esc(item.name).replace(/'/g, "\\'") + '\')" data-i18n="btn_delete">Eliminar</button>' +
@@ -264,7 +243,7 @@ await loadTaxes();
       document.getElementById('fieldActive').checked = true;
       document.getElementById('fieldImage').value = '';
       document.getElementById('imagePreview').innerHTML = '';
-      document.getElementById('qrPreview').innerHTML = '<span style="color:#999;font-size:.85em" data-i18n="msg_qr_saved_with_code">Se genera al guardar con el código</span>';
+      document.getElementById('qrPreview').innerHTML = '<span style="color:#999;font-size:.85em" data-i18n="msg_qr_saved_with_code">Se genera al guardar con el c�digo</span>';
       document.getElementById('itemModal').style.display = 'flex';
     }
 
@@ -286,7 +265,7 @@ await loadTaxes();
       document.getElementById('fieldActive').checked = item.active !== false;
       document.getElementById('fieldImage').value = '';
       document.getElementById('imagePreview').innerHTML = item.image_url ? '<img src="' + item.image_url + '" style="max-width:150px;max-height:120px;border:1px solid #eee;border-radius:4px" onerror="this.style.display=\'none\'"><br><button type="button" class="btn-danger" style="font-size:.75em;margin-top:2px" onclick="deleteImage(\'' + item.id + '\',this)" data-i18n="btn_delete_photo">Eliminar foto</button>' : '';
-      document.getElementById('qrPreview').innerHTML = item.qr_code ? '<img src="' + item.qr_code + '" style="width:80px;height:80px;border:1px solid #eee" onerror="this.style.display=\'none\'">' : '<span style="color:#999;font-size:.85em" data-i18n="msg_qr_saved_with_code">Se genera al guardar con el código</span>';
+      document.getElementById('qrPreview').innerHTML = item.qr_code ? '<img src="' + item.qr_code + '" style="width:80px;height:80px;border:1px solid #eee" onerror="this.style.display=\'none\'">' : '<span style="color:#999;font-size:.85em" data-i18n="msg_qr_saved_with_code">Se genera al guardar con el c�digo</span>';
       document.getElementById('itemModal').style.display = 'flex';
     }
 
@@ -341,7 +320,7 @@ await loadTaxes();
         track_inventory: document.getElementById('fieldTrackInventory').checked,
         active: document.getElementById('fieldActive').checked
       };
-      if (!code) { APP.showMessage('El código del producto es obligatorio', 'error'); return; }
+      if (!code) { APP.showMessage('El c�digo del producto es obligatorio', 'error'); return; }
       if (!data.name) { APP.showMessage('El nombre del producto es obligatorio', 'error'); return; }
       try {
         let savedId = id;
@@ -367,7 +346,7 @@ await loadTaxes();
     }
 
     function deleteItem(id, name) {
-      APP.confirm('Eliminar Producto', '¿Estás seguro de eliminar "' + name + '"? Esta acción no se puede deshacer.', async () => {
+      APP.confirm('Eliminar Producto', '�Est�s seguro de eliminar "' + name + '"? Esta acci�n no se puede deshacer.', async () => {
         try {
           await API.del('/api/items/' + id);
           APP.showMessage('Producto eliminado correctamente', 'success');

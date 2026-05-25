@@ -1,48 +1,27 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="page_title_settings">ConfiguraciÃ³n | Smatic</title>
+  <title data-i18n="page_title_settings">Configuración | Smatic</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
   <div class="navigation-wrapper" id="sidebar">
-    <nav class="navigation">
-      <div class="sidebar-brand">
-        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-        <span>Smatic</span>
-      </div>
-      <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">ğŸ“Š</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
-        <li><a href="customers.html"><span class="nav-icon">ğŸ‘¥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
-        <li><a href="invoices.html"><span class="nav-icon">ğŸ“„</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
-        <li><a href="quotes.html"><span class="nav-icon">ğŸ“</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">ğŸ“’</span> <span data-i18n="nav_credit_notes">Notas de CrÃ©dito</span></a></li>
-        <li><a href="payments.html"><span class="nav-icon">ğŸ’³</span> <span data-i18n="nav_payments">Pagos</span></a></li>
-        <li><a href="refunds.html"><span class="nav-icon">ğŸ’¸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
-        <li><a href="items.html"><span class="nav-icon">ğŸ“¦</span> <span data-i18n="nav_items">Productos</span></a></li>
-        <li><a href="reports.html"><span class="nav-icon">ğŸ“ˆ</span> <span data-i18n="nav_reports">Reportes</span></a></li>
-        <li class="active"><a href="settings.html"><span class="nav-icon">âš™ï¸</span> <span data-i18n="nav_settings">ConfiguraciÃ³n</span></a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">âš¡</span> <span data-i18n="nav_admin">AdministraciÃ³n</span></a></li>
-      </ul>
-      <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">ğŸšª <span data-i18n="nav_logout">Cerrar SesiÃ³n</span></a>
-      </div>
-    </nav>
-  </div>
+  <nav id="app-nav" class="navigation"></nav>
+</div>
 
   <div class="header-wrapper">
-    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">â˜°</div>
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">?</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-      <span data-i18n="breadcrumb_settings">Smatic - ConfiguraciÃ³n</span>
+      <span data-i18n="breadcrumb_settings">Smatic - Configuración</span>
     </div>
   </div>
 
   <div class="container" id="main-content">
     <div class="page-header">
-      <h1 data-i18n="page_title_settings">ConfiguraciÃ³n</h1>
+      <h1 data-i18n="page_title_settings">Configuración</h1>
       <div class="actions">
         <button onclick="saveSettings()" data-i18n="btn_save_changes">Guardar Cambios</button>
       </div>
@@ -56,18 +35,18 @@
 
     <div id="tab-business" class="tab-content">
       <div class="card">
-        <div class="card-header" data-i18n="card_business_info">InformaciÃ³n de la Empresa</div>
+        <div class="card-header" data-i18n="card_business_info">Información de la Empresa</div>
         <div class="settings-grid">
           <div>
             <label data-i18n="lbl_business_name">Nombre de la Empresa</label>
             <input type="text" id="fieldBusinessName">
           </div>
           <div>
-            <label data-i18n="lbl_address">DirecciÃ³n</label>
+            <label data-i18n="lbl_address">Dirección</label>
             <textarea id="fieldBusinessAddress" rows="2"></textarea>
           </div>
           <div>
-            <label data-i18n="lbl_phone">TelÃ©fono</label>
+            <label data-i18n="lbl_phone">Teléfono</label>
             <input type="text" id="fieldBusinessPhone">
           </div>
           <div>
@@ -81,7 +60,7 @@
           <div>
             <label data-i18n="lbl_currency">Moneda</label>
             <select id="fieldCurrency">
-              <option value="USD">USD - DÃ³lar</option>
+              <option value="USD">USD - Dólar</option>
               <option value="EUR">EUR - Euro</option>
               <option value="MXN">MXN - Peso Mexicano</option>
               <option value="COP">COP - Peso Colombiano</option>
@@ -91,7 +70,7 @@
           <div>
             <label data-i18n="lbl_language">Idioma</label>
             <select id="fieldLanguage">
-              <option value="es">EspaÃ±ol</option>
+              <option value="es">Español</option>
               <option value="en">English</option>
             </select>
           </div>
@@ -140,9 +119,9 @@
           <div>
             <label data-i18n="lbl_interface_language">Idioma de la interfaz</label>
             <select id="fieldUserLanguage">
-              <option value="es">EspaÃ±ol</option>
+              <option value="es">Español</option>
               <option value="en">English</option>
-              <option value="fr">FranÃ§ais</option>
+              <option value="fr">Français</option>
             </select>
           </div>
         </div>
@@ -159,21 +138,21 @@
             <input type="text" id="fieldQuotePrefix" data-i18n-placeholder="placeholder_quote_prefix" placeholder="ej: COT-">
           </div>
           <div>
-            <label data-i18n="lbl_credit_note_prefix">Prefijo de Notas de CrÃ©dito</label>
+            <label data-i18n="lbl_credit_note_prefix">Prefijo de Notas de Crédito</label>
             <input type="text" id="fieldCreditNotePrefix" data-i18n-placeholder="placeholder_credit_note_prefix" placeholder="ej: CN-">
           </div>
           <div>
-            <label data-i18n="lbl_payment_terms">TÃ©rminos de Pago (dÃ­as)</label>
+            <label data-i18n="lbl_payment_terms">Términos de Pago (días)</label>
             <select id="fieldPaymentTerms">
               <option value="0" data-i18n="payment_term_cash">Contado</option>
-              <option value="15" data-i18n="payment_term_15_days">15 DÃ­as</option>
-              <option value="30" data-i18n="payment_term_30_days">30 DÃ­as</option>
-              <option value="60" data-i18n="payment_term_60_days">60 DÃ­as</option>
-              <option value="90" data-i18n="payment_term_90_days">90 DÃ­as</option>
+              <option value="15" data-i18n="payment_term_15_days">15 Días</option>
+              <option value="30" data-i18n="payment_term_30_days">30 Días</option>
+              <option value="60" data-i18n="payment_term_60_days">60 Días</option>
+              <option value="90" data-i18n="payment_term_90_days">90 Días</option>
             </select>
           </div>
           <div>
-            <label data-i18n="lbl_fiscal_year_start">Inicio del AÃ±o Fiscal</label>
+            <label data-i18n="lbl_fiscal_year_start">Inicio del Año Fiscal</label>
             <input type="text" id="fieldFiscalYearStart" data-i18n-placeholder="placeholder_fiscal_year_start" placeholder="ej: 01-01">
           </div>
         </div>
@@ -350,10 +329,10 @@ await loadSettings();
       try {
         await API.put('/api/settings', data);
         await saveUserPreferences();
-        APP.showMessage('ConfiguraciÃ³n guardada correctamente', 'success');
+        APP.showMessage('Configuración guardada correctamente', 'success');
         APP.settings = data;
       } catch (e) {
-        APP.showMessage('Error al guardar la configuraciÃ³n', 'error');
+        APP.showMessage('Error al guardar la configuración', 'error');
         console.error(e);
       }
     }
@@ -379,8 +358,8 @@ await loadSettings();
         return '<tr>' +
           '<td>' + APP.esc(t.name) + '</td>' +
           '<td>' + (t.rate || 0) + '%</td>' +
-          '<td>' + (t.is_compound ? 'SÃ­' : 'No') + '</td>' +
-          '<td>' + (t.is_default ? 'SÃ­' : 'No') + '</td>' +
+          '<td>' + (t.is_compound ? 'Sí' : 'No') + '</td>' +
+          '<td>' + (t.is_default ? 'Sí' : 'No') + '</td>' +
           '<td>' +
             '<button class="btn-secondary" style="min-width:auto;font-size:.85em" onclick="openTaxEdit(\'' + t.id + '\')" data-i18n="btn_edit">Editar</button> ' +
             '<button class="btn-danger" style="min-width:auto;font-size:.85em" onclick="deleteTax(\'' + t.id + '\',\'' + APP.esc(t.name).replace(/'/g, "\\'") + '\')" data-i18n="btn_delete">Eliminar</button>' +
@@ -440,7 +419,7 @@ await loadSettings();
     }
 
     function deleteTax(id, name) {
-      APP.confirm('Eliminar Impuesto', 'Â¿EstÃ¡s seguro de eliminar el impuesto "' + name + '"? Esta acciÃ³n no se puede deshacer.', async () => {
+      APP.confirm('Eliminar Impuesto', '¿Estás seguro de eliminar el impuesto "' + name + '"? Esta acción no se puede deshacer.', async () => {
         try {
           await API.del('/api/settings/taxes/' + id);
           APP.showMessage('Impuesto eliminado correctamente', 'success');

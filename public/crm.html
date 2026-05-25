@@ -19,23 +19,9 @@
 </style>
 </head>
 <body>
-<div class="navigation-wrapper"><nav class="navigation">
-<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
-<ul>
-<li><a href="dashboard.html">📊 Panel Principal</a></li>
-<li><a href="customers.html">👥 Clientes</a></li>
-<li><a href="invoices.html">📄 Facturas</a></li>
-<li><a href="quotes.html">📝 Cotizaciones</a></li>
-<li><a href="credit-notes.html">📒 Notas de Crédito</a></li>
-<li><a href="payments.html">💳 Pagos</a></li>
-<li><a href="refunds.html">💸 Reembolsos</a></li>
-<li><a href="items.html">📦 Productos</a></li>
-<li><a href="reports.html">📈 Reportes</a></li>
-<li><a href="settings.html">⚙️ Configuración</a></li>
-<li id="admin-nav-link" class="hidden"><a href="admin.html">⚡ Administración</a></li>
-</ul>
-<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a></div>
-</nav></div>
+<div class="navigation-wrapper" id="sidebar">
+  <nav id="app-nav" class="navigation"></nav>
+</div>
 <div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic - CRM</span></div></div>
 <div class="container">
 <div class="page-header"><h1>CRM</h1><div class="actions">

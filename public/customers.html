@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -8,32 +8,11 @@
 </head>
 <body>
   <div class="navigation-wrapper" id="sidebar">
-    <nav class="navigation">
-      <div class="sidebar-brand">
-        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-        <span>Smatic</span>
-      </div>
-      <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
-        <li class="active"><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
-        <li><a href="quotes.html"><span class="nav-icon">📝</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span data-i18n="nav_credit_notes">Notas de Crédito</span></a></li>
-        <li><a href="payments.html"><span class="nav-icon">💳</span> <span data-i18n="nav_payments">Pagos</span></a></li>
-        <li><a href="refunds.html"><span class="nav-icon">💸</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
-        <li><a href="items.html"><span class="nav-icon">📦</span> <span data-i18n="nav_items">Productos</span></a></li>
-        <li><a href="reports.html"><span class="nav-icon">📈</span> <span data-i18n="nav_reports">Reportes</span></a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
-      </ul>
-      <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a>
-      </div>
-    </nav>
-  </div>
+  <nav id="app-nav" class="navigation"></nav>
+</div>
 
   <div class="header-wrapper">
-    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">?</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
       <span data-i18n="breadcrumb_customers">Smatic - Clientes</span>
@@ -64,7 +43,7 @@
             <tr>
               <th data-i18n="th_name">Nombre</th>
               <th data-i18n="th_email">Email</th>
-              <th data-i18n="th_phone">Teléfono</th>
+              <th data-i18n="th_phone">Tel�fono</th>
               <th data-i18n="th_group">Grupo</th>
               <th data-i18n="th_actions">Acciones</th>
             </tr>
@@ -96,7 +75,7 @@
           </div>
           <div class="form-row">
             <div>
-              <label data-i18n="lbl_phone">Teléfono</label>
+              <label data-i18n="lbl_phone">Tel�fono</label>
               <input type="text" id="fieldPhone">
             </div>
             <div>
@@ -106,11 +85,11 @@
           </div>
           <div class="form-row">
             <div>
-              <label data-i18n="lbl_billing_address">Dirección de Facturación</label>
+              <label data-i18n="lbl_billing_address">Direcci�n de Facturaci�n</label>
               <textarea id="fieldBillingAddress" rows="2"></textarea>
             </div>
             <div>
-              <label data-i18n="lbl_shipping_address">Dirección de Envío</label>
+              <label data-i18n="lbl_shipping_address">Direcci�n de Env�o</label>
               <textarea id="fieldShippingAddress" rows="2"></textarea>
             </div>
           </div>
@@ -121,13 +100,13 @@
               <datalist id="groupList"></datalist>
             </div>
             <div>
-              <label data-i18n="lbl_payment_terms">Términos de Pago</label>
+              <label data-i18n="lbl_payment_terms">T�rminos de Pago</label>
               <select id="fieldPaymentTerms">
                 <option value="0" data-i18n="payment_term_cash">Contado</option>
-                <option value="15" data-i18n="payment_term_15_days">15 Días</option>
-                <option value="30" selected data-i18n="payment_term_30_days">30 Días</option>
-                <option value="60" data-i18n="payment_term_60_days">60 Días</option>
-                <option value="90" data-i18n="payment_term_90_days">90 Días</option>
+                <option value="15" data-i18n="payment_term_15_days">15 D�as</option>
+                <option value="30" selected data-i18n="payment_term_30_days">30 D�as</option>
+                <option value="60" data-i18n="payment_term_60_days">60 D�as</option>
+                <option value="90" data-i18n="payment_term_90_days">90 D�as</option>
               </select>
             </div>
           </div>
@@ -207,7 +186,7 @@ loadCustomers();
         return;
       }
       tbody.innerHTML = list.map(c => {
-        const groupLabel = c.group_name ? APP.esc(c.group_name) : '<span style="color:#999">—</span>';
+        const groupLabel = c.group_name ? APP.esc(c.group_name) : '<span style="color:#999">�</span>';
         return '<tr>' +
           '<td><a href="#" onclick="openEditModal(\'' + c.id + '\')">' + APP.esc(c.name) + '</a></td>' +
           '<td>' + APP.esc(c.email || '') + '</td>' +
@@ -282,7 +261,7 @@ loadCustomers();
     }
 
     function deleteCustomer(id, name) {
-      APP.confirm('Eliminar Cliente', '¿Estás seguro de eliminar a "' + name + '"? Esta acción no se puede deshacer.', async () => {
+      APP.confirm('Eliminar Cliente', '�Est�s seguro de eliminar a "' + name + '"? Esta acci�n no se puede deshacer.', async () => {
         try {
           await API.del('/api/customers/' + id);
           APP.showMessage('Cliente eliminado correctamente', 'success');

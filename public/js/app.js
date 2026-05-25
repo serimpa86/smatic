@@ -23,7 +23,7 @@ const APP = {
     await this.loadLang();
     this.initNavigation();
     this.mobileSidebar();
-    this.injectModuleNav();
+    this.renderNav();
     this.renderCompanyInfo();
   },
 
@@ -41,100 +41,110 @@ const APP = {
     el.textContent = this.currentUser.company.name;
   },
 
-  injectModuleNav() {
-    const navList = document.querySelector('.navigation ul');
-    if (!navList) return;
-    if (document.querySelector('.nav-module-injected')) return;
-    const modules = [
+  renderNav() {
+    const nav = document.querySelector('#app-nav');
+    if (!nav) return;
+
+    const groups = [
       {
+        label: null, module: null,
+        items: [
+          ['dashboard.html', '📊', 'nav_dashboard', 'Panel Principal'],
+          ['reports.html', '📈', 'nav_reports', 'Reportes'],
+          ['tools.html', '🔧', 'nav_tools', 'Herramientas'],
+          ['settings.html', '⚙️', 'nav_settings', 'Configuración'],
+          ['admin.html', '⚡', 'nav_admin', 'Administración', 'admin'],
+        ]
+      },
+      {
+        label: 'nav_sales', module: 'invoices',
+        items: [
+          ['customers.html', '👥', 'nav_customers', 'Clientes'],
+          ['invoices.html', '📄', 'nav_invoices', 'Facturas'],
+          ['quotes.html', '📝', 'nav_quotes', 'Cotizaciones'],
+          ['credit-notes.html', '📒', 'nav_credit_notes', 'Notas de Crédito'],
+          ['payments.html', '💳', 'nav_payments', 'Pagos'],
+          ['refunds.html', '💸', 'nav_refunds', 'Reembolsos'],
+          ['items.html', '📦', 'nav_items', 'Productos'],
+        ]
+      },
+      {
+        label: 'nav_accounting', module: 'accounting',
         items: [
           ['chart-of-accounts.html', '📋', 'nav_chart_of_accounts', 'Plan de Cuentas'],
           ['journal.html', '📓', 'nav_journal', 'Libro Diario'],
           ['accounting-reports.html', '📊', 'nav_accounting_reports', 'Informes Contables'],
-        ],
-        module: 'accounting',
-        className: 'nav-accounting-injected',
-        before: 'li a[href="reports.html"]'
+        ]
       },
       {
+        label: 'nav_stock', module: 'stock',
         items: [
           ['warehouses.html', '🏭', 'nav_warehouses', 'Depósitos'],
           ['stock-movements.html', '📦', 'nav_stock_movements', 'Movimientos'],
           ['stock-report.html', '📊', 'nav_stock_report', 'Informe de Stock'],
-        ],
-        module: 'stock',
-        className: 'nav-stock-injected',
-        before: 'li a[href="reports.html"]'
+        ]
       },
       {
+        label: 'nav_purchases', module: 'purchases',
         items: [
           ['suppliers.html', '🏢', 'nav_suppliers', 'Proveedores'],
           ['purchases.html', '🛒', 'nav_purchases', 'Órdenes de Compra'],
-        ],
-        module: 'purchases',
-        className: 'nav-purchases-injected',
-        before: 'li a[href="reports.html"]'
+        ]
       },
       {
+        label: 'nav_hr', module: 'hr',
         items: [
           ['employees.html', '👔', 'nav_employees', 'Empleados'],
           ['payroll.html', '💰', 'nav_payroll', 'Recibos de Sueldo'],
-        ],
-        module: 'hr',
-        className: 'nav-hr-injected',
-        before: 'li a[href="reports.html"]'
+        ]
       },
       {
+        label: 'nav_crm', module: 'crm',
         items: [
           ['crm.html', '👥', 'nav_crm', 'CRM'],
-        ],
-        module: 'crm',
-        className: 'nav-crm-injected',
-        before: 'li a[href="reports.html"]'
+        ]
       },
       {
+        label: 'nav_pos', module: 'pos',
         items: [
           ['pos.html', '🛒', 'nav_pos', 'Punto de Venta'],
-        ],
-        module: 'pos',
-        className: 'nav-pos-injected',
-        before: 'li a[href="reports.html"]'
+        ]
       },
       {
+        label: 'nav_projects', module: 'projects',
         items: [
           ['projects.html', '📋', 'nav_projects', 'Proyectos'],
-        ],
-        module: 'projects',
-        className: 'nav-projects-injected',
-        before: 'li a[href="reports.html"]'
+        ]
       },
       {
+        label: 'nav_modules', module: 'vertical',
         items: [
           ['modules.html', '🧩', 'nav_modules', 'Módulos'],
-        ],
-        module: 'vertical',
-        className: 'nav-modules-injected',
-        before: 'li a[href="reports.html"]'
+        ]
       }
     ];
-    for (const group of modules) {
-      const refLi = navList.querySelector(group.before);
-      const refNode = refLi ? refLi.closest('li') : null;
-      for (const [href, icon, i18n, text] of group.items) {
-        const li = document.createElement('li');
-        li.className = group.className + ' nav-item';
-        li.setAttribute('data-module', group.module);
-        const isActive = window.location.pathname.includes('/' + href.split('/').pop().split('.')[0]) ||
-                         window.location.pathname.endsWith('/' + href);
-        if (isActive) li.classList.add('active');
-        li.innerHTML = '<a href="' + href + '"><span class="nav-icon">' + icon + '</span> <span data-i18n="' + i18n + '">' + text + '</span></a>';
-        if (refNode && refNode.parentNode) {
-          refNode.parentNode.insertBefore(li, refNode);
-        } else {
-          navList.appendChild(li);
-        }
+
+    const path = window.location.pathname;
+    let html = '<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display=\'none\'"><span>Smatic</span></div><ul>';
+
+    for (const group of groups) {
+      if (group.label) {
+        html += '<li class="nav-header" data-i18n="' + group.label + '">' + group.label + '</li>';
+      }
+      for (const item of group.items) {
+        const href = item[0], icon = item[1], i18n = item[2], text = item[3], role = item[4];
+        const isActive = path.includes('/' + href.replace('.html', '')) || path.endsWith('/' + href);
+        const mod = group.module || '';
+        const cls = 'nav-item' + (isActive ? ' active' : '') + (role ? ' hidden' : '');
+        html += '<li class="' + cls + '" data-module="' + mod + '"' + (role ? ' data-role="' + role + '"' : '') + '>';
+        html += '<a href="' + href + '"><span class="nav-icon">' + icon + '</span> <span data-i18n="' + i18n + '">' + text + '</span></a>';
+        html += '</li>';
       }
     }
+
+    html += '</ul><div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a></div>';
+    nav.innerHTML = html;
+    this.applyModuleVisibility();
     if (this.lang && Object.keys(this.lang).length > 0) this.applyLanguage();
   },
 
@@ -144,10 +154,12 @@ const APP = {
     if (!sidebar || !hamburger) return;
     hamburger.onclick = (e) => {
       e.stopPropagation();
+      sidebar.style.display = '';
       sidebar.classList.toggle('open');
     };
     document.addEventListener('click', (e) => {
       if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+        sidebar.style.display = '';
         sidebar.classList.remove('open');
       }
     });

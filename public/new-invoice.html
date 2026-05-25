@@ -1,4 +1,4 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -81,33 +81,11 @@
 </head>
 <body>
   <div class="navigation-wrapper" id="sidebar">
-    <nav class="navigation">
-      <div class="sidebar-brand">
-        <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
-        <span>Smatic</span>
-      </div>
-      <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">üìä</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
-        <li><a href="customers.html"><span class="nav-icon">üë•</span> <span data-i18n="nav_customers">Clientes</span></a></li>
-        <li class="active"><a href="new-invoice.html"><span class="nav-icon">üìÑ</span> <span data-i18n="nav_new_invoice">Nueva Factura</span></a></li>
-        <li><a href="invoices.html"><span class="nav-icon">üìã</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
-        <li><a href="quotes.html"><span class="nav-icon">üìù</span> <span data-i18n="nav_quotes">Cotizaciones</span></a></li>
-        <li><a href="credit-notes.html"><span class="nav-icon">üìí</span> <span data-i18n="nav_credit_notes">Notas de Cr√©dito</span></a></li>
-        <li><a href="payments.html"><span class="nav-icon">üí≥</span> <span data-i18n="nav_payments">Pagos</span></a></li>
-        <li><a href="refunds.html"><span class="nav-icon">üí∏</span> <span data-i18n="nav_refunds">Reembolsos</span></a></li>
-        <li><a href="items.html"><span class="nav-icon">üì¶</span> <span data-i18n="nav_items">Productos</span></a></li>
-        <li><a href="reports.html"><span class="nav-icon">üìà</span> <span data-i18n="nav_reports">Reportes</span></a></li>
-        <li><a href="settings.html"><span class="nav-icon">‚öôÔ∏è</span> <span data-i18n="nav_settings">Configuraci√≥n</span></a></li>
-        <li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">‚ö°</span> <span data-i18n="nav_admin">Administraci√≥n</span></a></li>
-      </ul>
-      <div class="sidebar-bottom">
-        <a href="#" onclick="API.logout()">üö™ <span data-i18n="nav_logout">Cerrar Sesi√≥n</span></a>
-      </div>
-    </nav>
-  </div>
+  <nav id="app-nav" class="navigation"></nav>
+</div>
 
   <div class="header-wrapper">
-    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">‚ò∞</div>
+    <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">?</div>
     <div class="breadcrumbs">
       <img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'">
       <span data-i18n="breadcrumb_new_invoice">Smatic - Nueva Factura</span>
@@ -136,18 +114,18 @@
             <input type="date" id="date">
           </div>
           <div>
-            <label for="invoice-number" data-i18n="lbl_invoice_number">N¬∞ Factura</label>
+            <label for="invoice-number" data-i18n="lbl_invoice_number">N∞ Factura</label>
             <input type="text" id="invoice-number" readonly>
           </div>
         </div>
         <div class="form-row">
           <div>
-            <label for="payment-terms" data-i18n="lbl_payment_terms">T√©rminos de Pago</label>
-            <input type="text" id="payment-terms" data-i18n-placeholder="placeholder_payment_terms" placeholder="Ej: 30 d√≠as">
+            <label for="payment-terms" data-i18n="lbl_payment_terms">TÈrminos de Pago</label>
+            <input type="text" id="payment-terms" data-i18n-placeholder="placeholder_payment_terms" placeholder="Ej: 30 dÌas">
           </div>
           <div>
             <label for="po-number" data-i18n="lbl_po_number">Orden de Compra #</label>
-            <input type="text" id="po-number" data-i18n-placeholder="placeholder_po_number" placeholder="N¬∞ de orden de compra">
+            <input type="text" id="po-number" data-i18n-placeholder="placeholder_po_number" placeholder="N∞ de orden de compra">
           </div>
           <div>
             <label for="salesperson" data-i18n="lbl_salesperson">Vendedor</label>
@@ -156,12 +134,12 @@
         </div>
         <div class="form-row">
           <div>
-            <label for="billing-address" data-i18n="lbl_billing_address">Direcci√≥n de Facturaci√≥n</label>
-            <textarea id="billing-address" data-i18n-placeholder="placeholder_billing_address" placeholder="Direcci√≥n de facturaci√≥n del cliente"></textarea>
+            <label for="billing-address" data-i18n="lbl_billing_address">DirecciÛn de FacturaciÛn</label>
+            <textarea id="billing-address" data-i18n-placeholder="placeholder_billing_address" placeholder="DirecciÛn de facturaciÛn del cliente"></textarea>
           </div>
           <div>
-            <label for="shipping-address" data-i18n="lbl_shipping_address">Direcci√≥n de Env√≠o</label>
-            <textarea id="shipping-address" data-i18n-placeholder="placeholder_shipping_address" placeholder="Direcci√≥n de env√≠o del cliente"></textarea>
+            <label for="shipping-address" data-i18n="lbl_shipping_address">DirecciÛn de EnvÌo</label>
+            <textarea id="shipping-address" data-i18n-placeholder="placeholder_shipping_address" placeholder="DirecciÛn de envÌo del cliente"></textarea>
           </div>
         </div>
         <button type="button" class="btn btn-secondary" onclick="toggleExtraFields()" style="min-width:auto;margin-top:.5em;font-size:.9em" data-i18n="btn_add_extra_fields">+ Agregar Campos Adicionales</button>
@@ -173,7 +151,7 @@
           <div>
             <label for="currency" data-i18n="lbl_currency">Moneda</label>
             <select id="currency">
-              <option value="USD">USD - D√≥lar</option>
+              <option value="USD">USD - DÛlar</option>
               <option value="EUR">EUR - Euro</option>
               <option value="MXN">MXN - Peso Mexicano</option>
               <option value="COP">COP - Peso Colombiano</option>
@@ -182,25 +160,25 @@
             </select>
           </div>
           <div>
-            <label for="shipping-cost" data-i18n="lbl_shipping_cost">Costo de Env√≠o</label>
+            <label for="shipping-cost" data-i18n="lbl_shipping_cost">Costo de EnvÌo</label>
             <input type="number" id="shipping-cost" step="0.01" min="0" value="0" oninput="calculateTotals()">
           </div>
           <div>
-            <label for="shipping-tax" data-i18n="lbl_shipping_tax">Impuesto de Env√≠o</label>
+            <label for="shipping-tax" data-i18n="lbl_shipping_tax">Impuesto de EnvÌo</label>
             <input type="number" id="shipping-tax" step="0.01" min="0" value="0" oninput="calculateTotals()">
           </div>
         </div>
       </div>
 
       <div class="form-section">
-        <div class="form-section-title" data-i18n="section_items">Art√≠culos</div>
+        <div class="form-section-title" data-i18n="section_items">ArtÌculos</div>
         <div class="scroll-table">
           <table class="items-table" id="items-table">
             <thead>
               <tr>
                 <th style="width:5em" data-i18n="th_qty">Cantidad</th>
-                <th style="width:8em" data-i18n="th_code">C√≥digo</th>
-                <th style="min-width:12em" data-i18n="th_description">Descripci√≥n</th>
+                <th style="width:8em" data-i18n="th_code">CÛdigo</th>
+                <th style="min-width:12em" data-i18n="th_description">DescripciÛn</th>
                 <th style="width:9em" data-i18n="th_unit_price">Precio Unitario</th>
                 <th style="width:7em" data-i18n="th_discount_pct">Descuento %</th>
                 <th style="width:9em" data-i18n="th_tax">Impuesto</th>
@@ -211,14 +189,14 @@
             <tbody id="items-body"></tbody>
           </table>
         </div>
-        <button type="button" class="btn btn-secondary" onclick="addItem()" style="margin-top:.5em;min-width:auto" data-i18n="btn_add_item">+ Agregar Art√≠culo</button>
+        <button type="button" class="btn btn-secondary" onclick="addItem()" style="margin-top:.5em;min-width:auto" data-i18n="btn_add_item">+ Agregar ArtÌculo</button>
       </div>
 
       <div class="form-section">
         <div class="form-section-title" data-i18n="section_notes">Notas</div>
         <div class="notes-grid">
           <div>
-            <label for="public-note" data-i18n="lbl_public_note">Nota P√∫blica</label>
+            <label for="public-note" data-i18n="lbl_public_note">Nota P˙blica</label>
             <textarea id="public-note" data-i18n-placeholder="placeholder_public_note" placeholder="Nota visible en la factura"></textarea>
           </div>
           <div>
@@ -226,8 +204,8 @@
             <textarea id="private-note" data-i18n-placeholder="placeholder_private_note" placeholder="Nota interna (no visible para el cliente)"></textarea>
           </div>
           <div>
-            <label for="footer" data-i18n="lbl_footer">Pie de P√°gina</label>
-            <textarea id="footer" data-i18n-placeholder="placeholder_footer" placeholder="Texto del pie de p√°gina"></textarea>
+            <label for="footer" data-i18n="lbl_footer">Pie de P·gina</label>
+            <textarea id="footer" data-i18n-placeholder="placeholder_footer" placeholder="Texto del pie de p·gina"></textarea>
           </div>
         </div>
       </div>
@@ -236,7 +214,7 @@
         <div class="total-row"><span class="label" data-i18n="lbl_subtotal">Subtotal</span><span class="value" id="t-subtotal">$ 0.00</span></div>
         <div class="total-row"><span class="label" data-i18n="lbl_discount">Descuento</span><span class="value" id="t-discount">$ 0.00</span></div>
         <div class="total-row"><span class="label" data-i18n="lbl_tax">Impuestos</span><span class="value" id="t-tax">$ 0.00</span></div>
-        <div class="total-row"><span class="label" data-i18n="lbl_shipping">Env√≠o</span><span class="value" id="t-shipping">$ 0.00</span></div>
+        <div class="total-row"><span class="label" data-i18n="lbl_shipping">EnvÌo</span><span class="value" id="t-shipping">$ 0.00</span></div>
         <div class="total-row grand"><span class="label" data-i18n="lbl_grand_total">Total General</span><span class="value" id="t-grand">$ 0.00</span></div>
       </div>
 
@@ -278,7 +256,7 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
         customers.forEach(c => {
           sel.innerHTML += `<option value="${APP.esc(c.id)}">${APP.esc(c.name)}${c.email ? ' (' + APP.esc(c.email) + ')' : ''}</option>`;
         });
-        sel.innerHTML += '<option value="__add__">‚ûï <span data-i18n="btn_add_new_customer">Agregar nuevo cliente</span></option>';
+        sel.innerHTML += '<option value="__add__">? <span data-i18n="btn_add_new_customer">Agregar nuevo cliente</span></option>';
       } catch (e) { console.error('Error loading customers', e); }
     }
 
@@ -327,8 +305,8 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
       const content = `
         <div class="customer-add-modal">
           <div class="form-row"><div><label data-i18n="lbl_name_required">Nombre *</label><input id="new-cust-name" data-i18n-placeholder="placeholder_customer_name" placeholder="Nombre del cliente"></div></div>
-          <div class="form-row"><div><label data-i18n="lbl_email">Email</label><input type="email" id="new-cust-email" data-i18n-placeholder="placeholder_email" placeholder="Email"></div><div><label data-i18n="lbl_phone">Tel√©fono</label><input id="new-cust-phone" data-i18n-placeholder="placeholder_phone" placeholder="Tel√©fono"></div></div>
-          <div class="form-row"><div><label data-i18n="lbl_billing_address">Direcci√≥n de Facturaci√≥n</label><textarea id="new-cust-billing" data-i18n-placeholder="placeholder_address" placeholder="Direcci√≥n"></textarea></div><div><label data-i18n="lbl_shipping_address">Direcci√≥n de Env√≠o</label><textarea id="new-cust-shipping" data-i18n-placeholder="placeholder_address" placeholder="Direcci√≥n"></textarea></div></div>
+          <div class="form-row"><div><label data-i18n="lbl_email">Email</label><input type="email" id="new-cust-email" data-i18n-placeholder="placeholder_email" placeholder="Email"></div><div><label data-i18n="lbl_phone">TelÈfono</label><input id="new-cust-phone" data-i18n-placeholder="placeholder_phone" placeholder="TelÈfono"></div></div>
+          <div class="form-row"><div><label data-i18n="lbl_billing_address">DirecciÛn de FacturaciÛn</label><textarea id="new-cust-billing" data-i18n-placeholder="placeholder_address" placeholder="DirecciÛn"></textarea></div><div><label data-i18n="lbl_shipping_address">DirecciÛn de EnvÌo</label><textarea id="new-cust-shipping" data-i18n-placeholder="placeholder_address" placeholder="DirecciÛn"></textarea></div></div>
           <div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest('.modal-ov').remove()" data-i18n="btn_cancel">Cancelar</button><button class="btn" onclick="saveNewCustomer()" data-i18n="btn_save_customer">Guardar Cliente</button></div>
         </div>`;
       APP.modal(content, APP.t('modal_title_add_new_customer', 'Agregar Nuevo Cliente'));
@@ -366,8 +344,8 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
       tr.id = rowId;
       tr.innerHTML = `
         <td><input type="number" class="item-qty" value="${data.quantity || 1}" min="0.01" step="0.01" oninput="calculateRow('${rowId}')"></td>
-        <td><div class="pulldown-parent" id="pp-code-${rowId}"><input type="text" class="item-code" value="${APP.esc(data.item_code || data.code || '')}" data-i18n-placeholder="placeholder_code" placeholder="C√≥digo" autocomplete="off"><a class="pulldown-arrow" href="javascript:void(0);" tabindex="-1">&#9660;</a><div class="pulldown-option-container" style="display:none"></div></div></td>
-        <td><div class="pulldown-parent" id="pp-desc-${rowId}"><textarea class="item-desc" rows="1" data-i18n-placeholder="placeholder_description" placeholder="Descripci√≥n">${APP.esc(data.description || data.name || '')}</textarea><a class="pulldown-arrow" href="javascript:void(0);" tabindex="-1">&#9660;</a><div class="pulldown-option-container" style="display:none"></div></div></td>
+        <td><div class="pulldown-parent" id="pp-code-${rowId}"><input type="text" class="item-code" value="${APP.esc(data.item_code || data.code || '')}" data-i18n-placeholder="placeholder_code" placeholder="CÛdigo" autocomplete="off"><a class="pulldown-arrow" href="javascript:void(0);" tabindex="-1">&#9660;</a><div class="pulldown-option-container" style="display:none"></div></div></td>
+        <td><div class="pulldown-parent" id="pp-desc-${rowId}"><textarea class="item-desc" rows="1" data-i18n-placeholder="placeholder_description" placeholder="DescripciÛn">${APP.esc(data.description || data.name || '')}</textarea><a class="pulldown-arrow" href="javascript:void(0);" tabindex="-1">&#9660;</a><div class="pulldown-option-container" style="display:none"></div></div></td>
         <td><input type="number" class="item-price" value="${data.unit_price || data.price || 0}" step="0.01" min="0" oninput="calculateRow('${rowId}')"></td>
         <td><input type="number" class="item-discount" value="${data.discount || 0}" step="0.01" min="0" max="100" oninput="calculateRow('${rowId}')"></td>
         <td><select class="item-tax" onchange="calculateRow('${rowId}')">${taxOpts}</select></td>
@@ -425,15 +403,15 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
       }).join('');
       const html = `
         <div class="item-selector-modal">
-          <div style="margin-bottom:10px"><input type="text" id="item-search-input" data-i18n-placeholder="placeholder_search_item" placeholder="Buscar por c√≥digo o descripci√≥n..." oninput="filterItemSelector()" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px"></div>
+          <div style="margin-bottom:10px"><input type="text" id="item-search-input" data-i18n-placeholder="placeholder_search_item" placeholder="Buscar por cÛdigo o descripciÛn..." oninput="filterItemSelector()" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px"></div>
           <div class="scroll-table" style="max-height:600px">
             <table class="items-table">
-              <thead><tr><th data-i18n="th_code">C√≥digo</th><th data-i18n="th_description">Descripci√≥n</th><th class="text-right" data-i18n="th_price">Precio</th></tr></thead>
-              <tbody id="item-selector-body">${rows || '<tr><td colspan="3" class="text-center" style="color:#999" data-i18n="msg_no_items">Sin art√≠culos</td></tr>'}</tbody>
+              <thead><tr><th data-i18n="th_code">CÛdigo</th><th data-i18n="th_description">DescripciÛn</th><th class="text-right" data-i18n="th_price">Precio</th></tr></thead>
+              <tbody id="item-selector-body">${rows || '<tr><td colspan="3" class="text-center" style="color:#999" data-i18n="msg_no_items">Sin artÌculos</td></tr>'}</tbody>
             </table>
           </div>
         </div>`;
-      APP.modal(html, APP.t('modal_title_select_item', 'Seleccionar Art√≠culo'));
+      APP.modal(html, APP.t('modal_title_select_item', 'Seleccionar ArtÌculo'));
       setTimeout(() => {
         const inp = document.getElementById('item-search-input');
         if (inp) inp.focus();
@@ -498,7 +476,7 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
           : APP.esc(item.description || item.name || '') + (item.code ? ' (' + APP.esc(item.code) + ')' : '');
         html += '<a href="javascript:void(0);" onmousedown="selectPulldownItem(\'' + APP.esc(item.id) + '\', \'' + rowId + '\')">' + display + ' <span style="float:right;color:#999">' + APP.formatMoney(item.price || 0) + '</span></a>';
       });
-      container.innerHTML = '<div class="pulldown-items">' + html + '</div><a href="javascript:void(0);" class="new-item" onmousedown="openNewItemModal(\'' + rowId + '\', \'' + field + '\')">‚ûï <span data-i18n="btn_new_item">Nuevo art√≠culo</span></a>';
+      container.innerHTML = '<div class="pulldown-items">' + html + '</div><a href="javascript:void(0);" class="new-item" onmousedown="openNewItemModal(\'' + rowId + '\', \'' + field + '\')">? <span data-i18n="btn_new_item">Nuevo artÌculo</span></a>';
       container.style.display = 'block';
     }
 
@@ -604,20 +582,20 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
       document.querySelectorAll('.pulldown-option-container').forEach(c => c.style.display = 'none');
       const content = `
         <div class="item-modal-form">
-          <div class="form-row"><div><label data-i18n="lbl_code_required">C√≥digo *</label><input id="new-item-code" data-i18n-placeholder="placeholder_item_code" placeholder="C√≥digo del art√≠culo"></div></div>
-          <div class="form-row"><div><label data-i18n="lbl_name_required">Nombre *</label><input id="new-item-name" data-i18n-placeholder="placeholder_item_name" placeholder="Nombre del art√≠culo"></div></div>
-          <div class="form-row"><div><label data-i18n="lbl_description">Descripci√≥n</label><textarea id="new-item-desc" data-i18n-placeholder="placeholder_description" placeholder="Descripci√≥n"></textarea></div></div>
+          <div class="form-row"><div><label data-i18n="lbl_code_required">CÛdigo *</label><input id="new-item-code" data-i18n-placeholder="placeholder_item_code" placeholder="CÛdigo del artÌculo"></div></div>
+          <div class="form-row"><div><label data-i18n="lbl_name_required">Nombre *</label><input id="new-item-name" data-i18n-placeholder="placeholder_item_name" placeholder="Nombre del artÌculo"></div></div>
+          <div class="form-row"><div><label data-i18n="lbl_description">DescripciÛn</label><textarea id="new-item-desc" data-i18n-placeholder="placeholder_description" placeholder="DescripciÛn"></textarea></div></div>
           <div class="form-row"><div><label data-i18n="lbl_price_required">Precio *</label><input type="number" id="new-item-price" step="0.01" min="0" data-i18n-placeholder="placeholder_price" placeholder="0.00"></div></div>
           <div class="form-row"><div><label data-i18n="lbl_tax_rate_pct">Tasa de Impuesto (%)</label><input type="number" id="new-item-tax" step="0.01" min="0" placeholder="0"></div></div>
-          <div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest('.modal-ov').remove()" data-i18n="btn_cancel">Cancelar</button><button class="btn" onclick="saveNewItemFromInvoice('${rowId}', '${field}')" data-i18n="btn_save_item">Guardar Art√≠culo</button></div>
+          <div class="modal-footer"><button class="btn btn-secondary" onclick="this.closest('.modal-ov').remove()" data-i18n="btn_cancel">Cancelar</button><button class="btn" onclick="saveNewItemFromInvoice('${rowId}', '${field}')" data-i18n="btn_save_item">Guardar ArtÌculo</button></div>
         </div>`;
-      APP.modal(content, APP.t('modal_title_new_item', 'Nuevo Art√≠culo'));
+      APP.modal(content, APP.t('modal_title_new_item', 'Nuevo ArtÌculo'));
     }
 
     async function saveNewItemFromInvoice(rowId, field) {
       const code = document.getElementById('new-item-code').value.trim();
       const name = document.getElementById('new-item-name').value.trim();
-      if (!code || !name) { APP.showMessage('C√≥digo y nombre son obligatorios', 'error'); return; }
+      if (!code || !name) { APP.showMessage('CÛdigo y nombre son obligatorios', 'error'); return; }
       try {
         const result = await API.post('/api/items', {
           code,
@@ -626,14 +604,14 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
           price: parseFloat(document.getElementById('new-item-price').value) || 0,
           tax_rate: parseFloat(document.getElementById('new-item-tax').value) || 0
         });
-        if (result.errorcode) { APP.showMessage(result.errormsg || 'Error al crear art√≠culo', 'error'); return; }
-        APP.showMessage('Art√≠culo creado exitosamente', 'success');
+        if (result.errorcode) { APP.showMessage(result.errormsg || 'Error al crear artÌculo', 'error'); return; }
+        APP.showMessage('ArtÌculo creado exitosamente', 'success');
         document.querySelector('.modal-ov').remove();
         const data = await API.get('/api/items');
         items = data.items || [];
         const newItem = items.find(i => i.id == result.id);
         if (newItem && rowId) fillItemIntoRow(newItem, rowId);
-      } catch (e) { APP.showMessage('Error al crear art√≠culo', 'error'); }
+      } catch (e) { APP.showMessage('Error al crear artÌculo', 'error'); }
     }
 
     function calculateRow(rowId) {
@@ -691,7 +669,7 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
     }
 
     function clearInvoice() {
-      if (!confirm('¬øEst√°s seguro de limpiar todos los campos?')) return;
+      if (!confirm('øEst·s seguro de limpiar todos los campos?')) return;
       document.getElementById('customer').value = '';
       document.getElementById('date').value = new Date().toISOString().split('T')[0];
       const due = new Date(); due.setDate(due.getDate() + 30);
@@ -805,12 +783,12 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
     function previewInvoice() {
       const custId = document.getElementById('customer').value;
       const cust = customers.find(c => c.id === custId);
-      const custName = cust ? cust.name : '‚Äî';
+      const custName = cust ? cust.name : 'ó';
       const invNum = document.getElementById('invoice-number').value;
       const date = document.getElementById('date').value;
       const dueDate = document.getElementById('due-date').value;
-      const bAddr = document.getElementById('billing-address').value || '‚Äî';
-      const sAddr = document.getElementById('shipping-address').value || '‚Äî';
+      const bAddr = document.getElementById('billing-address').value || 'ó';
+      const sAddr = document.getElementById('shipping-address').value || 'ó';
       const po = document.getElementById('po-number').value;
       const sp = document.getElementById('salesperson').value;
       const terms = document.getElementById('payment-terms').value;
@@ -854,22 +832,22 @@ document.getElementById('date').value = new Date().toISOString().split('T')[0];
             </div>
           </div>
           <div class="preview-info">
-            <div><span class="lbl" data-i18n="lbl_invoice_number">Factura N¬∞:</span> ${APP.esc(invNum)}</div>
+            <div><span class="lbl" data-i18n="lbl_invoice_number">Factura N∞:</span> ${APP.esc(invNum)}</div>
             <div><span class="lbl" data-i18n="lbl_date">Fecha:</span> ${date}</div>
             <div><span class="lbl" data-i18n="lbl_due_date">Vencimiento:</span> ${dueDate}</div>
-            ${terms ? '<div><span class="lbl" data-i18n="lbl_terms">T√©rminos:</span> ' + APP.esc(terms) + '</div>' : ''}
+            ${terms ? '<div><span class="lbl" data-i18n="lbl_terms">TÈrminos:</span> ' + APP.esc(terms) + '</div>' : ''}
             ${po ? '<div><span class="lbl" data-i18n="lbl_po">O.C.:</span> ' + APP.esc(po) + '</div>' : ''}
             ${sp ? '<div><span class="lbl" data-i18n="lbl_salesperson">Vendedor:</span> ' + APP.esc(sp) + '</div>' : ''}
           </div>
           <table>
-            <thead><tr><th data-i18n="th_code">C√≥digo</th><th data-i18n="th_description">Descripci√≥n</th><th data-i18n="th_qty">Cant</th><th class="text-right" data-i18n="th_price">Precio</th><th class="text-right" data-i18n="th_discount_pct">Desc %</th><th class="text-right" data-i18n="th_total">Total</th></tr></thead>
-            <tbody>${itemsHtml || '<tr><td colspan="6" class="text-center" style="color:#999" data-i18n="msg_no_items">Sin art√≠culos</td></tr>'}</tbody>
+            <thead><tr><th data-i18n="th_code">CÛdigo</th><th data-i18n="th_description">DescripciÛn</th><th data-i18n="th_qty">Cant</th><th class="text-right" data-i18n="th_price">Precio</th><th class="text-right" data-i18n="th_discount_pct">Desc %</th><th class="text-right" data-i18n="th_total">Total</th></tr></thead>
+            <tbody>${itemsHtml || '<tr><td colspan="6" class="text-center" style="color:#999" data-i18n="msg_no_items">Sin artÌculos</td></tr>'}</tbody>
           </table>
           <div class="preview-totals">
             <div><span data-i18n="lbl_subtotal">Subtotal:</span> ${APP.formatMoney(totals.subtotal)}</div>
             <div><span data-i18n="lbl_discount">Descuento:</span> ${APP.formatMoney(totals.discount)}</div>
             <div><span data-i18n="lbl_tax">Impuestos:</span> ${APP.formatMoney(totals.tax)}</div>
-            ${totals.shipping > 0 ? '<div><span data-i18n="lbl_shipping">Env√≠o:</span> ' + APP.formatMoney(totals.shipping) + '</div>' : ''}
+            ${totals.shipping > 0 ? '<div><span data-i18n="lbl_shipping">EnvÌo:</span> ' + APP.formatMoney(totals.shipping) + '</div>' : ''}
             <div class="gt"><span data-i18n="lbl_total">Total:</span> ${APP.formatMoney(totals.grandTotal)}</div>
           </div>
           ${note ? '<div class="preview-notes"><strong data-i18n="lbl_notes">Notas:</strong><br>' + APP.esc(note).replace(/\\n/g, '<br>') + '</div>' : ''}

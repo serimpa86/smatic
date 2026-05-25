@@ -33,18 +33,8 @@
 </head>
 <body>
   <div class="navigation-wrapper" id="sidebar">
-    <nav class="navigation">
-      <div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span data-i18n="sidebar_brand_admin">Smatic Admin</span></div>
-      <ul>
-        <li><a href="dashboard.html"><span class="nav-icon">📊</span> <span data-i18n="nav_dashboard">Panel Principal</span></a></li>
-        <li class="active"><a href="admin.html"><span class="nav-icon">⚡</span> <span data-i18n="nav_admin">Administración</span></a></li>
-        <li><a href="customers.html"><span class="nav-icon">👥</span> <span data-i18n="nav_customers">Clientes</span></a></li>
-        <li><a href="invoices.html"><span class="nav-icon">📄</span> <span data-i18n="nav_invoices">Facturas</span></a></li>
-        <li><a href="settings.html"><span class="nav-icon">⚙️</span> <span data-i18n="nav_settings">Configuración</span></a></li>
-      </ul>
-      <div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a></div>
-    </nav>
-  </div>
+  <nav id="app-nav" class="navigation"></nav>
+</div>
 
   <div class="header-wrapper">
     <div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div>
