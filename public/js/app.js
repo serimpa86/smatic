@@ -98,6 +98,14 @@ const APP = {
         module: 'pos',
         className: 'nav-pos-injected',
         before: 'li a[href="reports.html"]'
+      },
+      {
+        items: [
+          ['projects.html', '📋', 'nav_projects', 'Proyectos'],
+        ],
+        module: 'projects',
+        className: 'nav-projects-injected',
+        before: 'li a[href="reports.html"]'
       }
     ];
     for (const group of modules) {

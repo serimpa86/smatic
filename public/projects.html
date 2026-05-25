@@ -1,0 +1,295 @@
+<!DOCTYPE html><html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Proyectos | Smatic</title><link rel="stylesheet" href="css/main.css">
+<style>
+.project-card{border:1px solid #e0e0e0;border-radius:6px;padding:1em;margin-bottom:.5em;cursor:pointer;transition:box-shadow .15s}
+.project-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.project-card .p-name{font-weight:700;font-size:1.05em}
+.project-card .p-meta{font-size:.85em;color:#666;display:flex;gap:1em;flex-wrap:wrap;margin-top:.3em}
+.project-card .p-progress{height:6px;background:#e8e8e8;border-radius:3px;margin-top:.5em;overflow:hidden}
+.project-card .p-progress-bar{height:100%;background:#007bff;border-radius:3px;transition:width .3s}
+.status-badge{display:inline-block;padding:.15em .5em;border-radius:3px;font-size:.75em;font-weight:600}
+.status-planning{background:#e8e8e8;color:#555}
+.status-active{background:#d4edda;color:#155724}
+.status-on_hold{background:#fff3cd;color:#856404}
+.status-completed{background:#cce5ff;color:#004085}
+.status-cancelled{background:#f8d7da;color:#721c24}
+.task-board{display:flex;gap:.5em;overflow-x:auto;min-height:200px}
+.task-col{flex:1;min-width:200px;background:#f8f9fa;border-radius:6px;padding:.5em}
+.task-col h4{font-size:.85em;margin:0 0 .5em;padding:.3em .5em;background:#fff;border-radius:4px}
+.task-card{background:#fff;border:1px solid #e0e0e0;border-radius:4px;padding:.4em .6em;margin-bottom:.4em;cursor:pointer;font-size:.85em}
+.task-card:hover{border-color:#007bff}
+.task-card .t-name{font-weight:600}
+.task-card .t-assign{font-size:.8em;color:#888}
+.proj-detail{display:none}
+.proj-list{display:block}
+.sub-nav{display:flex;gap:.5em;margin-bottom:.5em}
+.sub-nav button{font-size:.85em;padding:.3em .8em}
+.time-table{width:100%;border-collapse:collapse;font-size:.85em}
+.time-table th{background:#f0f0f0;padding:.3em .5em;text-align:left;border-bottom:1px solid #ddd}
+.time-table td{padding:.3em .5em;border-bottom:1px solid #eee}
+.time-table tr:hover{background:#f8f9fa}
+.time-summary{display:flex;gap:1em;margin:.5em 0;flex-wrap:wrap}
+.time-summary div{background:#f8f9fa;padding:.3em .8em;border-radius:4px;font-size:.85em}
+.time-summary strong{font-weight:700}
+</style>
+</head>
+<body>
+<div class="navigation-wrapper"><nav class="navigation">
+<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
+<ul>
+<li><a href="dashboard.html">📊 Panel Principal</a></li>
+<li><a href="customers.html">👥 Clientes</a></li>
+<li><a href="invoices.html">📄 Facturas</a></li>
+<li><a href="quotes.html">📝 Cotizaciones</a></li>
+<li><a href="credit-notes.html">📒 Notas de Crédito</a></li>
+<li><a href="payments.html">💳 Pagos</a></li>
+<li><a href="refunds.html">💸 Reembolsos</a></li>
+<li><a href="items.html">📦 Productos</a></li>
+<li><a href="reports.html">📈 Reportes</a></li>
+<li><a href="settings.html">⚙️ Configuración</a></li>
+<li id="admin-nav-link" class="hidden"><a href="admin.html">⚡ Administración</a></li>
+</ul>
+<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a></div>
+</nav></div>
+<div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic - Proyectos</span></div></div>
+<div class="container">
+<div class="page-header proj-list" id="listHeader"><h1>Proyectos</h1><div class="actions"><button onclick="openProjectModal(null)">+ Nuevo Proyecto</button></div></div>
+<div class="page-header proj-detail" id="detailHeader" style="display:none"><h1 id="projTitle"></h1><div class="actions">
+<button onclick="openProjectModal(currentProject)">Editar</button>
+<button class="btn-secondary" onclick="showList()">← Volver</button>
+</div></div>
+
+<!-- Project list -->
+<div id="projectListView" class="proj-list"></div>
+
+<!-- Project detail -->
+<div id="projectDetailView" class="proj-detail">
+<div class="sub-nav">
+<button class="active" onclick="switchProjTab('board',this)">📋 Tareas</button>
+<button onclick="switchProjTab('time',this)">⏱ Tiempo</button>
+<button onclick="switchProjTab('info',this)">📄 Info</button>
+</div>
+<div id="projTab-board"><div class="task-board" id="taskBoard"></div></div>
+<div id="projTab-time" style="display:none">
+<div class="time-summary" id="timeSummary"></div>
+<div style="margin-bottom:.5em"><button onclick="openTimeEntryModal()">+ Cargar horas</button></div>
+<div id="timeEntriesList"></div>
+</div>
+<div id="projTab-info" style="display:none"><div id="projInfo"></div></div>
+</div>
+</div>
+<script src="js/api.js"></script><script src="js/config.js"></script><script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if(!API.isAuthenticated()){window.location.href='/login.html';return;}
+  await APP.init();
+  if(APP.currentUser&&APP.currentUser.role==='superadmin')document.getElementById('admin-nav-link').classList.remove('hidden');
+  loadProjects();
+});
+let allProjects=[];
+let currentProject=null;
+const statusLabels={planning:'Planificación',active:'Activo',on_hold:'En espera',completed:'Completado',cancelled:'Cancelado'};
+
+async function loadProjects(){
+  try{
+    const d=await API.get('/api/projects');
+    allProjects=d.projects||[];
+    renderProjects();
+  }catch(e){document.getElementById('projectListView').innerHTML='<div style="color:#d93025">Error</div>';}
+}
+function renderProjects(){
+  const el=document.getElementById('projectListView');
+  if(!allProjects.length){el.innerHTML='<div style="text-align:center;padding:2em;color:#999">Sin proyectos. Cree el primero.</div>';return;}
+  el.innerHTML=allProjects.map(p=>{
+    const donePct=p.task_count>0?Math.round(p.done_count/p.task_count*100):0;
+    return '<div class="project-card" onclick="openProject(\''+p.id+'\')">'+
+      '<div class="p-name">'+APP.esc(p.name)+'</div>'+
+      '<div class="p-meta"><span class="status-badge status-'+p.status+'">'+(statusLabels[p.status]||p.status)+'</span>'+
+      '<span>Cliente: '+(p.customer_name||'—')+'</span>'+
+      '<span>Tareas: '+p.done_count+'/'+p.task_count+'</span>'+
+      '<span>Horas: '+Number(p.total_hours||0).toFixed(1)+'</span>'+
+      '<span>Presupuesto: $'+APP.formatMoney(p.budget_amount)+'</span>'+
+      '<span>Facturado: $'+APP.formatMoney(p.billed_amount)+'</span></div>'+
+      '<div class="p-progress"><div class="p-progress-bar" style="width:'+donePct+'%"></div></div>'+
+    '</div>';
+  }).join('');
+}
+async function openProject(id){
+  try{
+    const d=await API.get('/api/projects/'+id);
+    currentProject=d.project;
+    document.getElementById('projTitle').textContent=APP.esc(currentProject.name);
+    document.getElementById('listHeader').style.display='none';
+    document.getElementById('projectListView').style.display='none';
+    document.getElementById('detailHeader').style.display='flex';
+    document.getElementById('projectDetailView').style.display='block';
+    loadTasks();
+    loadTimeEntries();
+    renderProjInfo();
+  }catch(e){alert('Error');}
+}
+function showList(){
+  currentProject=null;
+  document.getElementById('listHeader').style.display='flex';
+  document.getElementById('projectListView').style.display='block';
+  document.getElementById('detailHeader').style.display='none';
+  document.getElementById('projectDetailView').style.display='none';
+}
+function switchProjTab(tab,btn){
+  document.querySelectorAll('.sub-nav button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#projectDetailView > div[id^="projTab-"]').forEach(t=>t.style.display='none');
+  btn.classList.add('active');
+  document.getElementById('projTab-'+tab).style.display='block';
+}
+
+// ── Tasks ──
+async function loadTasks(){
+  if(!currentProject)return;
+  try{
+    const d=await API.get('/api/projects/'+currentProject.id+'/tasks');
+    renderTasks(d.tasks||[]);
+  }catch(e){}
+}
+function renderTasks(tasks){
+  const cols={todo:'Por hacer',in_progress:'En progreso',done:'Completado'};
+  let html='';
+  for(const [status,label] of Object.entries(cols)){
+    const t=tasks.filter(t=>t.status===status);
+    html+='<div class="task-col"><h4>'+label+' ('+t.length+')</h4>';
+    for(const tk of t){
+      html+='<div class="task-card" onclick="editTask(\''+tk.id+'\')">'+
+        '<div class="t-name">'+APP.esc(tk.name)+'</div>'+
+        '<div class="t-assign">'+(tk.assignee?'👤 '+APP.esc(tk.assignee):'')+(tk.estimated_hours?' ⏱ '+tk.estimated_hours+'h':'')+'</div>'+
+      '</div>';
+    }
+    html+='</div>';
+  }
+  document.getElementById('taskBoard').innerHTML=html;
+}
+function openTaskModal(task){
+  const html='<div class="modal-content" style="max-width:400px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>'+(task?'Editar Tarea':'Nueva Tarea')+'</h2>'+
+    '<div class="settings-grid">'+
+    '<div style="grid-column:1/-1"><label>Nombre</label><input id="tkName" value="'+(task?APP.esc(task.name):'')+'"></div>'+
+    '<div style="grid-column:1/-1"><label>Descripción</label><textarea id="tkDesc">'+(task?APP.esc(task.description):'')+'</textarea></div>'+
+    '<div><label>Asignado a</label><input id="tkAssign" value="'+(task?APP.esc(task.assignee):'')+'"></div>'+
+    '<div><label>Estado</label><select id="tkStatus"><option value="todo"'+(task&&task.status==='todo'?' selected':'')+'>Por hacer</option><option value="in_progress"'+(task&&task.status==='in_progress'?' selected':'')+'>En progreso</option><option value="done"'+(task&&task.status==='done'?' selected':'')+'>Completado</option></select></div>'+
+    '<div><label>Horas est.</label><input type="number" step="0.5" id="tkHours" value="'+(task?task.estimated_hours:'0')+'"></div>'+
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>'+(task?'<button class="btn-secondary" style="color:#d93025" onclick="deleteTask(\''+task.id+'\')">Eliminar</button>':'')+'<button onclick="saveTask(\''+(task?task.id:'')+'\')">Guardar</button></div></div>';
+  APP.modal(html,'');
+}
+async function saveTask(taskId){
+  const data={name:document.getElementById('tkName').value,description:document.getElementById('tkDesc').value,assignee:document.getElementById('tkAssign').value,status:document.getElementById('tkStatus').value,estimated_hours:parseFloat(document.getElementById('tkHours').value)||0};
+  if(!data.name){alert('Nombre obligatorio');return;}
+  try{
+    if(taskId)await API.put('/api/projects/tasks/'+taskId,data);
+    else await API.post('/api/projects/'+currentProject.id+'/tasks',data);
+    document.querySelector('.modal-overlay').remove();
+    loadTasks();
+  }catch(e){alert('Error');}
+}
+async function deleteTask(taskId){
+  if(!confirm('Eliminar tarea?'))return;
+  try{await API.del('/api/projects/tasks/'+taskId);document.querySelector('.modal-overlay').remove();loadTasks();}catch(e){alert('Error');}
+}
+async function editTask(taskId){
+  try{const d=await API.get('/api/projects/tasks/'+taskId);openTaskModal(d.task);}catch(e){}
+}
+
+// ── Project Modal ──
+function openProjectModal(proj){
+  const html='<div class="modal-content" style="max-width:500px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>'+(proj?'Editar Proyecto':'Nuevo Proyecto')+'</h2>'+
+    '<div class="settings-grid">'+
+    '<div style="grid-column:1/-1"><label>Nombre</label><input id="pjName" value="'+(proj?APP.esc(proj.name):'')+'"></div>'+
+    '<div style="grid-column:1/-1"><label>Descripción</label><textarea id="pjDesc">'+(proj?APP.esc(proj.description):'')+'</textarea></div>'+
+    '<div><label>Cliente</label><input id="pjCustomer" placeholder="Nombre" value="'+(proj?APP.esc(proj.customer_name):'')+'"></div>'+
+    '<div><label>Estado</label><select id="pjStatus"><option value="planning"'+(proj&&proj.status==='planning'?' selected':'')+'>Planificación</option><option value="active"'+(proj&&proj.status==='active'?' selected':'')+'>Activo</option><option value="on_hold"'+(proj&&proj.status==='on_hold'?' selected':'')+'>En espera</option><option value="completed"'+(proj&&proj.status==='completed'?' selected':'')+'>Completado</option><option value="cancelled"'+(proj&&proj.status==='cancelled'?' selected':'')+'>Cancelado</option></select></div>'+
+    '<div><label>Inicio</label><input type="date" id="pjStart" value="'+(proj?proj.start_date:'')+'"></div>'+
+    '<div><label>Fin</label><input type="date" id="pjEnd" value="'+(proj?proj.end_date:'')+'"></div>'+
+    '<div><label>Presupuesto</label><input type="number" step="0.01" id="pjBudget" value="'+(proj?proj.budget_amount:'0')+'"></div>'+
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>'+(proj?'<button class="btn-secondary" style="color:#d93025" onclick="deleteProject(\''+proj.id+'\')">Eliminar</button>':'')+'<button onclick="saveProject(\''+(proj?proj.id:'')+'\')">Guardar</button></div></div>';
+  APP.modal(html,'');
+}
+async function saveProject(id){
+  const data={name:document.getElementById('pjName').value,description:document.getElementById('pjDesc').value,customer_name:document.getElementById('pjCustomer').value,status:document.getElementById('pjStatus').value,start_date:document.getElementById('pjStart').value,end_date:document.getElementById('pjEnd').value,budget_amount:parseFloat(document.getElementById('pjBudget').value)||0};
+  if(!data.name){alert('Nombre obligatorio');return;}
+  try{
+    if(id){await API.put('/api/projects/'+id,data);const d=await API.get('/api/projects/'+id);currentProject=d.project;document.getElementById('projTitle').textContent=APP.esc(currentProject.name);}
+    else await API.post('/api/projects',data);
+    document.querySelector('.modal-overlay').remove();
+    loadProjects();
+  }catch(e){alert('Error');}
+}
+async function deleteProject(id){
+  if(!confirm('Eliminar proyecto y todas sus tareas? No se pueden eliminar horas registradas.'))return;
+  try{await API.del('/api/projects/'+id);document.querySelector('.modal-overlay').remove();showList();loadProjects();}catch(e){alert('Error');}
+}
+
+// ── Time ──
+async function loadTimeEntries(){
+  if(!currentProject)return;
+  try{
+    const d=await API.get('/api/projects/'+currentProject.id+'/time');
+    renderTimeEntries(d.entries||[]);
+  }catch(e){}
+}
+function renderTimeEntries(entries){
+  const total=entries.reduce((s,e)=>s+e.hours,0);
+  const billable=entries.filter(e=>e.billable).reduce((s,e)=>s+e.hours,0);
+  document.getElementById('timeSummary').innerHTML=
+    '<div><strong>Total horas:</strong> '+total.toFixed(1)+'h</div>'+
+    '<div><strong>Facturables:</strong> '+billable.toFixed(1)+'h</div>'+
+    '<div><strong>No facturables:</strong> '+(total-billable).toFixed(1)+'h</div>';
+  if(!entries.length){document.getElementById('timeEntriesList').innerHTML='<div style="text-align:center;padding:1em;color:#999">Sin horas registradas.</div>';return;}
+  let html='<table class="time-table"><thead><tr><th>Fecha</th><th>Tarea</th><th>Horas</th><th>Descripción</th><th>Facturable</th><th>Acción</th></tr></thead><tbody>';
+  for(const e of entries){
+    html+='<tr><td>'+e.date+'</td><td>'+(e.task_id?'⋯':'—')+'</td><td>'+e.hours+'</td><td>'+APP.esc(e.description)+'</td><td>'+(e.billable?'✓':'—')+'</td><td><button class="btn-secondary" style="min-width:auto;padding:.1em .4em;font-size:.8em" onclick="deleteTimeEntry(\''+e.id+'\')">✕</button></td></tr>';
+  }
+  html+='</tbody></table><div style="margin-top:.5em"><button onclick="billProject()">💵 Facturar horas no facturadas</button></div>';
+  document.getElementById('timeEntriesList').innerHTML=html;
+}
+async function deleteTimeEntry(id){
+  if(!confirm('Eliminar registro de horas?'))return;
+  try{await API.del('/api/projects/time/'+id);loadTimeEntries();}catch(e){alert('Error');}
+}
+function openTimeEntryModal(taskId){
+  const html='<div class="modal-content" style="max-width:400px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>Cargar Horas</h2>'+
+    '<div class="settings-grid">'+
+    '<div style="grid-column:1/-1"><label>Fecha</label><input type="date" id="teDate" value="'+new Date().toISOString().slice(0,10)+'"></div>'+
+    '<div><label>Horas</label><input type="number" step="0.25" id="teHours" placeholder="1"></div>'+
+    '<div><label><input type="checkbox" id="teBillable" checked> Facturable</label></div>'+
+    '<div style="grid-column:1/-1"><label>Descripción</label><textarea id="teDesc"></textarea></div>'+
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="saveTimeEntry()">Guardar</button></div></div>';
+  APP.modal(html,'');
+}
+async function saveTimeEntry(){
+  const hours=parseFloat(document.getElementById('teHours').value);
+  if(!hours||hours<=0){alert('Ingrese horas válidas');return;}
+  const data={hours,date:document.getElementById('teDate').value,description:document.getElementById('teDesc').value,billable:document.getElementById('teBillable').checked?1:0};
+  try{await API.post('/api/projects/'+currentProject.id+'/time',data);document.querySelector('.modal-overlay').remove();loadTimeEntries();if(data.billable)loadProjects();}catch(e){alert('Error');}
+}
+async function billProject(){
+  const rate=prompt('Ingrese tarifa por hora ($):','0');
+  if(rate===null)return;
+  try{
+    const d=await API.post('/api/projects/'+currentProject.id+'/bill',{hourly_rate:parseFloat(rate)||0,description:''});
+    alert('Factura creada: '+d.invoice_number+' - Total: $'+d.total.toFixed(2));
+    loadTimeEntries();
+    loadProjects();
+  }catch(e){alert('Error: '+(e.message||''));}
+}
+function renderProjInfo(){
+  if(!currentProject)return;
+  document.getElementById('projInfo').innerHTML=
+    '<div class="settings-grid" style="max-width:500px">'+
+    '<div><label>Estado</label><div><span class="status-badge status-'+currentProject.status+'">'+(statusLabels[currentProject.status]||currentProject.status)+'</span></div></div>'+
+    '<div><label>Cliente</label><div>'+(currentProject.customer_name||'—')+'</div></div>'+
+    '<div><label>Inicio</label><div>'+(currentProject.start_date||'—')+'</div></div>'+
+    '<div><label>Fin</label><div>'+(currentProject.end_date||'—')+'</div></div>'+
+    '<div><label>Presupuesto</label><div>$ '+APP.formatMoney(currentProject.budget_amount)+'</div></div>'+
+    '<div><label>Facturado</label><div>$ '+APP.formatMoney(currentProject.billed_amount)+'</div></div>'+
+    '<div style="grid-column:1/-1"><label>Descripción</label><div>'+(currentProject.description||'—')+'</div></div>'+
+    '</div>';
+}
+</script>
+</body>
+</html>

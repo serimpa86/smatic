@@ -509,6 +509,42 @@ async function initDb() {
     notes TEXT DEFAULT ''
   )`);
 
+  try { exec("ALTER TABLE projects ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE project_tasks ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE project_time_entries ADD COLUMN company_id TEXT"); } catch (e) {}
+
+  exec(`CREATE TABLE IF NOT EXISTS projects (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    name TEXT NOT NULL, description TEXT DEFAULT '',
+    customer_id TEXT DEFAULT '', customer_name TEXT DEFAULT '',
+    status TEXT DEFAULT 'planning' CHECK(status IN ('planning','active','on_hold','completed','cancelled')),
+    start_date TEXT DEFAULT '', end_date TEXT DEFAULT '',
+    budget_amount REAL DEFAULT 0, billed_amount REAL DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS project_tasks (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    project_id TEXT NOT NULL,
+    name TEXT NOT NULL, description TEXT DEFAULT '',
+    assignee TEXT DEFAULT '',
+    status TEXT DEFAULT 'todo' CHECK(status IN ('todo','in_progress','done')),
+    estimated_hours REAL DEFAULT 0,
+    sort_order INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS project_time_entries (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    project_id TEXT NOT NULL, task_id TEXT DEFAULT '',
+    user_id TEXT DEFAULT '', user_name TEXT DEFAULT '',
+    date TEXT NOT NULL DEFAULT (date('now')),
+    hours REAL NOT NULL DEFAULT 0,
+    description TEXT DEFAULT '',
+    billable INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
   migrateToMultiCompany();
   seed();
   save();
