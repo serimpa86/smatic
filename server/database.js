@@ -506,6 +506,9 @@ async function initDb() {
   )`);
 
   try { exec("ALTER TABLE pos_sessions ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE pos_sessions ADD COLUMN credit_card_sales REAL DEFAULT 0"); } catch (e) {}
+  try { exec("ALTER TABLE pos_sessions ADD COLUMN debit_card_sales REAL DEFAULT 0"); } catch (e) {}
+  try { exec("ALTER TABLE pos_sessions ADD COLUMN virtual_wallet_sales REAL DEFAULT 0"); } catch (e) {}
 
   exec(`CREATE TABLE IF NOT EXISTS pos_sessions (
     id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
@@ -516,7 +519,10 @@ async function initDb() {
     closing_balance REAL DEFAULT 0,
     cash_sales REAL DEFAULT 0,
     card_sales REAL DEFAULT 0,
+    credit_card_sales REAL DEFAULT 0,
+    debit_card_sales REAL DEFAULT 0,
     transfer_sales REAL DEFAULT 0,
+    virtual_wallet_sales REAL DEFAULT 0,
     other_sales REAL DEFAULT 0,
     status TEXT DEFAULT 'open' CHECK(status IN ('open','closed')),
     opened_by TEXT NOT NULL, closed_by TEXT DEFAULT '',
