@@ -26,6 +26,8 @@ const journalRoutes = require('./routes/journal');
 const accountingReportRoutes = require('./routes/accounting-reports');
 const warehouseRoutes = require('./routes/warehouses');
 const stockRoutes = require('./routes/stock');
+const supplierRoutes = require('./routes/suppliers');
+const purchaseRoutes = require('./routes/purchases');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -60,6 +62,8 @@ app.use('/api/journal', journalRoutes);
 app.use('/api/accounting-reports', accountingReportRoutes);
 app.use('/api/warehouses', warehouseRoutes);
 app.use('/api/stock', stockRoutes);
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/purchases', purchaseRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

@@ -385,6 +385,47 @@ async function initDb() {
     created_at TEXT DEFAULT (datetime('now'))
   )`);
 
+  try { exec("ALTER TABLE suppliers ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE purchase_orders ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE purchase_order_items ADD COLUMN company_id TEXT"); } catch (e) {}
+
+  exec(`CREATE TABLE IF NOT EXISTS suppliers (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    code TEXT DEFAULT '', name TEXT NOT NULL,
+    cuit TEXT DEFAULT '', address TEXT DEFAULT '',
+    phone TEXT DEFAULT '', email TEXT DEFAULT '',
+    contact_person TEXT DEFAULT '', payment_terms TEXT DEFAULT '30',
+    notes TEXT DEFAULT '', is_active INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS purchase_orders (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    po_number TEXT NOT NULL, supplier_id TEXT,
+    supplier_name TEXT DEFAULT '', supplier_cuit TEXT DEFAULT '',
+    supplier_address TEXT DEFAULT '', supplier_phone TEXT DEFAULT '',
+    date TEXT DEFAULT (date('now')),
+    expected_date TEXT DEFAULT '',
+    status TEXT DEFAULT 'draft' CHECK(status IN ('draft','sent','confirmed','received','cancelled')),
+    currency TEXT DEFAULT 'ARS', currency_symbol TEXT DEFAULT '$',
+    subtotal REAL DEFAULT 0, tax_total REAL DEFAULT 0,
+    total REAL DEFAULT 0, notes TEXT DEFAULT '',
+    created_by TEXT NOT NULL, warehouse_id TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS purchase_order_items (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    purchase_order_id TEXT NOT NULL,
+    item_id TEXT, item_code TEXT DEFAULT '',
+    description TEXT DEFAULT '', quantity REAL DEFAULT 1,
+    unit_price REAL DEFAULT 0, tax_rate REAL DEFAULT 0,
+    tax_name TEXT DEFAULT '', total REAL DEFAULT 0,
+    received_quantity REAL DEFAULT 0, sort_order INTEGER DEFAULT 0
+  )`);
+
   migrateToMultiCompany();
   seed();
   save();

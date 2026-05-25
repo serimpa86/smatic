@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proveedores | Smatic</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="navigation-wrapper"><nav class="navigation">
+<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
+<ul>
+<li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Panel Principal</span></a></li>
+<li><a href="customers.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+<li><a href="invoices.html"><span class="nav-icon">📄</span> <span>Facturas</span></a></li>
+<li><a href="quotes.html"><span class="nav-icon">📝</span> <span>Cotizaciones</span></a></li>
+<li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span>Notas de Crédito</span></a></li>
+<li><a href="payments.html"><span class="nav-icon">💳</span> <span>Pagos</span></a></li>
+<li><a href="refunds.html"><span class="nav-icon">💸</span> <span>Reembolsos</span></a></li>
+<li><a href="items.html"><span class="nav-icon">📦</span> <span>Productos</span></a></li>
+<li><a href="reports.html"><span class="nav-icon">📈</span> <span>Reportes</span></a></li>
+<li><a href="settings.html"><span class="nav-icon">⚙️</span> <span>Configuración</span></a></li>
+<li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span>Administración</span></a></li>
+</ul>
+<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span>Cerrar Sesión</span></a></div>
+</nav></div>
+<div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic - Proveedores</span></div></div>
+<div class="container">
+<div class="page-header"><h1>Proveedores</h1><div class="actions"><button onclick="openAdd()">+ Nuevo Proveedor</button></div></div>
+<div class="filters">
+<input type="text" id="searchInput" placeholder="Buscar..." oninput="loadSuppliers()">
+</div>
+<div class="card" id="supContainer"><div class="loading">Cargando...</div></div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+  await APP.init();
+  if (APP.currentUser && APP.currentUser.role === 'superadmin') document.getElementById('admin-nav-link').classList.remove('hidden');
+  loadSuppliers();
+});
+async function loadSuppliers() {
+  const q = document.getElementById('searchInput').value;
+  try {
+    const d = await API.get('/api/suppliers' + (q ? '?search=' + encodeURIComponent(q) : ''));
+    renderSuppliers(d.suppliers || []);
+  } catch(e) { document.getElementById('supContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+function renderSuppliers(list) {
+  if (!list.length) { document.getElementById('supContainer').innerHTML = '<div style="text-align:center;padding:2em;color:#999">No hay proveedores.</div>'; return; }
+  let html = '<table class="record-list"><thead><tr><th>Código</th><th>Nombre</th><th>CUIT</th><th>Teléfono</th><th>Email</th><th>Contacto</th><th>Activo</th><th>Acción</th></tr></thead><tbody>';
+  for (const s of list) {
+    html += '<tr><td>' + APP.esc(s.code) + '</td><td>' + APP.esc(s.name) + '</td><td>' + APP.esc(s.cuit) + '</td><td>' + APP.esc(s.phone) + '</td><td>' + APP.esc(s.email) + '</td><td>' + APP.esc(s.contact_person) + '</td><td>' + (s.is_active ? '✓' : '✗') + '</td><td><button class="btn-secondary" style="min-width:auto;padding:.2em .6em" onclick="editSup(\'' + s.id + '\')">✏️</button> <button class="btn-secondary" style="min-width:auto;padding:.2em .6em;color:#d93025" onclick="deleteSup(\'' + s.id + '\')">🗑️</button></td></tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('supContainer').innerHTML = html;
+}
+function openAdd() { showModal(null); }
+async function editSup(id) { try { const d = await API.get('/api/suppliers/' + id); showModal(d); } catch(e) { alert('Error'); } }
+function showModal(s) {
+  const isEdit = !!s;
+  const html = '<div class="modal-content"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>' + (isEdit ? 'Editar Proveedor' : 'Nuevo Proveedor') + '</h2>' +
+    '<div class="settings-grid"><div><label>Nombre</label><input id="fName" value="' + (s ? APP.esc(s.name) : '') + '"></div>' +
+    '<div><label>Código</label><input id="fCode" value="' + (s ? APP.esc(s.code) : '') + '"></div>' +
+    '<div><label>CUIT</label><input id="fCuit" value="' + (s ? APP.esc(s.cuit) : '') + '"></div>' +
+    '<div><label>Dirección</label><input id="fAddr" value="' + (s ? APP.esc(s.address) : '') + '"></div>' +
+    '<div><label>Teléfono</label><input id="fPhone" value="' + (s ? APP.esc(s.phone) : '') + '"></div>' +
+    '<div><label>Email</label><input id="fEmail" value="' + (s ? APP.esc(s.email) : '') + '"></div>' +
+    '<div><label>Contacto</label><input id="fContact" value="' + (s ? APP.esc(s.contact_person) : '') + '"></div>' +
+    '<div><label>Cond. pago (días)</label><input type="number" id="fTerms" value="' + (s ? s.payment_terms : '30') + '"></div>' +
+    '<div><label>Notas</label><textarea id="fNotes">' + (s ? APP.esc(s.notes) : '') + '</textarea></div>' +
+    (isEdit ? '<div><label><input type="checkbox" id="fActive"' + (s.is_active ? ' checked' : '') + '> Activo</label></div>' : '') +
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="saveSup(\'' + (isEdit ? s.id : '') + '\')">Guardar</button></div></div>';
+  APP.modal(html, '');
+}
+async function saveSup(id) {
+  const data = { name: document.getElementById('fName').value, code: document.getElementById('fCode').value, cuit: document.getElementById('fCuit').value, address: document.getElementById('fAddr').value, phone: document.getElementById('fPhone').value, email: document.getElementById('fEmail').value, contact_person: document.getElementById('fContact').value, payment_terms: document.getElementById('fTerms').value, notes: document.getElementById('fNotes').value };
+  if (id) data.is_active = document.getElementById('fActive').checked ? 1 : 0;
+  if (!data.name) { alert('Nombre obligatorio'); return; }
+  try {
+    if (id) await API.put('/api/suppliers/' + id, data); else await API.post('/api/suppliers', data);
+    document.querySelector('.modal-overlay').remove(); loadSuppliers();
+  } catch(e) { alert('Error: ' + (e.message || '')); }
+}
+async function deleteSup(id) {
+  APP.confirm('Eliminar proveedor', '¿Está seguro?', async () => { try { await API.del('/api/suppliers/' + id); loadSuppliers(); } catch(e) { alert('Error: ' + (e.message || '')); } });
+}
+</script>
+</body>
+</html>

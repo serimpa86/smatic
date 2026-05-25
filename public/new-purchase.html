@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nueva Orden de Compra | Smatic</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+.line-total { font-weight: bold; text-align: right; }
+</style>
+</head>
+<body>
+<div class="navigation-wrapper"><nav class="navigation">
+<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
+<ul>
+<li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Panel Principal</span></a></li>
+<li><a href="customers.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+<li><a href="invoices.html"><span class="nav-icon">📄</span> <span>Facturas</span></a></li>
+<li><a href="quotes.html"><span class="nav-icon">📝</span> <span>Cotizaciones</span></a></li>
+<li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span>Notas de Crédito</span></a></li>
+<li><a href="payments.html"><span class="nav-icon">💳</span> <span>Pagos</span></a></li>
+<li><a href="refunds.html"><span class="nav-icon">💸</span> <span>Reembolsos</span></a></li>
+<li><a href="items.html"><span class="nav-icon">📦</span> <span>Productos</span></a></li>
+<li><a href="reports.html"><span class="nav-icon">📈</span> <span>Reportes</span></a></li>
+<li><a href="settings.html"><span class="nav-icon">⚙️</span> <span>Configuración</span></a></li>
+<li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span>Administración</span></a></li>
+</ul>
+<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span>Cerrar Sesión</span></a></div>
+</nav></div>
+<div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic - Orden de Compra</span></div></div>
+<div class="container">
+<div class="page-header"><h1 id="pageTitle">Nueva Orden de Compra</h1></div>
+<div class="card">
+<div class="invoice-form">
+<div class="form-row">
+<div class="form-group"><label>Proveedor</label><select id="supplierSelect" style="width:100%"><option value="">Seleccionar proveedor...</option></select></div>
+<div class="form-group"><label>N° OC</label><input type="text" id="poNumber" readonly></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Fecha</label><input type="date" id="poDate"></div>
+<div class="form-group"><label>Fecha esperada</label><input type="date" id="poExpected"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Depósito destino</label><select id="whSelect" style="width:100%"><option value="">Seleccionar depósito...</option></select></div>
+<div class="form-group"><label>Moneda</label><select id="poCurrency"><option value="ARS">ARS</option><option value="USD">USD</option></select></div>
+</div>
+<div class="form-group"><label>Notas</label><textarea id="poNotes" rows="2"></textarea></div>
+</div>
+<h3 style="margin:1em 0 .5em">Items</h3>
+<button class="btn-secondary" onclick="addLine()" style="margin-bottom:.5em">+ Agregar item</button>
+<table class="items-table" id="itemsTable">
+<thead><tr><th style="width:25%">Producto</th><th style="width:30%">Descripción</th><th style="width:8%">Cant.</th><th style="width:10%">Precio</th><th style="width:8%">IVA%</th><th style="width:12%">Total</th><th style="width:3%"></th></tr></thead>
+<tbody></tbody>
+</table>
+<div class="totals">
+<div class="total-row"><span class="label">Subtotal:</span><span class="value" id="subtotal">$0.00</span></div>
+<div class="total-row"><span class="label">IVA:</span><span class="value" id="taxTotal">$0.00</span></div>
+<div class="total-row grand"><span class="label">Total:</span><span class="value" id="grandTotal">$0.00</span></div>
+</div>
+<div class="action-bar" id="actionBar">
+<button onclick="savePO()" id="btnSave">Guardar</button>
+<button class="btn-secondary" onclick="changeStatus('sent')" id="btnSend" style="display:none">Enviar</button>
+<button class="btn-secondary" onclick="changeStatus('confirmed')" id="btnConfirm" style="display:none">Confirmar</button>
+<button class="btn-secondary" onclick="receivePO()" id="btnReceive" style="display:none">Recibir completo</button>
+<button class="btn-secondary" onclick="cancelPO()" id="btnCancel" style="display:none">Cancelar</button>
+<button class="btn-secondary" onclick="window.location.href='purchases.html'">Volver</button>
+</div>
+</div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+let poId = null;
+let itemsCache = [], suppliersCache = [], whCache = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+  await APP.init();
+  if (APP.currentUser && APP.currentUser.role === 'superadmin') document.getElementById('admin-nav-link').classList.remove('hidden');
+  const params = new URLSearchParams(window.location.search);
+  poId = params.get('id');
+  await loadCaches();
+  if (poId) await loadPO(poId);
+  else await initNew();
+  updateTotals();
+});
+
+async function loadCaches() {
+  try {
+    const [itemsData, supData, whData] = await Promise.all([API.get('/api/items'), API.get('/api/suppliers'), API.get('/api/warehouses')]);
+    itemsCache = itemsData.items || [];
+    suppliersCache = supData.suppliers || [];
+    whCache = whData.warehouses || [];
+    const supSel = document.getElementById('supplierSelect');
+    supSel.innerHTML = '<option value="">Seleccionar proveedor...</option>' + suppliersCache.map(s => '<option value="' + s.id + '" data-name="' + APP.esc(s.name) + '" data-cuit="' + APP.esc(s.cuit) + '" data-addr="' + APP.esc(s.address) + '" data-phone="' + APP.esc(s.phone) + '">' + APP.esc(s.code ? s.code + ' - ' : '') + APP.esc(s.name) + '</option>').join('');
+    const whSel = document.getElementById('whSelect');
+    whSel.innerHTML = '<option value="">Seleccionar depósito...</option>' + whCache.filter(w => w.is_active).map(w => '<option value="' + w.id + '">' + APP.esc(w.name) + '</option>').join('');
+  } catch(e) { console.error('loadCaches', e); }
+}
+
+async function initNew() {
+  document.getElementById('pageTitle').textContent = 'Nueva Orden de Compra';
+  document.getElementById('poDate').value = new Date().toISOString().slice(0,10);
+  const next = await API.get('/api/purchases/next-number');
+  document.getElementById('poNumber').value = 'PO-' + String(next.nextNumber).padStart(6, '0');
+  addLine();
+  addLine();
+}
+
+async function loadPO(id) {
+  try {
+    const po = await API.get('/api/purchases/' + id);
+    document.getElementById('pageTitle').textContent = 'OC ' + po.po_number;
+    document.getElementById('poNumber').value = po.po_number;
+    document.getElementById('poDate').value = po.date;
+    document.getElementById('poExpected').value = po.expected_date || '';
+    document.getElementById('poNotes').value = po.notes || '';
+    document.getElementById('supplierSelect').value = po.supplier_id || '';
+    document.getElementById('whSelect').value = po.warehouse_id || '';
+    document.getElementById('poCurrency').value = po.currency || 'ARS';
+    const tbody = document.querySelector('#itemsTable tbody');
+    tbody.innerHTML = '';
+    (po.items || []).forEach((item, i) => addLine(item, i));
+    updateTotals();
+    updateActionButtons(po.status, po.id);
+  } catch(e) { alert('Error al cargar OC'); }
+}
+
+function updateActionButtons(status, id) {
+  document.getElementById('btnSave').style.display = (status === 'draft' || !status) ? 'inline-block' : 'none';
+  document.getElementById('btnSend').style.display = status === 'draft' ? 'inline-block' : 'none';
+  document.getElementById('btnConfirm').style.display = status === 'sent' ? 'inline-block' : 'none';
+  document.getElementById('btnReceive').style.display = (status === 'confirmed' || status === 'sent') ? 'inline-block' : 'none';
+  document.getElementById('btnCancel').style.display = (status && status !== 'received' && status !== 'cancelled') ? 'inline-block' : 'none';
+}
+
+function addLine(data, idx) {
+  const tbody = document.querySelector('#itemsTable tbody');
+  const i = idx !== undefined ? idx : tbody.children.length;
+  const itemOpts = '<option value="">Seleccionar...</option>' + itemsCache.map(it => '<option value="' + it.id + '" data-code="' + APP.esc(it.code || '') + '" data-price="' + (it.cost_price || 0) + '" data-tax="' + (it.tax_rate || 0) + '" data-taxname="' + APP.esc(it.tax_name || '') + '">' + APP.esc(it.code ? it.code + ' - ' : '') + APP.esc(it.name) + '</option>').join('');
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td><select class="line-item" data-index="' + i + '" style="width:100%" onchange="onItemChange(this)">' + itemOpts + '</select></td>' +
+    '<td><input type="text" class="line-desc" data-index="' + i + '" value="' + (data ? APP.esc(data.description) : '') + '" style="width:100%"></td>' +
+    '<td><input type="number" class="line-qty" data-index="' + i + '" value="' + (data ? data.quantity : 1) + '" step="0.01" min="0.01" style="width:100%" oninput="updateTotals()"></td>' +
+    '<td><input type="number" class="line-price" data-index="' + i + '" value="' + (data ? data.unit_price : '') + '" step="0.01" min="0" style="width:100%" oninput="updateTotals()"></td>' +
+    '<td><input type="number" class="line-tax" data-index="' + i + '" value="' + (data ? data.tax_rate : 0) + '" step="0.01" min="0" style="width:100%" oninput="updateTotals()"></td>' +
+    '<td class="line-total" data-index="' + i + '">$0.00</td>' +
+    '<td><span style="cursor:pointer;color:#d93025" onclick="this.closest(\'tr\').remove();updateTotals()">✕</span></td>';
+  tbody.appendChild(tr);
+  if (data && data.item_id) tr.querySelector('.line-item').value = data.item_id;
+  if (data) updateTotals();
+}
+
+function onItemChange(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  const tr = sel.closest('tr');
+  if (opt.value) {
+    tr.querySelector('.line-desc').value = opt.getAttribute('data-code') + ' - ' + opt.textContent;
+    tr.querySelector('.line-price').value = opt.getAttribute('data-price');
+    tr.querySelector('.line-tax').value = opt.getAttribute('data-tax');
+  }
+  updateTotals();
+}
+
+function updateTotals() {
+  let subtotal = 0, taxTotal = 0;
+  document.querySelectorAll('#itemsTable tbody tr').forEach(tr => {
+    const qty = parseFloat(tr.querySelector('.line-qty').value) || 0;
+    const price = parseFloat(tr.querySelector('.line-price').value) || 0;
+    const tax = parseFloat(tr.querySelector('.line-tax').value) || 0;
+    const total = qty * price;
+    subtotal += total;
+    taxTotal += total * (tax / 100);
+    tr.querySelector('.line-total').textContent = APP.formatMoney(total);
+  });
+  document.getElementById('subtotal').textContent = APP.formatMoney(subtotal);
+  document.getElementById('taxTotal').textContent = APP.formatMoney(taxTotal);
+  document.getElementById('grandTotal').textContent = APP.formatMoney(subtotal + taxTotal);
+}
+
+async function savePO() {
+  const items = [];
+  document.querySelectorAll('#itemsTable tbody tr').forEach(tr => {
+    const sel = tr.querySelector('.line-item');
+    items.push({
+      item_id: sel.value || null,
+      item_code: sel.value ? (sel.options[sel.selectedIndex].getAttribute('data-code') || '') : '',
+      description: tr.querySelector('.line-desc').value,
+      quantity: parseFloat(tr.querySelector('.line-qty').value) || 1,
+      unit_price: parseFloat(tr.querySelector('.line-price').value) || 0,
+      tax_rate: parseFloat(tr.querySelector('.line-tax').value) || 0
+    });
+  });
+  if (items.length === 0) { alert('Agregue al menos un item'); return; }
+  const data = {
+    supplier_id: document.getElementById('supplierSelect').value,
+    supplier_name: document.getElementById('supplierSelect').selectedOptions[0]?.getAttribute('data-name') || '',
+    supplier_cuit: document.getElementById('supplierSelect').selectedOptions[0]?.getAttribute('data-cuit') || '',
+    date: document.getElementById('poDate').value,
+    expected_date: document.getElementById('poExpected').value,
+    notes: document.getElementById('poNotes').value,
+    warehouse_id: document.getElementById('whSelect').value || null,
+    currency: document.getElementById('poCurrency').value,
+    items
+  };
+  if (!data.date) { alert('Fecha obligatoria'); return; }
+  try {
+    if (poId) await API.put('/api/purchases/' + poId, data);
+    else await API.post('/api/purchases', data);
+    if (!poId) window.location.reload();
+    else { alert('Guardado'); loadPO(poId); }
+  } catch(e) { alert('Error: ' + (e.message || '')); }
+}
+
+async function changeStatus(status) {
+  try { await API.post('/api/purchases/' + poId + '/status', { status }); loadPO(poId); } catch(e) { alert('Error: ' + (e.message || '')); }
+}
+
+async function receivePO() {
+  try { await API.post('/api/purchases/' + poId + '/receive', {}); loadPO(poId); } catch(e) { alert('Error: ' + (e.message || '')); }
+}
+
+async function cancelPO() {
+  APP.confirm('Cancelar OC', '¿Está seguro?', async () => { try { await changeStatus('cancelled'); } catch(e) { alert('Error'); } });
+}
+</script>
+</body>
+</html>

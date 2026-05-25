@@ -64,6 +64,15 @@ const APP = {
         module: 'stock',
         className: 'nav-stock-injected',
         before: 'li a[href="reports.html"]'
+      },
+      {
+        items: [
+          ['suppliers.html', '🏢', 'nav_suppliers', 'Proveedores'],
+          ['purchases.html', '🛒', 'nav_purchases', 'Órdenes de Compra'],
+        ],
+        module: 'purchases',
+        className: 'nav-purchases-injected',
+        before: 'li a[href="reports.html"]'
       }
     ];
     for (const group of modules) {

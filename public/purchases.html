@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Órdenes de Compra | Smatic</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="navigation-wrapper"><nav class="navigation">
+<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
+<ul>
+<li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Panel Principal</span></a></li>
+<li><a href="customers.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+<li><a href="invoices.html"><span class="nav-icon">📄</span> <span>Facturas</span></a></li>
+<li><a href="quotes.html"><span class="nav-icon">📝</span> <span>Cotizaciones</span></a></li>
+<li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span>Notas de Crédito</span></a></li>
+<li><a href="payments.html"><span class="nav-icon">💳</span> <span>Pagos</span></a></li>
+<li><a href="refunds.html"><span class="nav-icon">💸</span> <span>Reembolsos</span></a></li>
+<li><a href="items.html"><span class="nav-icon">📦</span> <span>Productos</span></a></li>
+<li><a href="reports.html"><span class="nav-icon">📈</span> <span>Reportes</span></a></li>
+<li><a href="settings.html"><span class="nav-icon">⚙️</span> <span>Configuración</span></a></li>
+<li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span>Administración</span></a></li>
+</ul>
+<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span>Cerrar Sesión</span></a></div>
+</nav></div>
+<div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic - Órdenes de Compra</span></div></div>
+<div class="container">
+<div class="page-header"><h1>Órdenes de Compra</h1><div class="actions"><button onclick="window.location.href='new-purchase.html'">+ Nueva OC</button></div></div>
+<div class="filters">
+<select id="filterStatus" onchange="loadPOs()"><option value="">Todas</option><option value="draft">Borrador</option><option value="sent">Enviada</option><option value="confirmed">Confirmada</option><option value="received">Recibida</option><option value="cancelled">Cancelada</option></select>
+<input type="date" id="filterFrom" onchange="loadPOs()">
+<input type="date" id="filterTo" onchange="loadPOs()">
+<button class="btn-secondary" onclick="document.getElementById('filterStatus').value='';document.getElementById('filterFrom').value='';document.getElementById('filterTo').value='';loadPOs()">Limpiar</button>
+</div>
+<div class="card" id="poContainer"><div class="loading">Cargando...</div></div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+  await APP.init();
+  if (APP.currentUser && APP.currentUser.role === 'superadmin') document.getElementById('admin-nav-link').classList.remove('hidden');
+  loadPOs();
+});
+async function loadPOs() {
+  const s = document.getElementById('filterStatus').value;
+  const from = document.getElementById('filterFrom').value;
+  const to = document.getElementById('filterTo').value;
+  let url = '/api/purchases?limit=100';
+  if (s) url += '&status=' + s;
+  if (from) url += '&from=' + from;
+  if (to) url += '&to=' + to;
+  try {
+    const d = await API.get(url);
+    renderPOs(d.orders || []);
+  } catch(e) { document.getElementById('poContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+const statusLabels = { draft: 'Borrador', sent: 'Enviada', confirmed: 'Confirmada', received: 'Recibida', cancelled: 'Cancelada' };
+const statusColors = { draft: '#888', sent: '#004085', confirmed: '#856404', received: '#155724', cancelled: '#999' };
+function renderPOs(list) {
+  if (!list.length) { document.getElementById('poContainer').innerHTML = '<div style="text-align:center;padding:2em;color:#999">Sin órdenes de compra.</div>'; return; }
+  let html = '<table class="record-list"><thead><tr><th>N° OC</th><th>Proveedor</th><th>Fecha</th><th>Esperada</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead><tbody>';
+  for (const o of list) {
+    html += '<tr><td><a href="new-purchase.html?id=' + o.id + '">' + APP.esc(o.po_number) + '</a></td><td>' + APP.esc(o.supplier_name) + '</td><td>' + APP.esc(o.date) + '</td><td>' + APP.esc(o.expected_date) + '</td><td>' + APP.formatMoney(o.total) + '</td><td><span style="color:' + (statusColors[o.status] || '#888') + ';font-weight:bold">' + (statusLabels[o.status] || o.status) + '</span></td><td><a href="new-purchase.html?id=' + o.id + '" class="btn-secondary" style="min-width:auto;padding:.2em .6em;font-size:.85em">Ver</a></td></tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('poContainer').innerHTML = html;
+}
+</script>
+</body>
+</html>
