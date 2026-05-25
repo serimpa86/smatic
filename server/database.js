@@ -36,9 +36,9 @@ function run(sql, params = []) {
 
 function transaction(fn) {
   if (!_db) throw new Error('Database not initialized');
-  _db.run('BEGIN TRANSACTION');
-  try { fn(); _db.run('COMMIT'); save(); }
-  catch (e) { _db.run('ROLLBACK'); throw e; }
+  _db.exec('BEGIN');
+  try { fn(); _db.exec('COMMIT'); save(); }
+  catch (e) { try { _db.exec('ROLLBACK'); } catch(e2) {} throw e; }
 }
 
 function save() {
@@ -339,14 +339,37 @@ async function initDb() {
 }
 
 function migrateToMultiCompany() {
-  // Only run once: check if any user already has company_id
-  const already = get("SELECT COUNT(*) as c FROM users WHERE company_id IS NOT NULL AND company_id != ''");
-  if (already && already.c > 0) return;
-  const users = all('SELECT u.*, bs.business_name, bs.currency, bs.currency_symbol, bs.timezone, bs.fiscal_year_start FROM users u LEFT JOIN business_settings bs ON bs.user_id = u.id');
-  if (!users || users.length === 0) return;
-  log('Migrating ' + users.length + ' users to multi-company...');
-  transaction(() => {
-    for (const user of users) {
+  // Check if any user has an orphaned company_id (company row missing) and fix
+  const orphaned = all("SELECT u.id, u.email, u.company_id FROM users u WHERE u.company_id IS NOT NULL AND u.company_id != '' AND NOT EXISTS (SELECT 1 FROM companies c WHERE c.id = u.company_id)");
+  if (orphaned && orphaned.length > 0) {
+    log('Fixing ' + orphaned.length + ' orphaned company references...');
+    for (const u of orphaned) {
+      const bs = get('SELECT business_name, currency, currency_symbol, timezone, fiscal_year_start FROM business_settings WHERE user_id = ?', [u.id]);
+      const newId = uuidv4();
+      run('INSERT INTO companies (id, name, business_name, currency, currency_symbol, timezone, fiscal_year_start) VALUES (?,?,?,?,?,?,?)',
+        [newId, bs ? bs.business_name || u.email : u.email, bs ? bs.business_name || '' : '', bs ? bs.currency || 'ARS' : 'ARS', bs ? bs.currency_symbol || '$' : '$', bs ? bs.timezone || 'America/Argentina/Buenos_Aires' : 'America/Argentina/Buenos_Aires', bs ? bs.fiscal_year_start || '01-01' : '01-01']);
+      run('UPDATE users SET company_id = ? WHERE id = ?', [newId, u.id]);
+      run('UPDATE business_settings SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE customers SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE customer_groups SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE items SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE taxes SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE invoices SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE quotes SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE payments SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE refunds SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE credit_notes SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+      run('UPDATE invoice_templates SET company_id = ? WHERE user_id = ?', [newId, u.id]);
+    }
+    log('Fixed ' + orphaned.length + ' orphaned references.');
+  }
+
+  // Migrate users that still don't have company_id
+  const pending = all("SELECT u.*, bs.business_name, bs.currency, bs.currency_symbol, bs.timezone, bs.fiscal_year_start FROM users u LEFT JOIN business_settings bs ON bs.user_id = u.id WHERE u.company_id IS NULL OR u.company_id = ''");
+  if (!pending || pending.length === 0) return;
+  log('Migrating ' + pending.length + ' users to multi-company...');
+  for (const user of pending) {
+    try {
       const companyId = uuidv4();
       run('INSERT INTO companies (id, name, business_name, currency, currency_symbol, timezone, fiscal_year_start) VALUES (?,?,?,?,?,?,?)',
         [companyId, user.business_name || user.name || 'Mi Empresa', user.business_name || '', user.currency || 'ARS', user.currency_symbol || '$', user.timezone || 'America/Argentina/Buenos_Aires', user.fiscal_year_start || '01-01']);
@@ -365,8 +388,8 @@ function migrateToMultiCompany() {
       run('UPDATE invoice_items SET company_id = ? WHERE invoice_id IN (SELECT id FROM invoices WHERE user_id = ?)', [companyId, user.id]);
       run('UPDATE quote_items SET company_id = ? WHERE quote_id IN (SELECT id FROM quotes WHERE user_id = ?)', [companyId, user.id]);
       run('UPDATE credit_note_items SET company_id = ? WHERE credit_note_id IN (SELECT id FROM credit_notes WHERE user_id = ?)', [companyId, user.id]);
-    }
-  });
+    } catch (e) { log('Migration error for user ' + user.email + ': ' + e.message); }
+  }
   log('Migration to multi-company completed.');
 }
 
