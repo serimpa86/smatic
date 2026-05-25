@@ -330,6 +330,9 @@ async function initDb() {
   try { exec("ALTER TABLE chart_of_accounts ADD COLUMN company_id TEXT"); } catch (e) {}
   try { exec("ALTER TABLE journal_entries ADD COLUMN company_id TEXT"); } catch (e) {}
   try { exec("ALTER TABLE journal_entry_lines ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE warehouses ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE stock_levels ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE stock_movements ADD COLUMN company_id TEXT"); } catch (e) {}
 
   exec(`CREATE TABLE IF NOT EXISTS chart_of_accounts (
     id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
@@ -353,6 +356,32 @@ async function initDb() {
     id TEXT PRIMARY KEY, journal_entry_id TEXT NOT NULL,
     account_id TEXT NOT NULL, description TEXT DEFAULT '',
     debit REAL DEFAULT 0, credit REAL DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS warehouses (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    name TEXT NOT NULL, code TEXT DEFAULT '',
+    address TEXT DEFAULT '', phone TEXT DEFAULT '',
+    is_default INTEGER DEFAULT 0, is_active INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS stock_levels (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    item_id TEXT NOT NULL, warehouse_id TEXT NOT NULL,
+    quantity REAL DEFAULT 0,
+    updated_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS stock_movements (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    item_id TEXT NOT NULL, warehouse_id TEXT NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('in','out','transfer_in','transfer_out','adjustment')),
+    quantity REAL NOT NULL, reference_type TEXT DEFAULT '',
+    reference_id TEXT DEFAULT '', description TEXT DEFAULT '',
+    unit_cost REAL DEFAULT 0, created_by TEXT NOT NULL,
     created_at TEXT DEFAULT (datetime('now'))
   )`);
 

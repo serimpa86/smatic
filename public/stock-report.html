@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Informe de Stock | Smatic</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+.low-stock { color: #d93025; font-weight: bold; }
+.ok-stock { color: #155724; }
+</style>
+</head>
+<body>
+<div class="navigation-wrapper"><nav class="navigation">
+<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
+<ul>
+<li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Panel Principal</span></a></li>
+<li><a href="customers.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+<li><a href="invoices.html"><span class="nav-icon">📄</span> <span>Facturas</span></a></li>
+<li><a href="quotes.html"><span class="nav-icon">📝</span> <span>Cotizaciones</span></a></li>
+<li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span>Notas de Crédito</span></a></li>
+<li><a href="payments.html"><span class="nav-icon">💳</span> <span>Pagos</span></a></li>
+<li><a href="refunds.html"><span class="nav-icon">💸</span> <span>Reembolsos</span></a></li>
+<li><a href="items.html"><span class="nav-icon">📦</span> <span>Productos</span></a></li>
+<li><a href="reports.html"><span class="nav-icon">📈</span> <span>Reportes</span></a></li>
+<li><a href="settings.html"><span class="nav-icon">⚙️</span> <span>Configuración</span></a></li>
+<li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span>Administración</span></a></li>
+</ul>
+<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span>Cerrar Sesión</span></a></div>
+</nav></div>
+<div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic - Informe de Stock</span></div></div>
+<div class="container">
+<div class="page-header"><h1>Informe de Stock</h1><div class="actions"><button onclick="loadReport(); loadLowStock()">Actualizar</button></div></div>
+<div class="card">
+<h3>Stock por producto y depósito</h3>
+<div id="stockContainer"><div class="loading">Cargando...</div></div>
+</div>
+<div class="card">
+<h3 style="color:#d93025">Alertas de stock bajo</h3>
+<div id="lowStockContainer"><div class="loading">Cargando...</div></div>
+</div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+  await APP.init();
+  if (APP.currentUser && APP.currentUser.role === 'superadmin') document.getElementById('admin-nav-link').classList.remove('hidden');
+  loadReport();
+  loadLowStock();
+});
+async function loadReport() {
+  try {
+    const data = await API.get('/api/stock/summary');
+    renderReport(data.items || []);
+  } catch(e) { document.getElementById('stockContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+function renderReport(items) {
+  if (!items.length) { document.getElementById('stockContainer').innerHTML = '<div style="color:#999;padding:1em;text-align:center">No hay productos con control de inventario.</div>'; return; }
+  let html = '<table class="record-list"><thead><tr><th>Código</th><th>Producto</th><th>Unidad</th><th>Stock Total</th><th>Precio Costo</th><th>Precio Venta</th><th>Valorizado</th><th>Alertas</th></tr></thead><tbody>';
+  for (const item of items) {
+    const isLow = item.track_inventory && item.stock_warning_level > 0 && item.stock_quantity <= item.stock_warning_level;
+    const valorized = (item.cost_price || 0) * (item.stock_quantity || 0);
+    html += '<tr' + (isLow ? ' class="low-stock"' : '') + '><td>' + APP.esc(item.code) + '</td><td>' + APP.esc(item.name) + '</td><td>' + APP.esc(item.unit) + '</td><td>' + (item.stock_quantity || 0) + '</td><td>' + APP.formatMoney(item.cost_price) + '</td><td>' + APP.formatMoney(item.price) + '</td><td>' + APP.formatMoney(valorized) + '</td><td>' + (isLow ? '⚠ Stock mínimo: ' + item.stock_warning_level : '') + '</td></tr>';
+    if (item.warehouses && item.warehouses.length > 0) {
+      for (const wh of item.warehouses) {
+        html += '<tr style="font-size:.85em;color:#888"><td></td><td colspan="7">↳ ' + APP.esc(wh.warehouse_name) + ': ' + wh.quantity + ' unidades</td></tr>';
+      }
+    }
+  }
+  html += '</tbody></table>';
+  document.getElementById('stockContainer').innerHTML = html;
+}
+async function loadLowStock() {
+  try {
+    const data = await API.get('/api/stock/levels?low_stock=1');
+    renderLowStock(data.levels || []);
+  } catch(e) { document.getElementById('lowStockContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+function renderLowStock(levels) {
+  if (!levels.length) { document.getElementById('lowStockContainer').innerHTML = '<div style="color:#155724;padding:1em">✅ Todos los productos tienen stock suficiente.</div>'; return; }
+  let html = '<table class="record-list"><thead><tr><th>Producto</th><th>Depósito</th><th>Stock Actual</th><th>Stock Mínimo</th></tr></thead><tbody>';
+  for (const l of levels) {
+    html += '<tr class="low-stock"><td>' + APP.esc(l.item_code) + ' - ' + APP.esc(l.item_name) + '</td><td>' + APP.esc(l.warehouse_name) + '</td><td>' + l.quantity + '</td><td>' + l.stock_warning_level + '</td></tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('lowStockContainer').innerHTML = html;
+}
+</script>
+</body>
+</html>

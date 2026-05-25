@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="page_title_warehouses">Depósitos | Smatic</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="navigation-wrapper"><nav class="navigation">
+<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
+<ul>
+<li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Panel Principal</span></a></li>
+<li><a href="customers.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+<li><a href="invoices.html"><span class="nav-icon">📄</span> <span>Facturas</span></a></li>
+<li><a href="quotes.html"><span class="nav-icon">📝</span> <span>Cotizaciones</span></a></li>
+<li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span>Notas de Crédito</span></a></li>
+<li><a href="payments.html"><span class="nav-icon">💳</span> <span>Pagos</span></a></li>
+<li><a href="refunds.html"><span class="nav-icon">💸</span> <span>Reembolsos</span></a></li>
+<li><a href="items.html"><span class="nav-icon">📦</span> <span>Productos</span></a></li>
+<li><a href="reports.html"><span class="nav-icon">📈</span> <span>Reportes</span></a></li>
+<li><a href="settings.html"><span class="nav-icon">⚙️</span> <span>Configuración</span></a></li>
+<li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span>Administración</span></a></li>
+</ul>
+<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span>Cerrar Sesión</span></a></div>
+</nav></div>
+<div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic - Depósitos</span></div></div>
+<div class="container">
+<div class="page-header"><h1>Depósitos</h1><div class="actions"><button onclick="openAddWarehouse()">+ Agregar Depósito</button></div></div>
+<div class="card" id="whContainer"><div class="loading">Cargando...</div></div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+  await APP.init();
+  if (APP.currentUser && APP.currentUser.role === 'superadmin') document.getElementById('admin-nav-link').classList.remove('hidden');
+  loadWarehouses();
+});
+async function loadWarehouses() {
+  try {
+    const data = await API.get('/api/warehouses');
+    renderWarehouses(data.warehouses || []);
+  } catch(e) { document.getElementById('whContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+function renderWarehouses(list) {
+  if (!list.length) { document.getElementById('whContainer').innerHTML = '<div style="text-align:center;padding:2em;color:#999">No hay depósitos.</div>'; return; }
+  let html = '<table class="record-list"><thead><tr><th>Código</th><th>Nombre</th><th>Dirección</th><th>Teléfono</th><th>Default</th><th>Activo</th><th>Acción</th></tr></thead><tbody>';
+  for (const w of list) {
+    html += '<tr><td>' + APP.esc(w.code) + '</td><td>' + APP.esc(w.name) + '</td><td>' + APP.esc(w.address) + '</td><td>' + APP.esc(w.phone) + '</td><td>' + (w.is_default ? '✓' : '') + '</td><td>' + (w.is_active ? '✓' : '✗') + '</td><td><button class="btn-secondary" style="min-width:auto;padding:.2em .6em" onclick="editWarehouse(\'' + w.id + '\')">✏️</button> <button class="btn-secondary" style="min-width:auto;padding:.2em .6em;color:#d93025" onclick="deleteWarehouse(\'' + w.id + '\')">🗑️</button></td></tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('whContainer').innerHTML = html;
+}
+function openAddWarehouse() { showWarehouseModal(null); }
+async function editWarehouse(id) { try { const d = await API.get('/api/warehouses/' + id); showWarehouseModal(d); } catch(e) { alert('Error'); } }
+function showWarehouseModal(w) {
+  const isEdit = !!w;
+  const html = '<div class="modal-content"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>' + (isEdit ? 'Editar Depósito' : 'Nuevo Depósito') + '</h2>' +
+    '<div class="settings-grid"><div><label>Nombre</label><input id="whName" value="' + (w ? APP.esc(w.name) : '') + '"></div>' +
+    '<div><label>Código</label><input id="whCode" value="' + (w ? APP.esc(w.code) : '') + '"></div>' +
+    '<div><label>Dirección</label><input id="whAddr" value="' + (w ? APP.esc(w.address) : '') + '"></div>' +
+    '<div><label>Teléfono</label><input id="whPhone" value="' + (w ? APP.esc(w.phone) : '') + '"></div>' +
+    '<div><label><input type="checkbox" id="whDefault"' + (w && w.is_default ? ' checked' : '') + '> Depósito por defecto</label></div>' +
+    (isEdit ? '<div><label><input type="checkbox" id="whActive"' + (w.is_active ? ' checked' : '') + '> Activo</label></div>' : '') +
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="saveWarehouse(\'' + (isEdit ? w.id : '') + '\')">Guardar</button></div></div>';
+  APP.modal(html, '');
+}
+async function saveWarehouse(id) {
+  const data = { name: document.getElementById('whName').value, code: document.getElementById('whCode').value, address: document.getElementById('whAddr').value, phone: document.getElementById('whPhone').value, is_default: document.getElementById('whDefault').checked ? 1 : 0 };
+  if (id) { data.is_active = document.getElementById('whActive').checked ? 1 : 0; }
+  if (!data.name) { alert('Nombre obligatorio'); return; }
+  try {
+    if (id) await API.put('/api/warehouses/' + id, data); else await API.post('/api/warehouses', data);
+    document.querySelector('.modal-overlay').remove(); loadWarehouses();
+  } catch(e) { alert('Error: ' + (e.message || '')); }
+}
+async function deleteWarehouse(id) {
+  APP.confirm('Eliminar depósito', '¿Está seguro?', async () => { try { await API.del('/api/warehouses/' + id); loadWarehouses(); } catch(e) { alert('Error: ' + (e.message || '')); } });
+}
+</script>
+</body>
+</html>

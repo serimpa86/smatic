@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Movimientos de Stock | Smatic</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="navigation-wrapper"><nav class="navigation">
+<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
+<ul>
+<li><a href="dashboard.html"><span class="nav-icon">📊</span> <span>Panel Principal</span></a></li>
+<li><a href="customers.html"><span class="nav-icon">👥</span> <span>Clientes</span></a></li>
+<li><a href="invoices.html"><span class="nav-icon">📄</span> <span>Facturas</span></a></li>
+<li><a href="quotes.html"><span class="nav-icon">📝</span> <span>Cotizaciones</span></a></li>
+<li><a href="credit-notes.html"><span class="nav-icon">📒</span> <span>Notas de Crédito</span></a></li>
+<li><a href="payments.html"><span class="nav-icon">💳</span> <span>Pagos</span></a></li>
+<li><a href="refunds.html"><span class="nav-icon">💸</span> <span>Reembolsos</span></a></li>
+<li><a href="items.html"><span class="nav-icon">📦</span> <span>Productos</span></a></li>
+<li><a href="reports.html"><span class="nav-icon">📈</span> <span>Reportes</span></a></li>
+<li><a href="settings.html"><span class="nav-icon">⚙️</span> <span>Configuración</span></a></li>
+<li id="admin-nav-link" class="hidden"><a href="admin.html"><span class="nav-icon">⚡</span> <span>Administración</span></a></li>
+</ul>
+<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span>Cerrar Sesión</span></a></div>
+</nav></div>
+<div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic - Movimientos de Stock</span></div></div>
+<div class="container">
+<div class="page-header"><h1>Movimientos de Stock</h1><div class="actions">
+<button onclick="openMovement('in')">+ Entrada</button>
+<button onclick="openMovement('out')">- Salida</button>
+<button onclick="openMovement('transfer')">⇄ Transferencia</button>
+<button onclick="openMovement('adjust')">⚖ Ajuste</button>
+</div></div>
+<div class="filters">
+<select id="filterType" onchange="loadMovements()"><option value="">Todos</option><option value="in">Entradas</option><option value="out">Salidas</option><option value="transfer_in">Transferencias (entrada)</option><option value="transfer_out">Transferencias (salida)</option><option value="adjustment">Ajustes</option></select>
+<input type="date" id="filterFrom" onchange="loadMovements()">
+<input type="date" id="filterTo" onchange="loadMovements()">
+<button class="btn-secondary" onclick="document.getElementById('filterType').value='';document.getElementById('filterFrom').value='';document.getElementById('filterTo').value='';loadMovements()">Limpiar</button>
+</div>
+<div class="card" id="movContainer"><div class="loading">Cargando...</div></div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+  await APP.init();
+  if (APP.currentUser && APP.currentUser.role === 'superadmin') document.getElementById('admin-nav-link').classList.remove('hidden');
+  loadMovements();
+});
+async function loadMovements() {
+  const type = document.getElementById('filterType').value;
+  const from = document.getElementById('filterFrom').value;
+  const to = document.getElementById('filterTo').value;
+  let url = '/api/stock/movements?limit=100';
+  if (type) url += '&type=' + type;
+  if (from) url += '&from=' + from;
+  if (to) url += '&to=' + to;
+  try {
+    const data = await API.get(url);
+    renderMovements(data.movements || []);
+  } catch(e) { document.getElementById('movContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+function renderMovements(list) {
+  if (!list.length) { document.getElementById('movContainer').innerHTML = '<div style="text-align:center;padding:2em;color:#999">Sin movimientos.</div>'; return; }
+  const typeLabels = { in: 'Entrada', out: 'Salida', transfer_in: 'Transf. (entrada)', transfer_out: 'Transf. (salida)', adjustment: 'Ajuste' };
+  const typeColors = { in: '#155724', out: '#721c24', transfer_in: '#0c5460', transfer_out: '#856404', adjustment: '#004085' };
+  let html = '<table class="record-list"><thead><tr><th>Fecha</th><th>Tipo</th><th>Producto</th><th>Depósito</th><th>Cantidad</th><th>Costo Unit.</th><th>Descripción</th></tr></thead><tbody>';
+  for (const m of list) {
+    const qty = Math.abs(m.quantity);
+    const qtyColor = m.quantity > 0 ? '#155724' : '#721c24';
+    html += '<tr><td>' + APP.esc(m.created_at || '') + '</td><td><span style="color:' + (typeColors[m.type] || '#888') + ';font-weight:bold">' + (typeLabels[m.type] || m.type) + '</span></td><td>' + APP.esc(m.item_code) + ' - ' + APP.esc(m.item_name) + '</td><td>' + APP.esc(m.warehouse_name) + '</td><td style="color:' + qtyColor + ';font-weight:bold">' + (m.quantity > 0 ? '+' : '') + qty + '</td><td>' + APP.formatMoney(m.unit_cost) + '</td><td>' + APP.esc(m.description) + '</td></tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('movContainer').innerHTML = html;
+}
+
+let itemsCache = [], whCache = [];
+
+async function openMovement(type) {
+  await loadCaches();
+  const titles = { in: 'Entrada de Stock', out: 'Salida de Stock', transfer: 'Transferencia entre Depósitos', adjust: 'Ajuste de Inventario' };
+  const title = titles[type] || 'Movimiento';
+  let body = '';
+  if (type === 'in' || type === 'out') {
+    body = '<div><label>Producto</label><select id="movItem" style="width:100%">' + itemsCache.map(i => '<option value="' + i.id + '">' + APP.esc(i.code) + ' - ' + APP.esc(i.name) + '</option>').join('') + '</select></div>' +
+      '<div><label>Depósito</label><select id="movWh" style="width:100%">' + whCache.map(w => '<option value="' + w.id + '">' + APP.esc(w.name) + '</option>').join('') + '</select></div>' +
+      '<div><label>Cantidad</label><input type="number" id="movQty" step="0.01" min="0.01"></div>' +
+      '<div><label>Costo unitario</label><input type="number" id="movCost" step="0.01" min="0"></div>' +
+      '<div><label>Descripción</label><input type="text" id="movDesc"></div>';
+  } else if (type === 'transfer') {
+    body = '<div><label>Producto</label><select id="movItem" style="width:100%">' + itemsCache.map(i => '<option value="' + i.id + '">' + APP.esc(i.code) + ' - ' + APP.esc(i.name) + '</option>').join('') + '</select></div>' +
+      '<div><label>Origen</label><select id="movFrom" style="width:100%">' + whCache.map(w => '<option value="' + w.id + '">' + APP.esc(w.name) + '</option>').join('') + '</select></div>' +
+      '<div><label>Destino</label><select id="movTo" style="width:100%">' + whCache.map(w => '<option value="' + w.id + '">' + APP.esc(w.name) + '</option>').join('') + '</select></div>' +
+      '<div><label>Cantidad</label><input type="number" id="movQty" step="0.01" min="0.01"></div>' +
+      '<div><label>Descripción</label><input type="text" id="movDesc"></div>';
+  } else if (type === 'adjust') {
+    body = '<div><label>Producto</label><select id="movItem" style="width:100%">' + itemsCache.map(i => '<option value="' + i.id + '">' + APP.esc(i.code) + ' - ' + APP.esc(i.name) + '</option>').join('') + '</select></div>' +
+      '<div><label>Depósito</label><select id="movWh" style="width:100%">' + whCache.map(w => '<option value="' + w.id + '">' + APP.esc(w.name) + '</option>').join('') + '</select></div>' +
+      '<div><label>Nueva cantidad</label><input type="number" id="movQty" step="0.01" min="0"></div>' +
+      '<div><label>Motivo</label><input type="text" id="movDesc"></div>';
+  }
+  const html = '<div class="modal-content"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>' + title + '</h2>' +
+    body +
+    '<div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="saveMovement(\'' + type + '\')">Guardar</button></div></div>';
+  APP.modal(html, '');
+}
+
+async function loadCaches() {
+  if (itemsCache.length > 0 && whCache.length > 0) return;
+  try {
+    const [itemsData, whData] = await Promise.all([API.get('/api/items'), API.get('/api/warehouses')]);
+    itemsCache = itemsData.items || [];
+    whCache = whData.warehouses || [];
+  } catch(e) {}
+}
+
+async function saveMovement(type) {
+  try {
+    const itemId = document.getElementById('movItem').value;
+    if (type === 'in') {
+      await API.post('/api/stock/in', { item_id: itemId, warehouse_id: document.getElementById('movWh').value, quantity: parseFloat(document.getElementById('movQty').value), unit_cost: parseFloat(document.getElementById('movCost').value) || 0, description: document.getElementById('movDesc').value });
+    } else if (type === 'out') {
+      await API.post('/api/stock/out', { item_id: itemId, warehouse_id: document.getElementById('movWh').value, quantity: parseFloat(document.getElementById('movQty').value), unit_cost: parseFloat(document.getElementById('movCost').value) || 0, description: document.getElementById('movDesc').value });
+    } else if (type === 'transfer') {
+      await API.post('/api/stock/transfer', { item_id: itemId, from_warehouse_id: document.getElementById('movFrom').value, to_warehouse_id: document.getElementById('movTo').value, quantity: parseFloat(document.getElementById('movQty').value), description: document.getElementById('movDesc').value });
+    } else if (type === 'adjust') {
+      await API.post('/api/stock/adjust', { item_id: itemId, warehouse_id: document.getElementById('movWh').value, new_quantity: parseFloat(document.getElementById('movQty').value), description: document.getElementById('movDesc').value });
+    }
+    document.querySelector('.modal-overlay').remove();
+    loadMovements();
+  } catch(e) { alert('Error: ' + (e.message || '')); }
+}
+</script>
+</body>
+</html>
