@@ -47,7 +47,7 @@ const APP = {
 
     const groups = [
       {
-        label: null, module: null,
+        label: 'nav_general', module: null,
         items: [
           ['dashboard.html', '📊', 'nav_dashboard', 'Panel Principal'],
           ['reports.html', '📈', 'nav_reports', 'Reportes'],
@@ -124,12 +124,22 @@ const APP = {
       }
     ];
 
+    const collapsed = this.getCollapsedGroups();
     const path = window.location.pathname;
-    let html = '<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display=\'none\'"><span>Smatic</span></div><ul>';
+    let html = '<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display=\'none\'"><span>Smatic</span></div><div class="nav-groups">';
 
     for (const group of groups) {
-      if (group.label) {
-        html += '<li class="nav-header">' + this.t(group.label, group.label) + '</li>';
+      const labelKey = group.label;
+      const labelText = labelKey ? this.t(labelKey, labelKey) : '';
+      const isCollapsed = collapsed.includes(labelKey);
+      const hasItems = group.items.some(item => {
+        const role = item[4];
+        return !role; // skip role=admin items for visibility check
+      });
+
+      html += '<ul class="nav-group' + (isCollapsed ? ' collapsed' : '') + '">';
+      if (labelKey) {
+        html += '<li class="nav-header" onclick="APP.toggleGroup(this)" data-group="' + labelKey + '">' + (isCollapsed ? '▶' : '▼') + ' ' + labelText + '</li>';
       }
       for (const item of group.items) {
         const href = item[0], icon = item[1], i18n = item[2], text = item[3], role = item[4];
@@ -140,12 +150,49 @@ const APP = {
         html += '<a href="' + href + '"><span class="nav-icon">' + icon + '</span> <span data-i18n="' + i18n + '">' + text + '</span></a>';
         html += '</li>';
       }
+      html += '</ul>';
     }
 
-    html += '</ul><div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a></div>';
+    html += '</div><div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span data-i18n="nav_logout">Cerrar Sesión</span></a></div>';
     nav.innerHTML = html;
     this.applyModuleVisibility();
     if (this.lang && Object.keys(this.lang).length > 0) this.applyLanguage();
+    this.restoreActiveGroup();
+  },
+
+  getCollapsedGroups() {
+    try {
+      const val = localStorage.getItem('nav_collapsed');
+      return val ? JSON.parse(val) : [];
+    } catch(e) { return []; }
+  },
+
+  saveCollapsedGroups(groups) {
+    localStorage.setItem('nav_collapsed', JSON.stringify(groups));
+  },
+
+  toggleGroup(el) {
+    const ul = el.closest('ul');
+    if (!ul) return;
+    ul.classList.toggle('collapsed');
+    const isCollapsed = ul.classList.contains('collapsed');
+    el.innerHTML = (isCollapsed ? '▶' : '▼') + ' ' + el.textContent.trim().replace(/^[▶▼]\s*/, '');
+    const group = el.getAttribute('data-group');
+    if (group) {
+      const collapsed = this.getCollapsedGroups();
+      const idx = collapsed.indexOf(group);
+      if (isCollapsed && idx === -1) collapsed.push(group);
+      else if (!isCollapsed && idx >= 0) collapsed.splice(idx, 1);
+      this.saveCollapsedGroups(collapsed);
+    }
+  },
+
+  restoreActiveGroup() {
+    const active = document.querySelector('.nav-item.active');
+    if (active) {
+      const ul = active.closest('ul.nav-group');
+      if (ul) ul.classList.remove('collapsed');
+    }
   },
 
   mobileSidebar() {
