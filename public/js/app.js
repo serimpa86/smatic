@@ -129,7 +129,7 @@ const APP = {
 
     for (const group of groups) {
       if (group.label) {
-        html += '<li class="nav-header" data-i18n="' + group.label + '">' + group.label + '</li>';
+        html += '<li class="nav-header">' + this.t(group.label, group.label) + '</li>';
       }
       for (const item of group.items) {
         const href = item[0], icon = item[1], i18n = item[2], text = item[3], role = item[4];
