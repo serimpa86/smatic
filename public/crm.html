@@ -29,7 +29,7 @@
 <button onclick="openActivityModal()">+ Actividad</button>
 </div></div>
 <div class="tab-bar">
-<button class="active" onclick="switchTab('pipeline',this)">Pipeline</button>
+<button class="active" onclick="switchTab('pipeline',this)" data-i18n="crm_tab_pipeline">Embudo de ventas</button>
 <button onclick="switchTab('activities',this)">Actividades</button>
 </div>
 <div class="tab-content active" id="tab-pipeline">
@@ -63,7 +63,7 @@ function switchTab(tab,btn){
   if(tab==='pipeline')loadPipeline();
   else loadActivities();
 }
-const stageLabels={lead:'Lead',qualified:'Calificado',proposal:'Propuesta',negotiation:'Negociación',won:'Ganado',lost:'Perdido'};
+const stageLabels={lead:'Prospecto',qualified:'Calificado',proposal:'Propuesta',negotiation:'Negociación',won:'Ganado',lost:'Perdido'};
 async function loadPipeline(){
   const stage=document.getElementById('stageFilter').value;
   const search=document.getElementById('searchDeal').value;

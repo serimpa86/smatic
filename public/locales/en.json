@@ -60,5 +60,6 @@
   "lang_es": "Español",
   "lang_en": "English",
   "lang_fr": "Français",
-  "setting_language": "Language"
+  "setting_language": "Language",
+  "crm_tab_pipeline": "Pipeline"
 }
