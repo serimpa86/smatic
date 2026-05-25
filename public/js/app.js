@@ -82,6 +82,14 @@ const APP = {
         module: 'hr',
         className: 'nav-hr-injected',
         before: 'li a[href="reports.html"]'
+      },
+      {
+        items: [
+          ['crm.html', '👥', 'nav_crm', 'CRM'],
+        ],
+        module: 'crm',
+        className: 'nav-crm-injected',
+        before: 'li a[href="reports.html"]'
       }
     ];
     for (const group of modules) {

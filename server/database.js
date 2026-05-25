@@ -466,6 +466,31 @@ async function initDb() {
     amount REAL NOT NULL, sort_order INTEGER DEFAULT 0
   )`);
 
+  try { exec("ALTER TABLE crm_deals ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE crm_activities ADD COLUMN company_id TEXT"); } catch (e) {}
+
+  exec(`CREATE TABLE IF NOT EXISTS crm_deals (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    customer_id TEXT, customer_name TEXT DEFAULT '',
+    title TEXT NOT NULL, value REAL DEFAULT 0,
+    stage TEXT DEFAULT 'lead' CHECK(stage IN ('lead','qualified','proposal','negotiation','won','lost')),
+    probability INTEGER DEFAULT 0, expected_close_date TEXT DEFAULT '',
+    source TEXT DEFAULT '', notes TEXT DEFAULT '',
+    assigned_to TEXT DEFAULT '', is_active INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS crm_activities (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    deal_id TEXT, customer_id TEXT,
+    type TEXT NOT NULL CHECK(type IN ('call','email','meeting','task','follow_up','note')),
+    subject TEXT NOT NULL, description TEXT DEFAULT '',
+    due_date TEXT DEFAULT '', completed INTEGER DEFAULT 0,
+    assigned_to TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
   migrateToMultiCompany();
   seed();
   save();
