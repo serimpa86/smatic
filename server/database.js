@@ -545,6 +545,84 @@ async function initDb() {
     created_at TEXT DEFAULT (datetime('now'))
   )`);
 
+  try { exec("ALTER TABLE custom_fields ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE custom_field_values ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE construction_works ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE construction_diaries ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE construction_subcontractors ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE service_contracts ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE service_visits ADD COLUMN company_id TEXT"); } catch (e) {}
+
+  exec(`CREATE TABLE IF NOT EXISTS custom_fields (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    entity_type TEXT NOT NULL, field_name TEXT NOT NULL,
+    field_type TEXT DEFAULT 'text' CHECK(field_type IN ('text','number','date','select')),
+    options TEXT DEFAULT '', sort_order INTEGER DEFAULT 0,
+    active INTEGER DEFAULT 1
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS custom_field_values (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    field_id TEXT NOT NULL, entity_id TEXT NOT NULL,
+    value TEXT DEFAULT ''
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS construction_works (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    name TEXT NOT NULL, description TEXT DEFAULT '',
+    customer_id TEXT DEFAULT '', customer_name TEXT DEFAULT '',
+    address TEXT DEFAULT '', status TEXT DEFAULT 'planning' CHECK(status IN ('planning','active','on_hold','completed','cancelled')),
+    start_date TEXT DEFAULT '', end_date TEXT DEFAULT '',
+    budget_amount REAL DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS construction_diaries (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    work_id TEXT NOT NULL, date TEXT NOT NULL DEFAULT (date('now')),
+    description TEXT DEFAULT '',
+    weather TEXT DEFAULT '', temperature TEXT DEFAULT '',
+    workers_count INTEGER DEFAULT 0,
+    supervisor TEXT DEFAULT '',
+    hours_worked REAL DEFAULT 0,
+    notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS construction_subcontractors (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    work_id TEXT NOT NULL,
+    name TEXT NOT NULL, contact TEXT DEFAULT '',
+    service TEXT DEFAULT '', contract_amount REAL DEFAULT 0,
+    paid_amount REAL DEFAULT 0,
+    start_date TEXT DEFAULT '', end_date TEXT DEFAULT '',
+    notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS service_contracts (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    customer_id TEXT DEFAULT '', customer_name TEXT DEFAULT '',
+    name TEXT NOT NULL, description TEXT DEFAULT '',
+    frequency TEXT DEFAULT 'monthly' CHECK(frequency IN ('weekly','biweekly','monthly','quarterly','semester','yearly','on_demand')),
+    status TEXT DEFAULT 'active' CHECK(status IN ('active','paused','cancelled')),
+    start_date TEXT DEFAULT '', end_date TEXT DEFAULT '',
+    price REAL DEFAULT 0, notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS service_visits (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    contract_id TEXT DEFAULT '',
+    customer_id TEXT DEFAULT '', customer_name TEXT DEFAULT '',
+    date TEXT NOT NULL DEFAULT (date('now')),
+    technician TEXT DEFAULT '', description TEXT DEFAULT '',
+    status TEXT DEFAULT 'scheduled' CHECK(status IN ('scheduled','in_progress','completed','cancelled')),
+    duration_hours REAL DEFAULT 0,
+    materials TEXT DEFAULT '', notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
   migrateToMultiCompany();
   seed();
   save();

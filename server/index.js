@@ -33,6 +33,7 @@ const payrollRoutes = require('./routes/payroll');
 const crmRoutes = require('./routes/crm');
 const posRoutes = require('./routes/pos');
 const projectsRoutes = require('./routes/projects');
+const modulesRoutes = require('./routes/modules');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -74,6 +75,7 @@ app.use('/api/payroll', payrollRoutes);
 app.use('/api/crm', crmRoutes);
 app.use('/api/pos', posRoutes);
 app.use('/api/projects', projectsRoutes);
+app.use('/api/modules', modulesRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

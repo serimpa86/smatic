@@ -1,0 +1,337 @@
+<!DOCTYPE html><html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Módulos | Smatic</title><link rel="stylesheet" href="css/main.css">
+<style>
+.module-tabs{display:flex;gap:.3em;margin-bottom:1em}
+.module-tabs button{padding:.5em 1em;border:1px solid #ddd;background:#f8f9fa;border-radius:4px 4px 0 0;cursor:pointer;font-size:.9em}
+.module-tabs button.active{background:#fff;border-bottom-color:#fff;font-weight:700}
+.module-content{display:none}.module-content.active{display:block}
+.entity-list{max-height:400px;overflow-y:auto;border:1px solid #eee;border-radius:4px}
+.entity-row{display:flex;justify-content:space-between;align-items:center;padding:.4em .6em;border-bottom:1px solid #f0f0f0;cursor:pointer}
+.entity-row:hover{background:#f0f7ff}
+.entity-row .er-name{font-weight:600}.entity-row .er-meta{font-size:.8em;color:#888}
+.sub-table{width:100%;border-collapse:collapse;font-size:.85em}
+.sub-table th{background:#f0f0f0;padding:.3em .5em;text-align:left;border-bottom:1px solid #ddd}
+.sub-table td{padding:.3em .5em;border-bottom:1px solid #eee}
+.sub-table tr:hover{background:#f8f9fa}
+.status-badge{display:inline-block;padding:.1em .4em;border-radius:3px;font-size:.75em;font-weight:600}
+.st-planning{background:#e8e8e8;color:#555}.st-active{background:#d4edda;color:#155724}
+.st-on_hold{background:#fff3cd;color:#856404}.st-completed{background:#cce5ff;color:#004085}
+.st-cancelled{background:#f8d7da;color:#721c24}
+.freq-badge{font-size:.75em;padding:.1em .4em;background:#e8e8e8;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="navigation-wrapper"><nav class="navigation">
+<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
+<ul>
+<li><a href="dashboard.html">📊 Panel Principal</a></li>
+<li><a href="customers.html">👥 Clientes</a></li>
+<li><a href="invoices.html">📄 Facturas</a></li>
+<li><a href="quotes.html">📝 Cotizaciones</a></li>
+<li><a href="credit-notes.html">📒 Notas de Crédito</a></li>
+<li><a href="payments.html">💳 Pagos</a></li>
+<li><a href="refunds.html">💸 Reembolsos</a></li>
+<li><a href="items.html">📦 Productos</a></li>
+<li><a href="reports.html">📈 Reportes</a></li>
+<li><a href="settings.html">⚙️ Configuración</a></li>
+<li id="admin-nav-link" class="hidden"><a href="admin.html">⚡ Administración</a></li>
+</ul>
+<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 Cerrar Sesión</a></div>
+</nav></div>
+<div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic - Módulos Verticales</span></div></div>
+<div class="container">
+<div class="page-header"><h1>Módulos Verticales</h1></div>
+<div class="module-tabs">
+<button class="active" onclick="switchModule('construccion',this)">🏗 Construcción</button>
+<button onclick="switchModule('servicios',this)">🔧 Servicios</button>
+<button onclick="switchModule('fields',this)">📋 Campos Personalizados</button>
+</div>
+
+<!-- Construcción -->
+<div id="mod-construccion" class="module-content active"></div>
+<!-- Servicios -->
+<div id="mod-servicios" class="module-content"></div>
+<!-- Campos Personalizados -->
+<div id="mod-fields" class="module-content"></div>
+</div>
+<script src="js/api.js"></script><script src="js/config.js"></script><script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if(!API.isAuthenticated()){window.location.href='/login.html';return;}
+  await APP.init();
+  if(APP.currentUser&&APP.currentUser.role==='superadmin')document.getElementById('admin-nav-link').classList.remove('hidden');
+  loadConstruccion();
+  loadServicios();
+  loadCustomFields();
+});
+function switchModule(name,btn){
+  document.querySelectorAll('.module-tabs button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.module-content').forEach(e=>e.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('mod-'+name).classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// CONSTRUCCIÓN
+// ══════════════════════════════════════════
+let currentWork=null;
+async function loadConstruccion(){
+  try{
+    const d=await API.get('/api/modules/construction/works');
+    renderWorks(d.works||[]);
+  }catch(e){document.getElementById('mod-construccion').innerHTML='<div style="color:#d93025">Error</div>';}
+}
+function renderWorks(works){
+  const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Obras</h2><div class="actions"><button onclick="openWorkModal(null)">+ Nueva Obra</button></div></div>'+
+    (works.length?'<div class="entity-list">'+works.map(w=>{
+      const stCls='st-'+w.status;
+      return '<div class="entity-row" onclick="openWork(\''+w.id+'\')"><div><div class="er-name">'+APP.esc(w.name)+'</div><div class="er-meta">'+(w.customer_name||'—')+' · <span class="status-badge '+stCls+'">'+(statusMap[w.status]||w.status)+'</span> · Partes: '+w.diary_count+'</div></div><div>$ '+APP.formatMoney(w.budget_amount)+'</div></div>';
+    }).join('')+'</div>':'<div style="text-align:center;padding:2em;color:#999">Sin obras registradas.</div>');
+  document.getElementById('mod-construccion').innerHTML=html;
+}
+const statusMap={planning:'Planificación',active:'Activo',on_hold:'En espera',completed:'Completado',cancelled:'Cancelado'};
+const freqMap={weekly:'Semanal',biweekly:'Quincenal',monthly:'Mensual',quarterly:'Trimestral',semester:'Semestral',yearly:'Anual',on_demand:'A demanda'};
+
+function openWorkModal(work){
+  const html='<div class="modal-content" style="max-width:500px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>'+(work?'Editar Obra':'Nueva Obra')+'</h2>'+
+    '<div class="settings-grid"><div style="grid-column:1/-1"><label>Nombre</label><input id="cwName" value="'+(work?APP.esc(work.name):'')+'"></div>'+
+    '<div style="grid-column:1/-1"><label>Descripción</label><textarea id="cwDesc">'+(work?APP.esc(work.description):'')+'</textarea></div>'+
+    '<div><label>Cliente</label><input id="cwCust" value="'+(work?APP.esc(work.customer_name):'')+'"></div>'+
+    '<div><label>Dirección</label><input id="cwAddr" value="'+(work?APP.esc(work.address):'')+'"></div>'+
+    '<div><label>Estado</label><select id="cwStatus"><option value="planning"'+(work&&work.status==='planning'?' selected':'')+'>Planificación</option><option value="active"'+(work&&work.status==='active'?' selected':'')+'>Activo</option><option value="on_hold"'+(work&&work.status==='on_hold'?' selected':'')+'>En espera</option><option value="completed"'+(work&&work.status==='completed'?' selected':'')+'>Completado</option><option value="cancelled"'+(work&&work.status==='cancelled'?' selected':'')+'>Cancelado</option></select></div>'+
+    '<div><label>Inicio</label><input type="date" id="cwStart" value="'+(work?work.start_date:'')+'"></div>'+
+    '<div><label>Fin</label><input type="date" id="cwEnd" value="'+(work?work.end_date:'')+'"></div>'+
+    '<div><label>Presupuesto</label><input type="number" step="0.01" id="cwBudget" value="'+(work?work.budget_amount:'0')+'"></div>'+
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>'+(work?'<button class="btn-secondary" style="color:#d93025" onclick="deleteWork(\''+work.id+'\')">Eliminar</button>':'')+'<button onclick="saveWork(\''+(work?work.id:'')+'\')">Guardar</button></div></div>';
+  APP.modal(html,'');
+}
+async function saveWork(id){
+  const data={name:document.getElementById('cwName').value,description:document.getElementById('cwDesc').value,customer_name:document.getElementById('cwCust').value,address:document.getElementById('cwAddr').value,status:document.getElementById('cwStatus').value,start_date:document.getElementById('cwStart').value,end_date:document.getElementById('cwEnd').value,budget_amount:parseFloat(document.getElementById('cwBudget').value)||0};
+  if(!data.name){alert('Nombre obligatorio');return;}
+  try{
+    if(id){await API.put('/api/modules/construction/works/'+id,data);}else{await API.post('/api/modules/construction/works',data);}
+    document.querySelector('.modal-overlay').remove();loadConstruccion();
+  }catch(e){alert('Error');}
+}
+async function deleteWork(id){
+  if(!confirm('Eliminar obra y todos sus partes/subcontratos?'))return;
+  try{await API.del('/api/modules/construction/works/'+id);document.querySelector('.modal-overlay').remove();loadConstruccion();}catch(e){alert('Error');}
+}
+async function openWork(id){
+  try{
+    const d=await API.get('/api/modules/construction/works/'+id);
+    currentWork=d.work;
+    const dd=await API.get('/api/modules/construction/works/'+id+'/diaries');
+    const ds=await API.get('/api/modules/construction/works/'+id+'/subcontractors');
+    showWorkDetail(currentWork,dd.diaries||[],ds.subs||[]);
+  }catch(e){alert('Error');}
+}
+function showWorkDetail(work,diaries,subs){
+  const stCls='st-'+work.status;
+  const html='<div style="margin-bottom:.5em"><button class="btn-secondary" onclick="loadConstruccion()">← Volver</button></div>'+
+    '<div style="background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:1em">'+
+    '<h2>'+APP.esc(work.name)+'</h2>'+
+    '<div style="font-size:.85em;color:#666;display:flex;gap:1em;flex-wrap:wrap;margin-bottom:.5em">'+
+    '<span><span class="status-badge '+stCls+'">'+(statusMap[work.status]||work.status)+'</span></span>'+
+    '<span>Cliente: '+(work.customer_name||'—')+'</span><span>Dirección: '+(work.address||'—')+'</span>'+
+    '<span>Presupuesto: $'+APP.formatMoney(work.budget_amount)+'</span>'+
+    '</div><div style="margin-bottom:.5em"><button onclick="openWorkModal(work)">Editar</button>&nbsp;<button onclick="openDiaryModal()">+ Parte de obra</button>&nbsp;<button onclick="openSubModal()">+ Subcontratista</button></div>'+
+
+    '<h3 style="margin:.5em 0">Partes de Obra</h3>'+
+    (diaries.length?'<table class="sub-table"><thead><tr><th>Fecha</th><th>Descripción</th><th>Clima</th><th>Trabajadores</th><th>Supervisor</th><th>Horas</th><th></th></tr></thead><tbody>'+
+    diaries.map(d=>'<tr><td>'+d.date+'</td><td>'+APP.esc(d.description.slice(0,40))+'</td><td>'+APP.esc(d.weather)+'</td><td>'+d.workers_count+'</td><td>'+APP.esc(d.supervisor)+'</td><td>'+d.hours_worked+'</td><td><button class="btn-secondary" style="min-width:auto;padding:.1em .4em;font-size:.8em" onclick="API.del(\'/api/modules/construction/diaries/'+d.id+'\');openWork(\''+work.id+'\')">✕</button></td></tr>').join('')+
+    '</tbody></table>':'<div style="color:#999;font-size:.85em;margin-bottom:.5em">Sin partes registrados.</div>')+
+
+    '<h3 style="margin:.5em 0">Subcontratistas</h3>'+
+    (subs.length?'<table class="sub-table"><thead><tr><th>Nombre</th><th>Servicio</th><th>Contacto</th><th>Contrato</th><th>Pagado</th><th></th></tr></thead><tbody>'+
+    subs.map(s=>'<tr><td>'+APP.esc(s.name)+'</td><td>'+APP.esc(s.service)+'</td><td>'+APP.esc(s.contact)+'</td><td>$'+APP.formatMoney(s.contract_amount)+'</td><td>$'+APP.formatMoney(s.paid_amount)+'</td><td><button class="btn-secondary" style="min-width:auto;padding:.1em .4em;font-size:.8em" onclick="openSubEdit(\''+s.id+'\',\''+APP.escAttr(s.name)+'\','+s.contract_amount+','+s.paid_amount+')">Editar</button></td></tr>').join('')+
+    '</tbody></table>':'<div style="color:#999;font-size:.85em">Sin subcontratistas.</div>')+
+    '</div>';
+  document.getElementById('mod-construccion').innerHTML=html;
+}
+function openDiaryModal(){
+  const html='<div class="modal-content" style="max-width:450px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>Parte de Obra</h2>'+
+    '<div class="settings-grid"><div><label>Fecha</label><input type="date" id="cdDate" value="'+new Date().toISOString().slice(0,10)+'"></div>'+
+    '<div><label>Trabajadores</label><input type="number" id="cdWorkers" value="0"></div>'+
+    '<div><label>Horas trabajadas</label><input type="number" step="0.5" id="cdHours" value="0"></div>'+
+    '<div><label>Supervisor</label><input id="cdSuper" value=""></div>'+
+    '<div><label>Clima</label><select id="cdWeather"><option value="">—</option><option value="soleado">Soleado</option><option value="nublado">Nublado</option><option value="lluvia">Lluvia</option><option value="tormenta">Tormenta</option><option value="calor">Calor extremo</option></select></div>'+
+    '<div style="grid-column:1/-1"><label>Descripción</label><textarea id="cdDesc"></textarea></div>'+
+    '<div style="grid-column:1/-1"><label>Notas</label><textarea id="cdNotes"></textarea></div>'+
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="saveDiary()">Guardar</button></div></div>';
+  APP.modal(html,'');
+}
+async function saveDiary(){
+  const data={date:document.getElementById('cdDate').value,description:document.getElementById('cdDesc').value,weather:document.getElementById('cdWeather').value,workers_count:parseInt(document.getElementById('cdWorkers').value)||0,supervisor:document.getElementById('cdSuper').value,hours_worked:parseFloat(document.getElementById('cdHours').value)||0,notes:document.getElementById('cdNotes').value};
+  try{await API.post('/api/modules/construction/works/'+currentWork.id+'/diaries',data);document.querySelector('.modal-overlay').remove();openWork(currentWork.id);}catch(e){alert('Error');}
+}
+function openSubModal(){
+  const html='<div class="modal-content" style="max-width:450px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>Nuevo Subcontratista</h2>'+
+    '<div class="settings-grid"><div style="grid-column:1/-1"><label>Nombre</label><input id="csName"></div>'+
+    '<div><label>Contacto</label><input id="csContact"></div><div><label>Servicio</label><input id="csService"></div>'+
+    '<div><label>Monto contrato</label><input type="number" step="0.01" id="csAmount" value="0"></div>'+
+    '<div><label>Inicio</label><input type="date" id="csStart"></div><div><label>Fin</label><input type="date" id="csEnd"></div>'+
+    '<div style="grid-column:1/-1"><label>Notas</label><textarea id="csNotes"></textarea></div>'+
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="saveSub()">Guardar</button></div></div>';
+  APP.modal(html,'');
+}
+async function saveSub(){
+  const data={name:document.getElementById('csName').value,contact:document.getElementById('csContact').value,service:document.getElementById('csService').value,contract_amount:parseFloat(document.getElementById('csAmount').value)||0,start_date:document.getElementById('csStart').value,end_date:document.getElementById('csEnd').value,notes:document.getElementById('csNotes').value};
+  if(!data.name){alert('Nombre obligatorio');return;}
+  try{await API.post('/api/modules/construction/works/'+currentWork.id+'/subcontractors',data);document.querySelector('.modal-overlay').remove();openWork(currentWork.id);}catch(e){alert('Error');}
+}
+async function openSubEdit(id,name,amt,paid){
+  const html='<div class="modal-content" style="max-width:450px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>Editar Subcontratista</h2>'+
+    '<div class="settings-grid"><div style="grid-column:1/-1"><label>Nombre</label><input id="csName" value="'+APP.escAttr(name)+'"></div>'+
+    '<div><label>Monto</label><input type="number" step="0.01" id="csAmount" value="'+amt+'"></div>'+
+    '<div><label>Pagado</label><input type="number" step="0.01" id="csPaid" value="'+paid+'"></div>'+
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button class="btn-secondary" style="color:#d93025" onclick="API.del(\'/api/modules/construction/subcontractors/'+id+'\');document.querySelector(\'.modal-overlay\').remove();openWork(currentWork.id)">Eliminar</button><button onclick="updateSub(\''+id+'\')">Guardar</button></div></div>';
+  APP.modal(html,'');
+}
+async function updateSub(id){
+  const data={name:document.getElementById('csName').value,contract_amount:parseFloat(document.getElementById('csAmount').value)||0,paid_amount:parseFloat(document.getElementById('csPaid').value)||0};
+  try{await API.put('/api/modules/construction/subcontractors/'+id,data);document.querySelector('.modal-overlay').remove();openWork(currentWork.id);}catch(e){alert('Error');}
+}
+
+// ══════════════════════════════════════════
+// SERVICIOS
+// ══════════════════════════════════════════
+let currentContract=null;
+async function loadServicios(){
+  try{
+    const d=await API.get('/api/modules/services/contracts');
+    renderContracts(d.contracts||[]);
+  }catch(e){document.getElementById('mod-servicios').innerHTML='<div style="color:#d93025">Error</div>';}
+}
+function renderContracts(contracts){
+  const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Contratos de Servicio</h2><div class="actions"><button onclick="openContractModal(null)">+ Nuevo Contrato</button>&nbsp;<button onclick="openVisitModal(null)">+ Visita</button></div></div>'+
+    (contracts.length?'<div class="entity-list">'+contracts.map(c=>{
+      return '<div class="entity-row" onclick="openContract(\''+c.id+'\')"><div><div class="er-name">'+APP.esc(c.name)+'</div><div class="er-meta">'+(c.customer_name||'—')+' · <span class="freq-badge">'+(freqMap[c.frequency]||c.frequency)+'</span> · $'+APP.formatMoney(c.price)+'/mes · <span class="status-badge st-'+(c.status==='active'?'active':c.status==='paused'?'on_hold':'cancelled')+'">'+(c.status==='active'?'Activo':c.status==='paused'?'Pausado':'Cancelado')+'</span> · Visitas: '+c.visit_count+'</div></div><div>$'+APP.formatMoney(c.price)+'</div></div>';
+    }).join('')+'</div>':'<div style="text-align:center;padding:2em;color:#999">Sin contratos.</div>')+
+    '<h3 style="margin-top:1em">Visitas Recientes</h3><div id="visitsList"></div>';
+  document.getElementById('mod-servicios').innerHTML=html;
+  loadVisits();
+}
+async function loadVisits(contractId){
+  let url='/api/modules/services/visits';
+  if(contractId)url+='?contract_id='+contractId;
+  try{
+    const d=await API.get(url);
+    renderVisits(d.visits||[]);
+  }catch(e){}
+}
+function renderVisits(visits){
+  const el=document.getElementById('visitsList');
+  if(!visits.length){el.innerHTML='<div style="color:#999;font-size:.85em">Sin visitas.</div>';return;}
+  el.innerHTML='<table class="sub-table"><thead><tr><th>Fecha</th><th>Cliente</th><th>Técnico</th><th>Estado</th><th>Duración</th></tr></thead><tbody>'+
+    visits.slice(0,20).map(v=>'<tr><td>'+v.date+'</td><td>'+(v.customer_name||'—')+'</td><td>'+APP.esc(v.technician)+'</td><td><span class="status-badge st-'+(v.status==='completed'?'active':v.status==='in_progress'?'on_hold':'cancelled')+'">'+(v.status==='scheduled'?'Programada':v.status==='in_progress'?'En curso':v.status==='completed'?'Completada':'Cancelada')+'</span></td><td>'+v.duration_hours+'h</td></tr>').join('')+
+    '</tbody></table>';
+}
+function openContractModal(contract){
+  const html='<div class="modal-content" style="max-width:500px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>'+(contract?'Editar Contrato':'Nuevo Contrato')+'</h2>'+
+    '<div class="settings-grid"><div style="grid-column:1/-1"><label>Nombre</label><input id="scName" value="'+(contract?APP.esc(contract.name):'')+'"></div>'+
+    '<div style="grid-column:1/-1"><label>Descripción</label><textarea id="scDesc">'+(contract?APP.esc(contract.description):'')+'</textarea></div>'+
+    '<div><label>Cliente</label><input id="scCust" value="'+(contract?APP.esc(contract.customer_name):'')+'"></div>'+
+    '<div><label>Frecuencia</label><select id="scFreq"><option value="weekly"'+(contract&&contract.frequency==='weekly'?' selected':'')+'>Semanal</option><option value="biweekly"'+(contract&&contract.frequency==='biweekly'?' selected':'')+'>Quincenal</option><option value="monthly"'+(contract&&contract.frequency==='monthly'?' selected':'')+'>Mensual</option><option value="quarterly"'+(contract&&contract.frequency==='quarterly'?' selected':'')+'>Trimestral</option><option value="semester"'+(contract&&contract.frequency==='semester'?' selected':'')+'>Semestral</option><option value="yearly"'+(contract&&contract.frequency==='yearly'?' selected':'')+'>Anual</option><option value="on_demand"'+(contract&&contract.frequency==='on_demand'?' selected':'')+'>A demanda</option></select></div>'+
+    '<div><label>Estado</label><select id="scStatus"><option value="active"'+(contract&&contract.status==='active'?' selected':'')+'>Activo</option><option value="paused"'+(contract&&contract.status==='paused'?' selected':'')+'>Pausado</option><option value="cancelled"'+(contract&&contract.status==='cancelled'?' selected':'')+'>Cancelado</option></select></div>'+
+    '<div><label>Precio</label><input type="number" step="0.01" id="scPrice" value="'+(contract?contract.price:'0')+'"></div>'+
+    '<div><label>Inicio</label><input type="date" id="scStart" value="'+(contract?contract.start_date:'')+'"></div><div><label>Fin</label><input type="date" id="scEnd" value="'+(contract?contract.end_date:'')+'"></div>'+
+    '<div style="grid-column:1/-1"><label>Notas</label><textarea id="scNotes">'+(contract?APP.esc(contract.notes):'')+'</textarea></div>'+
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>'+(contract?'<button class="btn-secondary" style="color:#d93025" onclick="deleteContract(\''+contract.id+'\')">Eliminar</button>':'')+'<button onclick="saveContract(\''+(contract?contract.id:'')+'\')">Guardar</button></div></div>';
+  APP.modal(html,'');
+}
+async function saveContract(id){
+  const data={name:document.getElementById('scName').value,description:document.getElementById('scDesc').value,customer_name:document.getElementById('scCust').value,frequency:document.getElementById('scFreq').value,status:document.getElementById('scStatus').value,price:parseFloat(document.getElementById('scPrice').value)||0,start_date:document.getElementById('scStart').value,end_date:document.getElementById('scEnd').value,notes:document.getElementById('scNotes').value};
+  if(!data.name){alert('Nombre obligatorio');return;}
+  try{if(id)await API.put('/api/modules/services/contracts/'+id,data);else await API.post('/api/modules/services/contracts',data);document.querySelector('.modal-overlay').remove();loadServicios();}catch(e){alert('Error');}
+}
+async function deleteContract(id){
+  if(!confirm('Eliminar contrato?'))return;
+  try{await API.del('/api/modules/services/contracts/'+id);document.querySelector('.modal-overlay').remove();loadServicios();}catch(e){alert('Error');}
+}
+async function openContract(id){
+  try{
+    const d=await API.get('/api/modules/services/contracts/'+id);
+    currentContract=d.contract;
+    loadVisits(id);
+    const html='<div style="margin-bottom:.5em"><button class="btn-secondary" onclick="loadServicios()">← Volver</button></div>'+
+      '<div style="background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:1em">'+
+      '<h2>'+APP.esc(d.contract.name)+'</h2>'+
+      '<div style="font-size:.85em;color:#666;display:flex;gap:1em;flex-wrap:wrap;margin-bottom:.5em">'+
+      'Cliente: '+(d.contract.customer_name||'—')+' · Frecuencia: '+(freqMap[d.contract.frequency]||d.contract.frequency)+' · Precio: $'+APP.formatMoney(d.contract.price)+'</div>'+
+      '<div style="margin-bottom:.5em"><button onclick="openContractModal(currentContract)">Editar</button>&nbsp;<button onclick="openVisitModal(\''+id+'\')">+ Visita</button></div>'+
+      '<h3>Visitas</h3><div id="visitsList"></div></div>';
+    document.getElementById('mod-servicios').innerHTML=html;
+  }catch(e){}
+}
+function openVisitModal(contractId){
+  const html='<div class="modal-content" style="max-width:450px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>Nueva Visita</h2>'+
+    '<div class="settings-grid"><div><label>Fecha</label><input type="date" id="svDate" value="'+new Date().toISOString().slice(0,10)+'"></div>'+
+    '<div><label>Técnico</label><input id="svTech"></div>'+
+    '<div><label>Horas</label><input type="number" step="0.5" id="svHours" value="0"></div>'+
+    '<div><label>Estado</label><select id="svStatus"><option value="scheduled">Programada</option><option value="in_progress">En curso</option><option value="completed">Completada</option><option value="cancelled">Cancelada</option></select></div>'+
+    '<div style="grid-column:1/-1"><label>Descripción</label><textarea id="svDesc"></textarea></div>'+
+    '<div style="grid-column:1/-1"><label>Materiales</label><textarea id="svMat"></textarea></div>'+
+    '<div style="grid-column:1/-1"><label>Notas</label><textarea id="svNotes"></textarea></div>'+
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="saveVisit(\''+(contractId||'')+'\')">Guardar</button></div></div>';
+  APP.modal(html,'');
+}
+async function saveVisit(contractId){
+  const data={contract_id:contractId||'',date:document.getElementById('svDate').value,technician:document.getElementById('svTech').value,description:document.getElementById('svDesc').value,status:document.getElementById('svStatus').value,duration_hours:parseFloat(document.getElementById('svHours').value)||0,materials:document.getElementById('svMat').value,notes:document.getElementById('svNotes').value};
+  try{await API.post('/api/modules/services/visits',data);document.querySelector('.modal-overlay').remove();if(contractId)openContract(contractId);else loadServicios();}catch(e){alert('Error');}
+}
+
+// ══════════════════════════════════════════
+// CAMPOS PERSONALIZADOS
+// ══════════════════════════════════════════
+async function loadCustomFields(){
+  try{
+    const d=await API.get('/api/modules/custom-fields');
+    renderCustomFields(d.fields||[]);
+  }catch(e){document.getElementById('mod-fields').innerHTML='<div style="color:#d93025">Error</div>';}
+}
+function renderCustomFields(fields){
+  const entities={construction_works:{label:'Obras',color:'#e8e8e8'},service_contracts:{label:'Contratos Servicio',color:'#fff3cd'},service_visits:{label:'Visitas',color:'#d4edda'},projects:{label:'Proyectos',color:'#cce5ff'},customers:{label:'Clientes',color:'#f8d7da'}};
+  const grouped={};
+  fields.forEach(f=>{if(!grouped[f.entity_type])grouped[f.entity_type]=[];grouped[f.entity_type].push(f);});
+  const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Campos Personalizados</h2><div class="actions"><button onclick="openFieldModal(null)">+ Nuevo Campo</button></div></div>'+
+    Object.entries(entities).map(([key,info])=>{
+      const flds=grouped[key]||[];
+      return '<div style="margin-bottom:.5em"><h3 style="font-size:.9em;background:'+info.color+';padding:.3em .6em;border-radius:4px">'+info.label+' ('+flds.length+')</h3>'+
+        (flds.length?'<table class="sub-table"><thead><tr><th>Campo</th><th>Tipo</th><th>Opciones</th><th>Orden</th><th>Activo</th><th></th></tr></thead><tbody>'+
+        flds.map(f=>'<tr><td>'+APP.esc(f.field_name)+'</td><td>'+f.field_type+'</td><td>'+(f.options||'—')+'</td><td>'+f.sort_order+'</td><td>'+(f.active?'✓':'✕')+'</td><td><button class="btn-secondary" style="min-width:auto;padding:.1em .4em;font-size:.8em" onclick="openFieldEdit(\''+f.id+'\',\''+APP.escAttr(f.field_name)+'\',\''+f.field_type+'\',\''+APP.escAttr(f.options)+'\','+f.sort_order+')">Editar</button></td></tr>').join('')+
+        '</tbody></table>':'<div style="color:#999;font-size:.85em">Sin campos definidos.</div></div>')+'</div>';
+    }).join('');
+  document.getElementById('mod-fields').innerHTML=html;
+}
+function openFieldModal(field){
+  const types=['text','number','date','select'];
+  const html='<div class="modal-content" style="max-width:450px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>'+(field?'Editar Campo':'Nuevo Campo')+'</h2>'+
+    '<div class="settings-grid"><div style="grid-column:1/-1"><label>Entidad</label><select id="cfEntity">'+
+    '<option value="construction_works"'+(field&&field.entity_type==='construction_works'?' selected':'')+'>Obras</option>'+
+    '<option value="service_contracts"'+(field&&field.entity_type==='service_contracts'?' selected':'')+'>Contratos Servicio</option>'+
+    '<option value="service_visits"'+(field&&field.entity_type==='service_visits'?' selected':'')+'>Visitas</option>'+
+    '<option value="projects"'+(field&&field.entity_type==='projects'?' selected':'')+'>Proyectos</option>'+
+    '<option value="customers"'+(field&&field.entity_type==='customers'?' selected':'')+'>Clientes</option>'+
+    '</select></div><div style="grid-column:1/-1"><label>Nombre del campo</label><input id="cfName" value="'+(field?APP.esc(field.field_name):'')+'"></div>'+
+    '<div><label>Tipo</label><select id="cfType">'+types.map(t=>'<option value="'+t+'"'+(field&&field.field_type===t?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'+
+    '<div><label>Orden</label><input type="number" id="cfOrder" value="'+(field?field.sort_order:'0')+'"></div>'+
+    '<div style="grid-column:1/-1"><label>Opciones (si es select, separar con comas)</label><input id="cfOpts" value="'+(field?APP.esc(field.options):'')+'"></div>'+
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>'+(field?'<button class="btn-secondary" style="color:#d93025" onclick="deleteField(\''+field.id+'\')">Eliminar</button>':'')+'<button onclick="saveField(\''+(field?field.id:'')+'\')">Guardar</button></div></div>';
+  APP.modal(html,'');
+}
+async function saveField(id){
+  const data={entity_type:document.getElementById('cfEntity').value,field_name:document.getElementById('cfName').value,field_type:document.getElementById('cfType').value,sort_order:parseInt(document.getElementById('cfOrder').value)||0,options:document.getElementById('cfOpts').value};
+  if(!data.field_name){alert('Nombre obligatorio');return;}
+  try{if(id)await API.put('/api/modules/custom-fields/'+id,data);else await API.post('/api/modules/custom-fields',data);document.querySelector('.modal-overlay').remove();loadCustomFields();}catch(e){alert('Error');}
+}
+function openFieldEdit(id,name,type,opts,order){
+  openFieldModal({id,entity_type:document.querySelector('#cfEntity').value||'construction_works',field_name:name,field_type:type,options:opts,sort_order:order});
+}
+async function deleteField(id){
+  if(!confirm('Eliminar campo?'))return;
+  try{await API.del('/api/modules/custom-fields/'+id);document.querySelector('.modal-overlay').remove();loadCustomFields();}catch(e){alert('Error');}
+}
+</script>
+</body>
+</html>

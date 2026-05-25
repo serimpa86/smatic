@@ -106,6 +106,14 @@ const APP = {
         module: 'projects',
         className: 'nav-projects-injected',
         before: 'li a[href="reports.html"]'
+      },
+      {
+        items: [
+          ['modules.html', '🧩', 'nav_modules', 'Módulos'],
+        ],
+        module: 'vertical',
+        className: 'nav-modules-injected',
+        before: 'li a[href="reports.html"]'
       }
     ];
     for (const group of modules) {
@@ -206,6 +214,10 @@ const APP = {
   esc(str) {
     if (!str) return '';
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  },
+  escAttr(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   },
 
   formatMoney(amount, symbol) {
