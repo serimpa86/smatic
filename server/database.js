@@ -426,6 +426,46 @@ async function initDb() {
     received_quantity REAL DEFAULT 0, sort_order INTEGER DEFAULT 0
   )`);
 
+  try { exec("ALTER TABLE employees ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE payroll_receipts ADD COLUMN company_id TEXT"); } catch (e) {}
+  try { exec("ALTER TABLE payroll_items ADD COLUMN company_id TEXT"); } catch (e) {}
+
+  exec(`CREATE TABLE IF NOT EXISTS employees (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    code TEXT DEFAULT '', first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL, dni TEXT DEFAULT '',
+    cuil TEXT DEFAULT '', birth_date TEXT DEFAULT '',
+    address TEXT DEFAULT '', phone TEXT DEFAULT '',
+    email TEXT DEFAULT '', position TEXT DEFAULT '',
+    department TEXT DEFAULT '', hire_date TEXT DEFAULT '',
+    termination_date TEXT DEFAULT '', salary REAL DEFAULT 0,
+    salary_type TEXT DEFAULT 'monthly' CHECK(salary_type IN ('monthly','hourly','daily')),
+    bank_name TEXT DEFAULT '', bank_account TEXT DEFAULT '',
+    cbu TEXT DEFAULT '', health_insurance TEXT DEFAULT '',
+    pension_fund TEXT DEFAULT '', union_name TEXT DEFAULT '',
+    is_active INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS payroll_receipts (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    employee_id TEXT NOT NULL, period TEXT NOT NULL,
+    receipt_number TEXT NOT NULL, date TEXT DEFAULT (date('now')),
+    gross_salary REAL DEFAULT 0, deductions REAL DEFAULT 0,
+    net_salary REAL DEFAULT 0, days_worked INTEGER DEFAULT 0,
+    absences INTEGER DEFAULT 0, overtime REAL DEFAULT 0,
+    status TEXT DEFAULT 'generated',
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+
+  exec(`CREATE TABLE IF NOT EXISTS payroll_items (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    payroll_receipt_id TEXT NOT NULL,
+    concept TEXT NOT NULL, type TEXT NOT NULL CHECK(type IN ('earning','deduction')),
+    amount REAL NOT NULL, sort_order INTEGER DEFAULT 0
+  )`);
+
   migrateToMultiCompany();
   seed();
   save();

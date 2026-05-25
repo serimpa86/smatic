@@ -28,6 +28,8 @@ const warehouseRoutes = require('./routes/warehouses');
 const stockRoutes = require('./routes/stock');
 const supplierRoutes = require('./routes/suppliers');
 const purchaseRoutes = require('./routes/purchases');
+const employeeRoutes = require('./routes/employees');
+const payrollRoutes = require('./routes/payroll');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -64,6 +66,8 @@ app.use('/api/warehouses', warehouseRoutes);
 app.use('/api/stock', stockRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/purchases', purchaseRoutes);
+app.use('/api/employees', employeeRoutes);
+app.use('/api/payroll', payrollRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

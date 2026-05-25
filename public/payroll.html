@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recibos de Sueldo | Smatic</title><link rel="stylesheet" href="css/main.css">
+<style>
+.receipt-card { border:1px solid #e0e0e0; margin-bottom:1em; background:#fff; }
+.receipt-header { padding:.75em 1em; background:#f9f9f9; border-bottom:1px solid #e0e0e0; display:flex; justify-content:space-between; align-items:center; }
+.receipt-body { padding:1em; }
+.receipt-body table { width:100%; border-collapse:collapse; font-size:.9em; }
+.receipt-body th { text-align:left; padding:.3em .5em; border-bottom:2px solid #ddd; }
+.receipt-body td { padding:.3em .5em; border-bottom:1px solid #eee; }
+</style></head>
+<body>
+<div class="navigation-wrapper"><nav class="navigation">
+<div class="sidebar-brand"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic</span></div>
+<ul>
+<li><a href="dashboard.html">📊 <span>Panel Principal</span></a></li>
+<li><a href="customers.html">👥 <span>Clientes</span></a></li>
+<li><a href="invoices.html">📄 <span>Facturas</span></a></li>
+<li><a href="quotes.html">📝 <span>Cotizaciones</span></a></li>
+<li><a href="credit-notes.html">📒 <span>Notas de Crédito</span></a></li>
+<li><a href="payments.html">💳 <span>Pagos</span></a></li>
+<li><a href="refunds.html">💸 <span>Reembolsos</span></a></li>
+<li><a href="items.html">📦 <span>Productos</span></a></li>
+<li><a href="reports.html">📈 <span>Reportes</span></a></li>
+<li><a href="settings.html">⚙️ <span>Configuración</span></a></li>
+<li id="admin-nav-link" class="hidden"><a href="admin.html">⚡ <span>Administración</span></a></li>
+</ul>
+<div class="sidebar-bottom"><a href="#" onclick="API.logout()">🚪 <span>Cerrar Sesión</span></a></div>
+</nav></div>
+<div class="header-wrapper"><div class="hamburger" onclick="document.getElementById('sidebar').style.display='block'">☰</div><div class="breadcrumbs"><img src="images/logo.png" alt="Smatic" onerror="this.style.display='none'"><span>Smatic - Recibos de Sueldo</span></div></div>
+<div class="container">
+<div class="page-header"><h1>Recibos de Sueldo</h1><div class="actions"><button onclick="openGenerate()">+ Generar Recibos</button></div></div>
+<div class="filters">
+<select id="filterPeriod" onchange="loadReceipts()"><option value="">Todos los períodos</option></select>
+<input type="date" id="filterFrom" onchange="loadReceipts()">
+<input type="date" id="filterTo" onchange="loadReceipts()">
+<button class="btn-secondary" onclick="document.getElementById('filterPeriod').value='';document.getElementById('filterFrom').value='';document.getElementById('filterTo').value='';loadReceipts()">Limpiar</button>
+</div>
+<div id="receiptsContainer"><div class="loading">Cargando...</div></div>
+</div>
+<script src="js/api.js"></script><script src="js/config.js"></script><script src="js/app.js"></script>
+<script>
+let employeesCache = [];
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!API.isAuthenticated()) { window.location.href = '/login.html'; return; }
+  await APP.init();
+  if (APP.currentUser && APP.currentUser.role === 'superadmin') document.getElementById('admin-nav-link').classList.remove('hidden');
+  await loadPeriods();
+  loadReceipts();
+});
+async function loadPeriods() {
+  try {
+    const d = await API.get('/api/payroll/periods');
+    const sel = document.getElementById('filterPeriod');
+    sel.innerHTML = '<option value="">Todos los períodos</option>' + d.periods.map(p => '<option value="' + p + '">' + p + '</option>').join('');
+  } catch(e) {}
+}
+async function loadReceipts() {
+  const period = document.getElementById('filterPeriod').value;
+  const from = document.getElementById('filterFrom').value;
+  const to = document.getElementById('filterTo').value;
+  let url = '/api/payroll?';
+  if (period) url += 'period=' + period + '&';
+  if (from) url += 'from=' + from + '&';
+  if (to) url += 'to=' + to + '&';
+  try {
+    const d = await API.get(url);
+    renderReceipts(d.receipts || []);
+  } catch(e) { document.getElementById('receiptsContainer').innerHTML = '<div style="color:#d93025">Error</div>'; }
+}
+function renderReceipts(list) {
+  if (!list.length) { document.getElementById('receiptsContainer').innerHTML = '<div style="text-align:center;padding:2em;color:#999">Sin recibos.</div>'; return; }
+  let html = list.map(r => {
+    const items = (r.items || []).map(item =>
+      '<tr><td>' + APP.esc(item.concept) + '</td><td style="color:' + (item.type === 'earning' ? '#155724' : '#d93025') + ';font-weight:bold">' + (item.type === 'earning' ? '' : '- ') + APP.formatMoney(Math.abs(item.amount)) + '</td></tr>'
+    ).join('');
+    return '<div class="receipt-card"><div class="receipt-header"><div><strong>' + APP.esc(r.receipt_number) + '</strong> — ' + APP.esc(r.last_name) + ', ' + APP.esc(r.first_name) + '<br><span style="font-size:.85em;color:#888">' + APP.esc(r.period) + ' | ' + APP.esc(r.position) + '</span></div><div style="text-align:right"><span style="font-size:1.1em;font-weight:bold">' + APP.formatMoney(r.net_salary) + '</span><br><span style="font-size:.8em;color:#d93025">Desc: ' + APP.formatMoney(r.deductions) + '</span></div></div>' +
+    '<div class="receipt-body"><table><thead><tr><th>Concepto</th><th class="text-right">Importe</th></tr></thead><tbody>' + items + '</tbody></table></div></div>';
+  }).join('');
+  document.getElementById('receiptsContainer').innerHTML = html;
+}
+async function openGenerate() {
+  try {
+    const empD = await API.get('/api/employees?active=1');
+    employeesCache = empD.employees || [];
+    if (!employeesCache.length) { alert('No hay empleados activos'); return; }
+    const now = new Date();
+    const period = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    const html = '<div class="modal-content" style="max-width:500px"><span class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">&times;</span><h2>Generar Recibos</h2>' +
+      '<div class="settings-grid">' +
+      '<div><label>Empleado</label><select id="gEmp" style="width:100%">' + employeesCache.map(e => '<option value="' + e.id + '">' + APP.esc(e.last_name) + ', ' + APP.esc(e.first_name) + '</option>').join('') + '</select></div>' +
+      '<div><label>Período</label><input type="month" id="gPeriod" value="' + period + '"></div>' +
+      '<div><label>Días trabajados</label><input type="number" id="gDays" value="30" min="1" max="31"></div>' +
+      '<div><label>Ausencias</label><input type="number" id="gAbsences" value="0" min="0"></div>' +
+      '<div><label>Horas extras</label><input type="number" id="gOvertime" value="0" min="0" step="0.5"></div>' +
+      '</div>' +
+      '<div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="generateReceipt()">Generar</button></div></div>';
+    APP.modal(html, '');
+  } catch(e) { alert('Error: ' + (e.message || '')); }
+}
+async function generateReceipt() {
+  const data = {
+    employee_id: document.getElementById('gEmp').value,
+    period: document.getElementById('gPeriod').value,
+    days_worked: parseInt(document.getElementById('gDays').value) || 30,
+    absences: parseInt(document.getElementById('gAbsences').value) || 0,
+    overtime: parseFloat(document.getElementById('gOvertime').value) || 0
+  };
+  if (!data.employee_id || !data.period) { alert('Complete todos los campos'); return; }
+  try {
+    const r = await API.post('/api/payroll/generate', data);
+    document.querySelector('.modal-overlay').remove();
+    loadReceipts();
+    loadPeriods();
+    alert('Recibo ' + r.receipt_number + ' generado. Neto: ' + APP.formatMoney(r.net_salary));
+  } catch(e) { alert('Error: ' + (e.message || '')); }
+}
+</script>
+</body>
+</html>
