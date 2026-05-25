@@ -73,8 +73,9 @@ async function loadConstruccion(){
   }catch(e){document.getElementById('mod-construccion').innerHTML='<div style="text-align:center;padding:2em;color:#d93025">Error al cargar obras. Verifique la conexión con el servidor.</div>';}
 }
 function renderWorks(works){
-  const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Obras</h2><div class="actions"><button onclick="openWorkModal(null)">+ Nueva Obra</button></div></div>'+
-    (works.length?'<div class="entity-list">'+works.map(w=>{
+const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Obras</h2><div class="actions"><button onclick="openWorkModal(null)" title="Crear una nueva obra">+ Nueva Obra</button></div></div>'+
+
+(works.length?'<div class="entity-list">'+works.map(w=>{
       const stCls='st-'+w.status;
       return '<div class="entity-row" onclick="openWork(\''+w.id+'\')"><div><div class="er-name">'+APP.esc(w.name)+'</div><div class="er-meta">'+(w.customer_name||'—')+' · <span class="status-badge '+stCls+'">'+(statusMap[w.status]||w.status)+'</span> · Partes: '+w.diary_count+'</div></div><div>$ '+APP.formatMoney(w.budget_amount)+'</div></div>';
     }).join('')+'</div>':'<div style="text-align:center;padding:2em;color:#999">Sin obras registradas.</div>');
@@ -93,7 +94,7 @@ function openWorkModal(work){
     '<div><label>Inicio</label><input type="date" id="cwStart" value="'+(work?work.start_date:'')+'"></div>'+
     '<div><label>Fin</label><input type="date" id="cwEnd" value="'+(work?work.end_date:'')+'"></div>'+
     '<div><label>Presupuesto</label><input type="number" step="0.01" id="cwBudget" value="'+(work?work.budget_amount:'0')+'"></div>'+
-    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>'+(work?'<button class="btn-secondary" style="color:#d93025" onclick="deleteWork(\''+work.id+'\')">Eliminar</button>':'')+'<button onclick="saveWork(\''+(work?work.id:'')+'\')">Guardar</button></div></div>';
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" title="Descartar cambios">Cancelar</button>'+(work?'<button class="btn-secondary" style="color:#d93025" onclick="deleteWork(\''+work.id+'\')" title="Eliminar esta obra permanentemente">Eliminar</button>':'')+'<button onclick="saveWork(\''+(work?work.id:'')+'\')" title="Guardar obra">Guardar</button></div></div>';
   APP.modal(html,'');
 }
 async function saveWork(id){
@@ -119,23 +120,24 @@ async function openWork(id){
 }
 function showWorkDetail(work,diaries,subs){
   const stCls='st-'+work.status;
-  const html='<div style="margin-bottom:.5em"><button class="btn-secondary" onclick="loadConstruccion()">← Volver</button></div>'+
+const html='<div style="margin-bottom:.5em"><button class="btn-secondary" onclick="loadConstruccion()" title="Volver al listado de obras">← Volver</button></div>'+
+
     '<div style="background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:1em">'+
     '<h2>'+APP.esc(work.name)+'</h2>'+
     '<div style="font-size:.85em;color:#666;display:flex;gap:1em;flex-wrap:wrap;margin-bottom:.5em">'+
     '<span><span class="status-badge '+stCls+'">'+(statusMap[work.status]||work.status)+'</span></span>'+
     '<span>Cliente: '+(work.customer_name||'—')+'</span><span>Dirección: '+(work.address||'—')+'</span>'+
     '<span>Presupuesto: $'+APP.formatMoney(work.budget_amount)+'</span>'+
-    '</div><div style="margin-bottom:.5em"><button onclick="openWorkModal(work)">Editar</button>&nbsp;<button onclick="openDiaryModal()">+ Parte de obra</button>&nbsp;<button onclick="openSubModal()">+ Subcontratista</button></div>'+
+    '</div><div style="margin-bottom:.5em"><button onclick="openWorkModal(work)" title="Editar datos de la obra">Editar</button>&nbsp;<button onclick="openDiaryModal()" title="Agregar parte de obra diario">+ Parte de obra</button>&nbsp;<button onclick="openSubModal()" title="Agregar subcontratista a la obra">+ Subcontratista</button></div>'+
 
     '<h3 style="margin:.5em 0">Partes de Obra</h3>'+
     (diaries.length?'<table class="sub-table"><thead><tr><th>Fecha</th><th>Descripción</th><th>Clima</th><th>Trabajadores</th><th>Supervisor</th><th>Horas</th><th></th></tr></thead><tbody>'+
-    diaries.map(d=>'<tr><td>'+d.date+'</td><td>'+APP.esc(d.description.slice(0,40))+'</td><td>'+APP.esc(d.weather)+'</td><td>'+d.workers_count+'</td><td>'+APP.esc(d.supervisor)+'</td><td>'+d.hours_worked+'</td><td><button class="btn-secondary" style="min-width:auto;padding:.1em .4em;font-size:.8em" onclick="API.del(\'/api/modules/construction/diaries/'+d.id+'\');openWork(\''+work.id+'\')">✕</button></td></tr>').join('')+
+    diaries.map(d=>'<tr><td>'+d.date+'</td><td>'+APP.esc(d.description.slice(0,40))+'</td><td>'+APP.esc(d.weather)+'</td><td>'+d.workers_count+'</td><td>'+APP.esc(d.supervisor)+'</td><td>'+d.hours_worked+'</td><td><button class="btn-secondary" style="min-width:auto;padding:.1em .4em;font-size:.8em" onclick="API.del(\'/api/modules/construction/diaries/'+d.id+'\');openWork(\''+work.id+'\')" title="Eliminar parte de obra">✕</button></td></tr>').join('')+
     '</tbody></table>':'<div style="color:#999;font-size:.85em;margin-bottom:.5em">Sin partes registrados.</div>')+
 
     '<h3 style="margin:.5em 0">Subcontratistas</h3>'+
     (subs.length?'<table class="sub-table"><thead><tr><th>Nombre</th><th>Servicio</th><th>Contacto</th><th>Contrato</th><th>Pagado</th><th></th></tr></thead><tbody>'+
-    subs.map(s=>'<tr><td>'+APP.esc(s.name)+'</td><td>'+APP.esc(s.service)+'</td><td>'+APP.esc(s.contact)+'</td><td>$'+APP.formatMoney(s.contract_amount)+'</td><td>$'+APP.formatMoney(s.paid_amount)+'</td><td><button class="btn-secondary" style="min-width:auto;padding:.1em .4em;font-size:.8em" onclick="openSubEdit(\''+s.id+'\',\''+APP.escAttr(s.name)+'\','+s.contract_amount+','+s.paid_amount+')">Editar</button></td></tr>').join('')+
+    subs.map(s=>'<tr><td>'+APP.esc(s.name)+'</td><td>'+APP.esc(s.service)+'</td><td>'+APP.esc(s.contact)+'</td><td>$'+APP.formatMoney(s.contract_amount)+'</td><td>$'+APP.formatMoney(s.paid_amount)+'</td><td><button class="btn-secondary" style="min-width:auto;padding:.1em .4em;font-size:.8em" onclick="openSubEdit(\''+s.id+'\',\''+APP.escAttr(s.name)+'\','+s.contract_amount+','+s.paid_amount+')" title="Editar subcontratista">Editar</button></td></tr>').join('')+
     '</tbody></table>':'<div style="color:#999;font-size:.85em">Sin subcontratistas.</div>')+
     '</div>';
   document.getElementById('mod-construccion').innerHTML=html;
@@ -149,7 +151,7 @@ function openDiaryModal(){
     '<div><label>Clima</label><select id="cdWeather"><option value="">—</option><option value="soleado">Soleado</option><option value="nublado">Nublado</option><option value="lluvia">Lluvia</option><option value="tormenta">Tormenta</option><option value="calor">Calor extremo</option></select></div>'+
     '<div style="grid-column:1/-1"><label>Descripción</label><textarea id="cdDesc"></textarea></div>'+
     '<div style="grid-column:1/-1"><label>Notas</label><textarea id="cdNotes"></textarea></div>'+
-    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="saveDiary()">Guardar</button></div></div>';
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" title="Cancelar">Cancelar</button><button onclick="saveDiary()" title="Guardar parte de obra">Guardar</button></div></div>';
   APP.modal(html,'');
 }
 async function saveDiary(){
@@ -163,7 +165,7 @@ function openSubModal(){
     '<div><label>Monto contrato</label><input type="number" step="0.01" id="csAmount" value="0"></div>'+
     '<div><label>Inicio</label><input type="date" id="csStart"></div><div><label>Fin</label><input type="date" id="csEnd"></div>'+
     '<div style="grid-column:1/-1"><label>Notas</label><textarea id="csNotes"></textarea></div>'+
-    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="saveSub()">Guardar</button></div></div>';
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" title="Cancelar">Cancelar</button><button onclick="saveSub()" title="Guardar subcontratista">Guardar</button></div></div>';
   APP.modal(html,'');
 }
 async function saveSub(){
@@ -176,7 +178,7 @@ async function openSubEdit(id,name,amt,paid){
     '<div class="settings-grid"><div style="grid-column:1/-1"><label>Nombre</label><input id="csName" value="'+APP.escAttr(name)+'"></div>'+
     '<div><label>Monto</label><input type="number" step="0.01" id="csAmount" value="'+amt+'"></div>'+
     '<div><label>Pagado</label><input type="number" step="0.01" id="csPaid" value="'+paid+'"></div>'+
-    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button class="btn-secondary" style="color:#d93025" onclick="API.del(\'/api/modules/construction/subcontractors/'+id+'\');document.querySelector(\'.modal-overlay\').remove();openWork(currentWork.id)">Eliminar</button><button onclick="updateSub(\''+id+'\')">Guardar</button></div></div>';
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" title="Cancelar">Cancelar</button><button class="btn-secondary" style="color:#d93025" onclick="API.del(\'/api/modules/construction/subcontractors/'+id+'\');document.querySelector(\'.modal-overlay\').remove();openWork(currentWork.id)" title="Eliminar subcontratista">Eliminar</button><button onclick="updateSub(\''+id+'\')" title="Guardar cambios">Guardar</button></div></div>';
   APP.modal(html,'');
 }
 async function updateSub(id){
@@ -195,7 +197,7 @@ async function loadServicios(){
   }catch(e){document.getElementById('mod-servicios').innerHTML='<div style="text-align:center;padding:2em;color:#d93025">Error al cargar contratos. Verifique la conexión con el servidor.</div>';}
 }
 function renderContracts(contracts){
-  const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Contratos de Servicio</h2><div class="actions"><button onclick="openContractModal(null)">+ Nuevo Contrato</button>&nbsp;<button onclick="openVisitModal(null)">+ Visita</button></div></div>'+
+  const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Contratos de Servicio</h2><div class="actions"><button onclick="openContractModal(null)" title="Crear un nuevo contrato de servicio">+ Nuevo Contrato</button>&nbsp;<button onclick="openVisitModal(null)" title="Registrar una visita">+ Visita</button></div></div>'+
     (contracts.length?'<div class="entity-list">'+contracts.map(c=>{
       return '<div class="entity-row" onclick="openContract(\''+c.id+'\')"><div><div class="er-name">'+APP.esc(c.name)+'</div><div class="er-meta">'+(c.customer_name||'—')+' · <span class="freq-badge">'+(freqMap[c.frequency]||c.frequency)+'</span> · $'+APP.formatMoney(c.price)+'/mes · <span class="status-badge st-'+(c.status==='active'?'active':c.status==='paused'?'on_hold':'cancelled')+'">'+(c.status==='active'?'Activo':c.status==='paused'?'Pausado':'Cancelado')+'</span> · Visitas: '+c.visit_count+'</div></div><div>$'+APP.formatMoney(c.price)+'</div></div>';
     }).join('')+'</div>':'<div style="text-align:center;padding:2em;color:#999">Sin contratos.</div>')+
@@ -228,7 +230,7 @@ function openContractModal(contract){
     '<div><label>Precio</label><input type="number" step="0.01" id="scPrice" value="'+(contract?contract.price:'0')+'"></div>'+
     '<div><label>Inicio</label><input type="date" id="scStart" value="'+(contract?contract.start_date:'')+'"></div><div><label>Fin</label><input type="date" id="scEnd" value="'+(contract?contract.end_date:'')+'"></div>'+
     '<div style="grid-column:1/-1"><label>Notas</label><textarea id="scNotes">'+(contract?APP.esc(contract.notes):'')+'</textarea></div>'+
-    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>'+(contract?'<button class="btn-secondary" style="color:#d93025" onclick="deleteContract(\''+contract.id+'\')">Eliminar</button>':'')+'<button onclick="saveContract(\''+(contract?contract.id:'')+'\')">Guardar</button></div></div>';
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" title="Descartar cambios">Cancelar</button>'+(contract?'<button class="btn-secondary" style="color:#d93025" onclick="deleteContract(\''+contract.id+'\')" title="Eliminar este contrato">Eliminar</button>':'')+'<button onclick="saveContract(\''+(contract?contract.id:'')+'\')" title="Guardar contrato">Guardar</button></div></div>';
   APP.modal(html,'');
 }
 async function saveContract(id){
@@ -245,12 +247,12 @@ async function openContract(id){
     const d=await API.get('/api/modules/services/contracts/'+id);
     currentContract=d.contract;
     loadVisits(id);
-    const html='<div style="margin-bottom:.5em"><button class="btn-secondary" onclick="loadServicios()">← Volver</button></div>'+
+    const html='<div style="margin-bottom:.5em"><button class="btn-secondary" onclick="loadServicios()" title="Volver al listado de contratos">← Volver</button></div>'+
       '<div style="background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:1em">'+
       '<h2>'+APP.esc(d.contract.name)+'</h2>'+
       '<div style="font-size:.85em;color:#666;display:flex;gap:1em;flex-wrap:wrap;margin-bottom:.5em">'+
       'Cliente: '+(d.contract.customer_name||'—')+' · Frecuencia: '+(freqMap[d.contract.frequency]||d.contract.frequency)+' · Precio: $'+APP.formatMoney(d.contract.price)+'</div>'+
-      '<div style="margin-bottom:.5em"><button onclick="openContractModal(currentContract)">Editar</button>&nbsp;<button onclick="openVisitModal(\''+id+'\')">+ Visita</button></div>'+
+      '<div style="margin-bottom:.5em"><button onclick="openContractModal(currentContract)" title="Editar contrato">Editar</button>&nbsp;<button onclick="openVisitModal(\''+id+'\')" title="Agregar visita al contrato">+ Visita</button></div>'+
       '<h3>Visitas</h3><div id="visitsList"></div></div>';
     document.getElementById('mod-servicios').innerHTML=html;
   }catch(e){}
@@ -264,7 +266,7 @@ function openVisitModal(contractId){
     '<div style="grid-column:1/-1"><label>Descripción</label><textarea id="svDesc"></textarea></div>'+
     '<div style="grid-column:1/-1"><label>Materiales</label><textarea id="svMat"></textarea></div>'+
     '<div style="grid-column:1/-1"><label>Notas</label><textarea id="svNotes"></textarea></div>'+
-    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button><button onclick="saveVisit(\''+(contractId||'')+'\')">Guardar</button></div></div>';
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" title="Cancelar">Cancelar</button><button onclick="saveVisit(\''+(contractId||'')+'\')" title="Guardar visita">Guardar</button></div></div>';
   APP.modal(html,'');
 }
 async function saveVisit(contractId){
@@ -285,12 +287,12 @@ function renderCustomFields(fields){
   const entities={construction_works:{label:'Obras',color:'#e8e8e8'},service_contracts:{label:'Contratos Servicio',color:'#fff3cd'},service_visits:{label:'Visitas',color:'#d4edda'},projects:{label:'Proyectos',color:'#cce5ff'},customers:{label:'Clientes',color:'#f8d7da'}};
   const grouped={};
   fields.forEach(f=>{if(!grouped[f.entity_type])grouped[f.entity_type]=[];grouped[f.entity_type].push(f);});
-  const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Campos Personalizados</h2><div class="actions"><button onclick="openFieldModal(null)">+ Nuevo Campo</button></div></div>'+
+  const html='<div class="page-header" style="border:none;margin:0"><h2 style="font-size:1em">Campos Personalizados</h2><div class="actions"><button onclick="openFieldModal(null)" title="Crear un nuevo campo personalizado">+ Nuevo Campo</button></div></div>'+
     Object.entries(entities).map(([key,info])=>{
       const flds=grouped[key]||[];
       return '<div style="margin-bottom:.5em"><h3 style="font-size:.9em;background:'+info.color+';padding:.3em .6em;border-radius:4px">'+info.label+' ('+flds.length+')</h3>'+
         (flds.length?'<table class="sub-table"><thead><tr><th>Campo</th><th>Tipo</th><th>Opciones</th><th>Orden</th><th>Activo</th><th></th></tr></thead><tbody>'+
-        flds.map(f=>'<tr><td>'+APP.esc(f.field_name)+'</td><td>'+f.field_type+'</td><td>'+(f.options||'—')+'</td><td>'+f.sort_order+'</td><td>'+(f.active?'✓':'✕')+'</td><td><button class="btn-secondary" style="min-width:auto;padding:.1em .4em;font-size:.8em" onclick="openFieldEdit(\''+f.id+'\',\''+APP.escAttr(f.field_name)+'\',\''+f.field_type+'\',\''+APP.escAttr(f.options)+'\','+f.sort_order+')">Editar</button></td></tr>').join('')+
+        flds.map(f=>'<tr><td>'+APP.esc(f.field_name)+'</td><td>'+f.field_type+'</td><td>'+(f.options||'—')+'</td><td>'+f.sort_order+'</td><td>'+(f.active?'✓':'✕')+'</td><td><button class="btn-secondary" style="min-width:auto;padding:.1em .4em;font-size:.8em" onclick="openFieldEdit(\''+f.id+'\',\''+APP.escAttr(f.field_name)+'\',\''+f.field_type+'\',\''+APP.escAttr(f.options)+'\','+f.sort_order+')" title="Editar campo personalizado">Editar</button></td></tr>').join('')+
         '</tbody></table>':'<div style="color:#999;font-size:.85em">Sin campos definidos.</div></div>')+'</div>';
     }).join('');
   document.getElementById('mod-fields').innerHTML=html;
@@ -308,7 +310,7 @@ function openFieldModal(field){
     '<div><label>Tipo</label><select id="cfType">'+types.map(t=>'<option value="'+t+'"'+(field&&field.field_type===t?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'+
     '<div><label>Orden</label><input type="number" id="cfOrder" value="'+(field?field.sort_order:'0')+'"></div>'+
     '<div style="grid-column:1/-1"><label>Opciones (si es select, separar con comas)</label><input id="cfOpts" value="'+(field?APP.esc(field.options):'')+'"></div>'+
-    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()">Cancelar</button>'+(field?'<button class="btn-secondary" style="color:#d93025" onclick="deleteField(\''+field.id+'\')">Eliminar</button>':'')+'<button onclick="saveField(\''+(field?field.id:'')+'\')">Guardar</button></div></div>';
+    '</div><div class="modal-footer"><button class="btn-secondary" onclick="this.closest(\'.modal-overlay\').remove()" title="Descartar cambios">Cancelar</button>'+(field?'<button class="btn-secondary" style="color:#d93025" onclick="deleteField(\''+field.id+'\')" title="Eliminar campo personalizado">Eliminar</button>':'')+'<button onclick="saveField(\''+(field?field.id:'')+'\')" title="Guardar campo">Guardar</button></div></div>';
   APP.modal(html,'');
 }
 async function saveField(id){
