@@ -491,6 +491,24 @@ async function initDb() {
     created_at TEXT DEFAULT (datetime('now'))
   )`);
 
+  try { exec("ALTER TABLE pos_sessions ADD COLUMN company_id TEXT"); } catch (e) {}
+
+  exec(`CREATE TABLE IF NOT EXISTS pos_sessions (
+    id TEXT PRIMARY KEY, company_id TEXT NOT NULL,
+    session_date TEXT NOT NULL DEFAULT (date('now')),
+    opened_at TEXT DEFAULT (datetime('now')),
+    closed_at TEXT DEFAULT '',
+    opening_balance REAL DEFAULT 0,
+    closing_balance REAL DEFAULT 0,
+    cash_sales REAL DEFAULT 0,
+    card_sales REAL DEFAULT 0,
+    transfer_sales REAL DEFAULT 0,
+    other_sales REAL DEFAULT 0,
+    status TEXT DEFAULT 'open' CHECK(status IN ('open','closed')),
+    opened_by TEXT NOT NULL, closed_by TEXT DEFAULT '',
+    notes TEXT DEFAULT ''
+  )`);
+
   migrateToMultiCompany();
   seed();
   save();

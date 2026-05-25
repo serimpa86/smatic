@@ -31,6 +31,7 @@ const purchaseRoutes = require('./routes/purchases');
 const employeeRoutes = require('./routes/employees');
 const payrollRoutes = require('./routes/payroll');
 const crmRoutes = require('./routes/crm');
+const posRoutes = require('./routes/pos');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -70,6 +71,7 @@ app.use('/api/purchases', purchaseRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/crm', crmRoutes);
+app.use('/api/pos', posRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

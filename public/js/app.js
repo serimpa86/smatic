@@ -90,6 +90,14 @@ const APP = {
         module: 'crm',
         className: 'nav-crm-injected',
         before: 'li a[href="reports.html"]'
+      },
+      {
+        items: [
+          ['pos.html', '🛒', 'nav_pos', 'Punto de Venta'],
+        ],
+        module: 'pos',
+        className: 'nav-pos-injected',
+        before: 'li a[href="reports.html"]'
       }
     ];
     for (const group of modules) {
