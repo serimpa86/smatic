@@ -220,7 +220,7 @@ class AFIPClient {
     const caeMatch = data.match(/<CAE>(\d+)<\/CAE>/);
     const vencMatch = data.match(/<Vencimiento>(\d+)<\/Vencimiento>/);
     const obsMatch = data.match(/<Observaciones>([\s\S]*?)<\/Observaciones>/);
-    const errMatch = data.match(/<ErrCode>(\d+)<\/ErrCode>[\s\S]*??<ErrMsg>(.*?)<\/ErrMsg>/);
+    const errMatch = data.match(/<ErrCode>(\d+)<\/ErrCode>[\s\S]*?<ErrMsg>(.*?)<\/ErrMsg>/);
     const resultMatch = data.match(/<Resultado>(A|R)<\/Resultado>/);
 
     if (errMatch) throw new Error(`AFIP Error ${errMatch[1]}: ${errMatch[2]}`);
