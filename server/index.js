@@ -42,6 +42,22 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Redirect authenticated users from / to the app
+const jwt = require('jsonwebtoken');
+app.get('/', (req, res, next) => {
+  const auth = req.headers['authorization'];
+  const token = auth && auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (token) {
+    try {
+      if (jwt.verify(token, process.env.JWT_SECRET || 'smatic-dev-secret')) {
+        return res.redirect('/dashboard.html');
+      }
+    } catch(e) {}
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use((req, res, next) => {
